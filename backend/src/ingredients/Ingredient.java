@@ -6,13 +6,23 @@ public class Ingredient {
     private String image;
     private Date expiry;
 
-    /**
-     * Constructor for Ingredient. Needs to take in image/id?
-     */
+
     public Ingredient(String name, String image, Date expiryDate) {
         this.name = name;
         this.image = image;
         this.expiry = expiryDate;
-        // error handling, generate random id, etc
+        // error handling, generate random id (or pass in?), etc
+    }
+
+    public void selectIngredientToDelete(int userID) {
+
+    }
+
+    public void selectIngredient(Ingredient ing, int userID) {
+
+    }
+
+    void editExpiryDate() {
+
     }
 }
