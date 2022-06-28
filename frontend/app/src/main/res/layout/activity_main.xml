@@ -7,23 +7,26 @@
     tools:context=".MainActivity">
 
     <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:id="@+id/frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
     </FrameLayout>
-    
+
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:fabCradleRoundedCornerRadius="10dp"
-        android:background="@android:color/transparent"
         android:layout_gravity="bottom"
-        >
+        android:background="@android:color/transparent"
+        android:minHeight="70dp"
+        app:fabCradleRoundedCornerRadius="10dp"
+        app:fabCradleVerticalOffset="10dp">
+
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="match_parent"
@@ -31,27 +34,18 @@
             android:layout_marginEnd="16dp"
             android:background="@android:color/transparent"
             app:elevation="0dp"
+            app:itemRippleColor="@android:color/transparent"
             app:menu="@menu/bottom_navigation_menu" />
 
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fridgeFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_baseline_apps_24"
+        app:fabCustomSize="70dp"
         app:layout_anchor="@id/bottomAppBar"
-        />
+        app:maxImageSize="50dp"
+        app:srcCompat="@drawable/ic_recipez_logo" />
 
-    <!--        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"-->
-
-<!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
-<!--        android:id="@+id/bottomNavigationView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:menu="@menu/bottom_navigation_menu">-->
-
-<!--    </com.google.android.material.bottomnavigation.BottomNavigationView>-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
