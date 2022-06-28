@@ -2,4 +2,7 @@
     <string name="app_name">RecipEZ</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Profile Fragment -->
+    <string name="user_pref_name_text">Your name</string>
 </resources>

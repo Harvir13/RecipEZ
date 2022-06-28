@@ -88,11 +88,13 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 // sign in was successful
                 Log.d(TAG, "Pref Name: " + account.getDisplayName());
-                Log.d(TAG, "Email Name: " + account.getEmail());
+                // Log.d(TAG, "Email Name: " + account.getEmail());
                 // Log.d(TAG, "Given Name: " + account.getGivenName());
                 // Log.d(TAG, "Family Name: " + account.getFamilyName());
-                // Log.d(TAG, "Display Picture: " + account.getPhotoUrl());
+                Log.d(TAG, "Display Picture: " + account.getPhotoUrl());
                 Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
+                mainActivityIntent.putExtra("USER_GOOGLE_PREF_NAME", account.getDisplayName());
+                mainActivityIntent.putExtra("USER_GOOGLE_PHOTO_URL", account.getPhotoUrl().toString());
                 startActivity(mainActivityIntent);
             }
         }
