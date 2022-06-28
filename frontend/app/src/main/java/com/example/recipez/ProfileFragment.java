@@ -86,6 +86,6 @@ public class ProfileFragment extends Fragment {
         userGooglePrefNameText = view.findViewById(R.id.user_pref_name_text);
         userGooglePrefNameText.setText(userGooglePrefName);
         userGooglePhoto = view.findViewById(R.id.user_photo_image);
-        Picasso.get().load(userGooglePhotoUrl).placeholder(R.drawable.ic_recipez_logo).transform(new CircleTransform()).into(userGooglePhoto);
+        Picasso.get().load(userGooglePhotoUrl).transform(new CircleTransform()).into(userGooglePhoto);
     }
 }
