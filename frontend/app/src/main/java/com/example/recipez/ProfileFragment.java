@@ -9,10 +9,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,6 +39,7 @@ public class ProfileFragment extends Fragment {
     private String userGooglePhotoUrl;
     private TextView userGooglePrefNameText;
     private ImageView userGooglePhoto;
+    private ListView settingsList;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -87,5 +92,16 @@ public class ProfileFragment extends Fragment {
         userGooglePrefNameText.setText(userGooglePrefName);
         userGooglePhoto = view.findViewById(R.id.user_photo_image);
         Picasso.get().load(userGooglePhotoUrl).transform(new CircleTransform()).into(userGooglePhoto);
+
+        settingsList = view.findViewById(R.id.settings_list);
+//        ArrayList<String> settingsListArray = new ArrayList<>();
+//        settingsListArray.add("App settings");
+//        settingsListArray.add("Notifications");
+//        settingsListArray.add("Accessibility");
+//        settingsListArray.add("Sign out");
+        String[] settingsListArray = {"App settings", "Notifications", "Accessibility", "Sign out"};
+//        // getActivity() might be deprecated
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, settingsListArray);
+        settingsList.setAdapter(arrayAdapter);
     }
 }
