@@ -2,6 +2,7 @@ import express from 'express';
 import {MongoClient} from 'mongodb';
 
 var app = express()
+app.use(express.json())
 
 // const {MongoClient} = require("mongodb")
 const uri = "mongodb://localhost:27017"
@@ -15,7 +16,7 @@ app.get("/scanDB", async (req, res) => {
             console.log(result)
             if (result > 0) {
                 console.log("True")
-                res.json({"userExists": "True"})
+                res.send("True")
             }
             else {
                 console.log("False")

@@ -2,15 +2,15 @@ import express, { json } from 'express';
 import fetch from 'node-fetch';
 
 var app = express()
+app.use(express.json())
 
 app.get("/checkUserExists", async (req, res) => {
     try {
-
-        fetch("http://localhost:8081/scanDB/?email=test@test.com").then(response => {
-            console.log(response)
-            response.json()
-        }).then(data => {
-            // res.send(data)
+        var email = encodeURIComponenent(req.query["email"])
+        fetch("http://localhost:8081/scanDB?email=" + email).then(response =>
+            response.text()
+        ).then(data => {
+            res.send(data)
             console.log(data)
         })
     }
