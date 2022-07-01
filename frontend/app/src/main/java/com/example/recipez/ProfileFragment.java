@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -101,10 +102,22 @@ public class ProfileFragment extends Fragment {
         userGooglePhoto = view.findViewById(R.id.user_photo_image);
         Picasso.get().load(account.getPhotoUrl()).transform(new CircleTransform()).into(userGooglePhoto);
 
-        String[] settingsListArray = {"App settings", "Notifications", "Accessibility", "Sign out"};
+        String[] settingsListArray = {"App settings", "Sign out"};
         settingsList = view.findViewById(R.id.settings_list);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, settingsListArray);
         settingsList.setAdapter(arrayAdapter);
+        settingsList.setClickable(true);
+        settingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // this is so scuffed rn, pls look away
+                // (prob gonna get rid of the list/adapter all together)
+                if (i == 0) {
+                    Fragment fragment = new AppSettingsFragment();
+                    getParentFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
+                }
+            }
+        });
 
         bookmarkListButton = view.findViewById(R.id.bookmarked_list_card);
         bookmarkListButton.setOnClickListener(new View.OnClickListener() {

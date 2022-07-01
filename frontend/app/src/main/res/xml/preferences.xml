@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Pantry Settings">
+        <EditTextPreference android:title="Maximum missing ingredients per recipe"></EditTextPreference>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Display Settings">
+        <SwitchPreference android:title="Dark mode">
+        </SwitchPreference>
+    </PreferenceCategory>
+</PreferenceScreen>
