@@ -3,6 +3,7 @@ package com.example.recipez;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class ProfileFragment extends Fragment {
     private TextView userGooglePrefNameText;
     private ImageView userGooglePhoto;
     private ListView settingsList;
+    private CardView bookmarkListButton;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -103,5 +106,14 @@ public class ProfileFragment extends Fragment {
 //        // getActivity() might be deprecated
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, settingsListArray);
         settingsList.setAdapter(arrayAdapter);
+
+        bookmarkListButton = view.findViewById(R.id.bookmarked_list_card);
+        bookmarkListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new BookmarkListFragment();
+                getParentFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
+            }
+        });
     }
 }

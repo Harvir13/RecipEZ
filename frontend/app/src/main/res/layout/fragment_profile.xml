@@ -104,6 +104,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/bookmarked_list_card"
             android:layout_width="182dp"
             android:layout_height="wrap_content"
             android:clickable="true"

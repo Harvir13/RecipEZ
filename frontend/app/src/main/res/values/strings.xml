@@ -7,4 +7,7 @@
     <string name="user_pref_name_text">Your name</string>
     <string name="allergy_and_restrictions_text">Allergy and Food Restrictions</string>
     <string name="bookmarked_list_text">Bookmarked Recipes</string>
+
+    <!-- Bookmark List Fragment -->
+    <string name="bookmarked_list_title_text">Bookmarked Recipes</string>
 </resources>
