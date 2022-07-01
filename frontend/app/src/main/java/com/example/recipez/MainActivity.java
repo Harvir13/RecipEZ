@@ -27,12 +27,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            userGooglePrefName = extras.getString("USER_GOOGLE_PREF_NAME");
-            userGooglePhotoUrl = extras.getString("USER_GOOGLE_PHOTO_URL");
-        }
-
         getSupportFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
@@ -45,10 +39,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.profile:
                         fragment = new ProfileFragment();
-                        Bundle userInfoBundle = new Bundle();
-                        userInfoBundle.putString("USER_GOOGLE_PREF_NAME", userGooglePrefName);
-                        userInfoBundle.putString("USER_GOOGLE_PHOTO_URL", userGooglePhotoUrl);
-                        fragment.setArguments(userInfoBundle);
                         break;
                 }
 

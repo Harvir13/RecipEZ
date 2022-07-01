@@ -71,11 +71,6 @@ public class RecipeArrayAdapter extends ArrayAdapter<Recipe> implements Filterab
                             filteredList.add(recipe);
                         };
                     }
-
-                    Log.d(TAG, String.valueOf(filteredList.size()));
-                    for (int i = 0; i < filteredList.size(); i++) {
-                        Log.d(TAG, filteredList.get(i).title);
-                    }
                 }
             }
 

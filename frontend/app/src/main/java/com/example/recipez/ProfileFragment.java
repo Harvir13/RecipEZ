@@ -1,5 +1,6 @@
 package com.example.recipez;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
@@ -91,19 +94,15 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        userGooglePrefNameText = view.findViewById(R.id.user_pref_name_text);
-        userGooglePrefNameText.setText(userGooglePrefName);
-        userGooglePhoto = view.findViewById(R.id.user_photo_image);
-        Picasso.get().load(userGooglePhotoUrl).transform(new CircleTransform()).into(userGooglePhoto);
 
-        settingsList = view.findViewById(R.id.settings_list);
-//        ArrayList<String> settingsListArray = new ArrayList<>();
-//        settingsListArray.add("App settings");
-//        settingsListArray.add("Notifications");
-//        settingsListArray.add("Accessibility");
-//        settingsListArray.add("Sign out");
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        userGooglePrefNameText = view.findViewById(R.id.user_pref_name_text);
+        userGooglePrefNameText.setText(account.getDisplayName());
+        userGooglePhoto = view.findViewById(R.id.user_photo_image);
+        Picasso.get().load(account.getPhotoUrl()).transform(new CircleTransform()).into(userGooglePhoto);
+
         String[] settingsListArray = {"App settings", "Notifications", "Accessibility", "Sign out"};
-//        // getActivity() might be deprecated
+        settingsList = view.findViewById(R.id.settings_list);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, settingsListArray);
         settingsList.setAdapter(arrayAdapter);
 

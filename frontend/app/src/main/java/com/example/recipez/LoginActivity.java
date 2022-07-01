@@ -93,8 +93,6 @@ public class LoginActivity extends AppCompatActivity {
                 // Log.d(TAG, "Family Name: " + account.getFamilyName());
                 Log.d(TAG, "Display Picture: " + account.getPhotoUrl());
                 Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
-                mainActivityIntent.putExtra("USER_GOOGLE_PREF_NAME", account.getDisplayName());
-                mainActivityIntent.putExtra("USER_GOOGLE_PHOTO_URL", account.getPhotoUrl().toString());
                 startActivity(mainActivityIntent);
             }
         }
