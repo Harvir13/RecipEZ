@@ -16,24 +16,27 @@ import androidx.annotation.Nullable;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class RecipeArrayAdapter extends ArrayAdapter<Recipe> implements Filterable {
-    final static String TAG = "RecipeArrayAdapter";
+public class JSONArrayAdapter extends ArrayAdapter<JSONObject> implements Filterable {
+    final static String TAG = "JSONArrayAdapter";
 
     private Context mContext;
     private int mResource;
-    private ArrayList<Recipe> mObjects;
-    private ArrayList<Recipe> allObjects;
+    private ArrayList<JSONObject> allObjects;
+    private String objectType;
 
-    public RecipeArrayAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Recipe> objects) {
+    public JSONArrayAdapter(@NonNull Context context, int resource, @NonNull ArrayList<JSONObject> objects, String objectType) {
         super(context, resource, objects);
-        this.mContext = context;
-        this.mResource = resource;
-        this.mObjects = objects;
+        mContext = context;
+        mResource = resource;
         allObjects = new ArrayList<>(objects);
+        objectType = objectType;
     }
 
     @NonNull
@@ -45,8 +48,12 @@ public class RecipeArrayAdapter extends ArrayAdapter<Recipe> implements Filterab
         ImageView imageView = convertView.findViewById(R.id.recipe_image);
         TextView textView = convertView.findViewById(R.id.recipe_title);
 
-        Picasso.get().load(getItem(position).imageUrl).resize(60, 60).centerCrop().into(imageView);
-        textView.setText(getItem(position).title);
+        try {
+            Picasso.get().load(getItem(position).getString("image")).resize(60, 60).centerCrop().into(imageView);
+            textView.setText(getItem(position).getString("title"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         return convertView;
     }
@@ -55,21 +62,24 @@ public class RecipeArrayAdapter extends ArrayAdapter<Recipe> implements Filterab
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults filterResults = new FilterResults();
-            ArrayList<Recipe> filteredList = new ArrayList<Recipe>();
+            ArrayList<JSONObject> filteredList = new ArrayList<JSONObject>();
             // constraint (query) is the result from text you want to filter against
             // objects is your data set you will filter from
-
             if (allObjects != null) {
                 if (constraint == null || constraint.length() == 0) {
                     filteredList.addAll(allObjects);
                 } else {
                     for (int i = 0; i < allObjects.size(); i++) {
-                        Recipe recipe = allObjects.get(i);
-                        String recipeTitle = allObjects.get(i).title;
-
-                        if (recipeTitle.toLowerCase().contains(constraint.toString().toLowerCase().trim())) {
-                            filteredList.add(recipe);
-                        };
+                        JSONObject object = allObjects.get(i);
+                        String objectTitle = "";
+                        try {
+                            objectTitle = allObjects.get(i).getString("title");
+                            if (objectTitle.toLowerCase().contains(constraint.toString().toLowerCase().trim())) {
+                                filteredList.add(object);
+                            };
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -84,7 +94,7 @@ public class RecipeArrayAdapter extends ArrayAdapter<Recipe> implements Filterab
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             clear();
-            addAll((ArrayList<Recipe>) results.values);
+            addAll((ArrayList<JSONObject>) results.values);
 
             if (results.count > 0) {
                 notifyDataSetChanged();
@@ -95,7 +105,12 @@ public class RecipeArrayAdapter extends ArrayAdapter<Recipe> implements Filterab
 
         @Override
         public CharSequence convertResultToString(Object resultValue) {
-            return ((Recipe) resultValue).title;
+            try {
+                return ((JSONObject) resultValue).getString("title");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     };
 
@@ -105,7 +120,7 @@ public class RecipeArrayAdapter extends ArrayAdapter<Recipe> implements Filterab
     }
 
 //    @Override
-//    public Recipe getItemAtPosition() {
+//    public JSONObject getItemAtPosition() {
 //        return myFilter;
 //    }
 }

@@ -10,20 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class BookmarkListFragment extends Fragment {
     final static String TAG = "BookmarkListFragment";
@@ -122,7 +116,7 @@ public class BookmarkListFragment extends Fragment {
             "    }\n" +
             "]";
     //String[] dummyList = {"pizza", "sushi", "apple", "pancake", "egg", "feta cheese"};
-    RecipeArrayAdapter arrayAdapter;
+    JSONArrayAdapter arrayAdapter;
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -139,15 +133,15 @@ public class BookmarkListFragment extends Fragment {
 
         try {
             bookmarkedRecipesListView = view.findViewById(R.id.bookmarked_recipes_listview);
-            ArrayList<Recipe> recipes = new ArrayList<>();
             JSONArray recipesArray = new JSONArray(dummyList);
+            ArrayList<JSONObject> recipes = new ArrayList<>();
             for (int i = 0; i < recipesArray.length(); i++) {
                 JSONObject recipeObject = recipesArray.getJSONObject(i);
-                Recipe recipe = new Recipe(recipeObject.getString("title"), recipeObject.getString("image"));
-                recipes.add(recipe);
+                // Recipe recipe = new Recipe(recipeObject.getString("title"), recipeObject.getString("image"));
+                recipes.add(recipeObject);
             }
 
-            arrayAdapter = new RecipeArrayAdapter(getActivity(), R.layout.list_row_recipe, recipes);
+            arrayAdapter = new JSONArrayAdapter(getActivity(), R.layout.list_row_recipe, recipes, "recipe");
             if (bookmarkedRecipesListView != null) {
                 bookmarkedRecipesListView.setAdapter(arrayAdapter);
             }

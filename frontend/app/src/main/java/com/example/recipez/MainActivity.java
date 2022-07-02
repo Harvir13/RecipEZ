@@ -18,8 +18,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
     final static String TAG = "MainActivity";
-    private String userGooglePrefName;
-    private String userGooglePhotoUrl;
 
     Fragment fragment = new RecipesFragment();
     @Override
