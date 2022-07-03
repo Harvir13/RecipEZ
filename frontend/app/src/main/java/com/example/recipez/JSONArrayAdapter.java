@@ -1,6 +1,7 @@
 package com.example.recipez;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,9 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class JSONArrayAdapter extends ArrayAdapter<JSONObject> implements Filterable {
     final static String TAG = "JSONArrayAdapter";
@@ -33,7 +36,7 @@ public class JSONArrayAdapter extends ArrayAdapter<JSONObject> implements Filter
         mContext = context;
         mResource = resource;
         allObjects = new ArrayList<>(objects);
-        objectType = objectType;
+        this.objectType = objectType;
     }
 
     @NonNull
@@ -42,14 +45,32 @@ public class JSONArrayAdapter extends ArrayAdapter<JSONObject> implements Filter
         LayoutInflater layoutInflator = LayoutInflater.from(mContext);
         convertView = layoutInflator.inflate(mResource, parent, false);
 
-        ImageView imageView = convertView.findViewById(R.id.recipe_row_image);
-        TextView textView = convertView.findViewById(R.id.recipe_row_title);
+        if (objectType.equals("recipe")) {
+            ImageView imageView = convertView.findViewById(R.id.recipe_image);
+            TextView textView = convertView.findViewById(R.id.recipe_title);
+            Log.d(TAG, "GOT HERE");
 
-        try {
-            Picasso.get().load(getItem(position).getString("image")).resize(60, 60).centerCrop().into(imageView);
-            textView.setText(getItem(position).getString("title"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+            try {
+                Picasso.get().load(getItem(position).getString("image")).resize(60, 60).centerCrop().into(imageView);
+                textView.setText(getItem(position).getString("title"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (objectType.equals("ingredient")) {
+            ImageView ingredient_image = convertView.findViewById(R.id.ingredient_image);
+            TextView ingredient_name = convertView.findViewById(R.id.ingredient_name);
+            TextView ingredient_expiry = convertView.findViewById(R.id.ingredient_expiry);
+
+            try {
+                Picasso.get().load(getItem(position).getString("image")).resize(60, 60).centerCrop().into(ingredient_image);
+                ingredient_name.setText(getItem(position).getString("name"));
+                ingredient_expiry.setText(getItem(position).getString("expiry"));
+                Log.d(TAG, "PASSED");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e(TAG, "FAILED HERE");
+            }
         }
 
         return convertView;
