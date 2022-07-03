@@ -41,16 +41,19 @@ public class FridgeFragment extends Fragment {
     String dummyList = "[\n" +
             "    {\n" +
             "        \"name\": \"What to make for dinner tonight?? Bruschetta Style Pork & Pasta\",\n" +
-            "        \"expiry\": \"https://spoonacular.com/recipeImages/715538-312x231.jpg\"\n" +
+            "        \"image\": \"https://spoonacular.com/recipeImages/715538-312x231.jpg\",\n" +
+            "        \"expiry\": \"123456\"\n" +
             "    },\n" +
             "    {\n" +
             "        \"name\": \"Toasted\\\" Agnolotti (or Ravioli)\",\n" +
-            "        \"expiry\": \"https://spoonacular.com/recipeImages/631807-312x231.jpg\"\n" +
+            "        \"image\": \"https://spoonacular.com/recipeImages/631807-312x231.jpg\",\n" +
+            "        \"expiry\": \"123456\"\n" +
             "    },\n" +
             "    {\n" +
             "        \"name\": \"Penne with Goat Cheese and Basil\",\n" +
-            "        \"expiry\": \"https://spoonacular.com/recipeImages/655589-312x231.jpg\"\n" +
-            "    },\n" +
+            "        \"image\": \"https://spoonacular.com/recipeImages/655589-312x231.jpg\",\n" +
+            "        \"expiry\": \"123456\"\n" +
+            "    }\n" +
             "]";
 
     public FridgeFragment() {
@@ -100,15 +103,14 @@ public class FridgeFragment extends Fragment {
 
         try {
             fridgeListView = view.findViewById(R.id.fridge_listview);
-            JSONArray recipesArray = new JSONArray(dummyList);
-            ArrayList<JSONObject> recipes = new ArrayList<>();
-            for (int i = 0; i < recipesArray.length(); i++) {
-                JSONObject recipeObject = recipesArray.getJSONObject(i);
-                // Recipe recipe = new Recipe(recipeObject.getString("title"), recipeObject.getString("image"));
-                recipes.add(recipeObject);
+            JSONArray ingredientArray = new JSONArray(dummyList);
+            ArrayList<JSONObject> ingredients = new ArrayList<>();
+            for (int i = 0; i < ingredientArray.length(); i++) {
+                JSONObject ingredientObject = ingredientArray.getJSONObject(i);
+                ingredients.add(ingredientObject);
             }
 
-            arrayAdapter = new JSONArrayAdapter(getActivity(), R.layout.list_row_recipe, recipes, "recipe");
+            arrayAdapter = new JSONArrayAdapter(getActivity(), R.layout.list_row_ingredient, ingredients, "ingredient");
             if (fridgeListView != null) {
                 fridgeListView.setAdapter(arrayAdapter);
             }
