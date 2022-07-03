@@ -46,8 +46,8 @@ public class JSONArrayAdapter extends ArrayAdapter<JSONObject> implements Filter
         convertView = layoutInflator.inflate(mResource, parent, false);
 
         if (objectType.equals("recipe")) {
-            ImageView imageView = convertView.findViewById(R.id.recipe_image);
-            TextView textView = convertView.findViewById(R.id.recipe_title);
+            ImageView imageView = convertView.findViewById(R.id.recipe_row_image);
+            TextView textView = convertView.findViewById(R.id.recipe_row_title);
             Log.d(TAG, "GOT HERE");
 
             try {
