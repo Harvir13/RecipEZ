@@ -3,6 +3,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- Recipe (Main Screen) Fragment -->
+    <string name="recipe_card_placeholder_text">Recipe Name</string>
+
     <!-- Profile Fragment -->
     <string name="user_pref_name_text">Your name</string>
     <string name="allergy_and_restrictions_text">Allergy and Food Restrictions</string>

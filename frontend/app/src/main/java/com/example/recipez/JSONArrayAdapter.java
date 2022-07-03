@@ -1,7 +1,6 @@
 package com.example.recipez;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +18,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class JSONArrayAdapter extends ArrayAdapter<JSONObject> implements Filterable {
     final static String TAG = "JSONArrayAdapter";
@@ -45,8 +42,8 @@ public class JSONArrayAdapter extends ArrayAdapter<JSONObject> implements Filter
         LayoutInflater layoutInflator = LayoutInflater.from(mContext);
         convertView = layoutInflator.inflate(mResource, parent, false);
 
-        ImageView imageView = convertView.findViewById(R.id.recipe_image);
-        TextView textView = convertView.findViewById(R.id.recipe_title);
+        ImageView imageView = convertView.findViewById(R.id.recipe_row_image);
+        TextView textView = convertView.findViewById(R.id.recipe_row_title);
 
         try {
             Picasso.get().load(getItem(position).getString("image")).resize(60, 60).centerCrop().into(imageView);
