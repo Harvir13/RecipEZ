@@ -115,7 +115,6 @@ public class BookmarkListFragment extends Fragment {
             "        \"image\": \"https://spoonacular.com/recipeImages/634995-312x231.jpg\"\n" +
             "    }\n" +
             "]";
-    //String[] dummyList = {"pizza", "sushi", "apple", "pancake", "egg", "feta cheese"};
     JSONArrayAdapter arrayAdapter;
 
     @Override
@@ -137,7 +136,6 @@ public class BookmarkListFragment extends Fragment {
             ArrayList<JSONObject> recipes = new ArrayList<>();
             for (int i = 0; i < recipesArray.length(); i++) {
                 JSONObject recipeObject = recipesArray.getJSONObject(i);
-                // Recipe recipe = new Recipe(recipeObject.getString("title"), recipeObject.getString("image"));
                 recipes.add(recipeObject);
             }
 
