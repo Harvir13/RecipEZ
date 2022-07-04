@@ -5,6 +5,7 @@
 
     <!-- Recipe (Main Screen) Fragment -->
     <string name="recipe_card_placeholder_text">Recipe Name</string>
+    <string name="recipe_list_based_on_your_pantry_text">Based on your pantry</string>
 
     <!-- Profile Fragment -->
     <string name="user_pref_name_text">Your name</string>

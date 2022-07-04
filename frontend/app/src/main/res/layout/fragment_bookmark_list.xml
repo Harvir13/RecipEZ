@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <TextView
         android:id="@+id/bookmark_list_title"
         android:layout_width="wrap_content"
@@ -14,22 +13,21 @@
         android:text="@string/bookmarked_list_title_text" />
 
     <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_baseline_chevron_left" />
+        android:id="@+id/back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_baseline_chevron_left" />
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/bookmark_list_search_bar"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:iconifiedByDefault="false"
-            app:queryHint="Search bookmarked recipe" />
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/bookmark_list_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search bookmarked recipe" />
 
     <ListView
         android:id="@+id/bookmarked_recipes_listview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </ListView>
+        android:layout_height="match_parent"></ListView>
 
 </LinearLayout>

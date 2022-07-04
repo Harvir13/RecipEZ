@@ -81,7 +81,6 @@ public class RecipeDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         Bundle bundle = this.getArguments();
 
         recipeIDText = view.findViewById(R.id.recipe_id_text);
