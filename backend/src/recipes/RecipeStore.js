@@ -135,9 +135,9 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                     if (skipFilters === 0) {
                         for (let key in filters) {
                             // console.log(key)
-                            console.log(key)
-                            console.log(filters[key])
-                            console.log(data2[k][key])
+                            // console.log(key)
+                            // console.log(filters[key])
+                            // console.log(data2[k][key])
                             if (key === "cuisine") {
                                 if (!(data2[k][key].includes(filters[key]))) {
                                     include = 0
@@ -267,11 +267,11 @@ app.get("/searchRecipe", async (req, res) => {
     try {
         //TODO: check if Recipe is in cache
         var name = encodeURIComponent(req.query["recipename"])
-        fetch("http://localhost:8083/getRecipeFromAPI?recipename=" + name).then(response =>
+        fetch("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
             response.json()
-        ).then(data => {
-            res.send(data)
+        ).then (data => {
             console.log(data)
+            res.send(data)
         })
     }
     catch (err) {
@@ -286,18 +286,20 @@ app.get("/getRecipeDetails", async (req, res) => {
         //getRecipeDetails: {"ingredientsAndAmounts": ["1 lb spaghetti", ""], 
         //                    "nutritionalDetails":  {"calories": "576k","carbs": "51g","fat": "32g","protein": "20g"}, 
         //                    "instructions: [{"name": "xxx", "steps": ["Preheat the oven to 200 degrees F.", ""] }, {...} ]} 
-        fetch("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
+        console.log(req.query["recipeid"])
+        fetch("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
             response.json()
         ).then(data => {
+            console.log(data)
             var returnObj = {}
             var ingredients = []
-            for (let i = 0; i < data.length; i++) {
-                var amount = data[i]["amount"]["us"]
-                var name = data[i]["name"]
-                ingredients.push(amount["value"].toString() + amount["unit"] + name)
+            for (let i = 0; i < data["ingredients"].length; i++) {
+                var amount = data["ingredients"][i]["amount"]["us"]
+                var name = data["ingredients"][i]["name"]
+                ingredients.push(amount["value"].toString() + " " + amount["unit"] + " " + name)
             }
             returnObj["ingredientsAndAmounts"] = ingredients
-            fetch ("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/nutritionWidget.json&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
+            fetch ("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/nutritionWidget.json?apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
                 response.json()
             ).then(data => {
                 var nutrition = {}
@@ -306,7 +308,7 @@ app.get("/getRecipeDetails", async (req, res) => {
                 nutrition["fat"] = data["fat"]
                 nutrition["protein"] = data["protein"]
                 returnObj["nutritionDetails"] = nutrition
-                fetch("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/analyzedInstructions&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
+                fetch("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/analyzedInstructions?apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
                     response.json()
                 ).then(data => {
                     var instructions = []
@@ -320,6 +322,8 @@ app.get("/getRecipeDetails", async (req, res) => {
                         }
                         instructions.push(currStep)
                     }
+                    returnObj["instructions"] = instructions
+                    res.send(returnObj)
                 })
             })
         })

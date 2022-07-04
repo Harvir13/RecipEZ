@@ -47,24 +47,24 @@ app.delete("/removeFromBookmarkedList", async (req, res) => {
 })
 
 
-app.get("/getRecipeFromAPI", async (req, res) => {
-    try {
-        //req.query should contain {recipeName: xxxx}
-        var name = encodeURIComponent(req.query["recipename"])
-        console.log(name)
-        fetch("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
-            response.json()
-        ).then (data => {
-            console.log(data)
-            res.send(data)
-        })
+// app.get("/getRecipeFromAPI", async (req, res) => {
+//     try {
+//         //req.query should contain {recipeName: xxxx}
+//         var name = encodeURIComponent(req.query["recipename"])
+//         console.log(name)
+//         fetch("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
+//             response.json()
+//         ).then (data => {
+//             console.log(data)
+//             res.send(data)
+//         })
         
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
-})
+//     }
+//     catch (err) {
+//         console.log(err)
+//         res.status(400).send(err)
+//     }
+// })
 
 async function run () {
     try {
