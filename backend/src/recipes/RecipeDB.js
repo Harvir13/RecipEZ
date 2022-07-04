@@ -18,7 +18,7 @@ const client = new MongoClient(uri)
 
 app.post("/addToBookmarkedList", async (req, res) => {
     try {
-        //req.body should contain data like {userID: xxx, recipeID: xxx}
+        //req.body should contain data like {userID: xxx, recipeID: xxx, path:home/xxx}
         console.log(req.body)
         client.db("RecipeDB").collection("BookmarkedRecipes").insertOne(req.body).then(result => {
             console.log(result)
