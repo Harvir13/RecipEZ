@@ -13,13 +13,15 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:outlineAmbientShadowColor="#000000">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
             android:layout_width="380dp"
             android:layout_height="wrap_content"
             app:cardCornerRadius="15dp"
-            app:cardElevation="10dp"
+            app:cardElevation="8dp"
             app:cardUseCompatPadding="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -54,17 +56,121 @@
                     android:textAlignment="center"
                     android:textSize="16sp" />
             </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="182dp"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="15dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.061"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.387"
+            tools:cardCornerRAdius="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/allergy_and_restrictions_image"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.199"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.1"
+                    app:srcCompat="@drawable/ic_nuts_not_allowed"
+                    tools:srcCompat="@drawable/ic_nuts_not_allowed" />
+
+                <TextView
+                    android:id="@+id/allergy_and_restrictions_text"
+                    android:layout_width="178dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/allergy_and_restrictions_text"
+                    android:textAlignment="center"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
 
         </androidx.cardview.widget.CardView>
 
-        <View
-            android:id="@+id/divider"
-            android:layout_width="409dp"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider"
-            tools:layout_editor_absoluteX="1dp"
-            tools:layout_editor_absoluteY="241dp" />
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bookmarked_list_card"
+            android:layout_width="182dp"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="15dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.925"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.387"
+            tools:cardCornerRAdius="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/bookmarked_list_image"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.199"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.1"
+                    app:srcCompat="@drawable/ic_recipe_book"
+                    tools:srcCompat="@drawable/ic_recipe_book" />
+
+                <TextView
+                    android:id="@+id/bookmarked_list_text"
+                    android:layout_width="178dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/bookmarked_list_text"
+                    android:textAlignment="center"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="350dp"
+            android:layout_height="198dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.491"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.766">
+
+            <ListView
+                android:id="@+id/settings_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/settings_list_border"
+                tools:layout_editor_absoluteX="30dp"
+                tools:layout_editor_absoluteY="405dp" />
+        </RelativeLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -3,12 +3,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".RecipesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Recipes" />
+        android:orientation="vertical">
 
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/recipe_list_search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search for a recipe" />
+
+        <TextView
+            android:id="@+id/recipe_list_based_on_your_pantry_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/recipe_list_based_on_your_pantry_text"
+            android:textSize="18sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recipe_fragment_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
 </FrameLayout>

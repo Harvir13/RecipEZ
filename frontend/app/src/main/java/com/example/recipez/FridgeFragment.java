@@ -2,11 +2,21 @@ package com.example.recipez;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +24,7 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class FridgeFragment extends Fragment {
+    final static String TAG = "FridgeFragment";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -23,6 +34,27 @@ public class FridgeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private ListView fridgeListView;
+    private JSONArrayAdapter arrayAdapter;
+
+    String dummyList = "[\n" +
+            "    {\n" +
+            "        \"name\": \"What to make for dinner tonight?? Bruschetta Style Pork & Pasta\",\n" +
+            "        \"image\": \"https://spoonacular.com/recipeImages/715538-312x231.jpg\",\n" +
+            "        \"expiry\": \"123456\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "        \"name\": \"Toasted\\\" Agnolotti (or Ravioli)\",\n" +
+            "        \"image\": \"https://spoonacular.com/recipeImages/631807-312x231.jpg\",\n" +
+            "        \"expiry\": \"123456\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "        \"name\": \"Penne with Goat Cheese and Basil\",\n" +
+            "        \"image\": \"https://spoonacular.com/recipeImages/655589-312x231.jpg\",\n" +
+            "        \"expiry\": \"123456\"\n" +
+            "    }\n" +
+            "]";
 
     public FridgeFragment() {
         // Required empty public constructor
@@ -60,5 +92,32 @@ public class FridgeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_fridge, container, false);
+
+        // Maybe make API call here to get JSONArray
+
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        try {
+            fridgeListView = view.findViewById(R.id.fridge_listview);
+            JSONArray ingredientArray = new JSONArray(dummyList);
+            ArrayList<JSONObject> ingredients = new ArrayList<>();
+            for (int i = 0; i < ingredientArray.length(); i++) {
+                JSONObject ingredientObject = ingredientArray.getJSONObject(i);
+                ingredients.add(ingredientObject);
+            }
+
+            arrayAdapter = new JSONArrayAdapter(getActivity(), R.layout.list_row_ingredient, ingredients, "ingredient");
+            if (fridgeListView != null) {
+                fridgeListView.setAdapter(arrayAdapter);
+            }
+
+        } catch (JSONException e) {
+            Log.d(TAG, e.toString());
+            e.printStackTrace();
+        }
     }
 }
