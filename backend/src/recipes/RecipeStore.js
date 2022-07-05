@@ -8,7 +8,7 @@ app.use(express.json())
 app.post("/addRecipe", async (req, res) => {
     try {
         console.log(req.body)
-        //req.body should contain data like {userID: xxx, recipeID: xxx, path: home/xxx/xxx}
+        //req.body should contain data like {userID: xxx, recipeID: xxx, path: home/xxx/xxx, title: xxx, image: xxx}
         fetch("http://localhost:8083/addToBookmarkedList", {
             method: 'POST',
             headers: {
@@ -52,7 +52,35 @@ app.delete("/removeRecipe", async (req, res) => {
     }
 })
 
-//ASK GROUP HOW TO DO THIS ONE
+app.get("/getRecipes", async (req, res) => {
+    try {
+        console.log(req.query)
+        //req.query should contain data like ?userid=xxx
+        var id = encodeURIComponent(req.query["userid"])
+        fetch("http://localhost:8083/getBookmarkedRecipes?userid=" + id).then(response =>
+            response.json()
+        ).then(data => {
+            console.log(data)
+            var retList = []
+            var currItem = {}
+            for (let i = 0; i < data.length; i++) {
+                currItem["userID"] = data[i]["userID"]
+                currItem["recipeID"] = data[i]["recipeID"]
+                currItem["title"] = data[i]["title"]
+                currItem["image"] = data[i]["image"]
+                currItem["path"] = data[i]["path"]
+                console.log(currItem)
+                retList.push(currItem)
+            }
+            res.send(retList)
+            // console.log(data)
+        })  
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
 
 //req.query is of the form ?ingredients=xxx,xxx&filters=xxx,xxx&restrictions=xxx,xxx where the filters are taken as true
 app.get("/requestFilteredRecipes", async (req, res) => {
@@ -270,8 +298,18 @@ app.get("/searchRecipe", async (req, res) => {
         fetch("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
             response.json()
         ).then (data => {
-            console.log(data)
-            res.send(data)
+            // console.log(data)
+            var recipes = data["results"]
+            var hasTitles = checkForTitles(recipes)
+            var returnList = []
+            var currItem = {}
+            for (let i = 0; i < hasTitles.length; i++) {
+                currItem["title"] = hasTitles[i]["title"]
+                currItem["id"] = hasTitles[i]["id"]
+                currItem["image"] = hasTitles[i]["image"]
+                returnList.push(currItem)
+            }
+            res.send(returnList)
         })
     }
     catch (err) {

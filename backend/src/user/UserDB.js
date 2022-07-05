@@ -89,6 +89,24 @@ app.put("/updateDietaryRestrictions", async (req, res) => {
 })
 
 
+app.put("/updateDietaryRestrictions", async (req, res) => {
+    try {
+        //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx,xxx]}
+        console.log("here")
+        console.log(req.body)
+        console.log(req.body["dietaryRestrictions"])
+        client.db("UserDB").collection("Users").updateOne({"id": req.body["userID"]}, {$set: {"dietaryRestrictions": req.body["dietaryRestrictions"]}}).then(result => {
+            console.log(result)
+            res.send("Successfully updated dietary restrictions list")
+        })   
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
+
 async function run () {
     try {
         await client.connect()

@@ -46,6 +46,21 @@ app.delete("/removeFromBookmarkedList", async (req, res) => {
     }
 })
 
+app.get("/getBookmarkedRecipes", async (req, res) => {
+    try {
+        //req.query should contain data like ?userid=xxx
+        console.log(req.query)
+        client.db("RecipeDB").collection("BookmarkedRecipes").find({"userID": parseInt(req.query["userid"])}).toArray().then(result => {
+            console.log(result)
+            res.send(result)
+        })   
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
 
 // app.get("/getRecipeFromAPI", async (req, res) => {
 //     try {
