@@ -162,13 +162,13 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                     if (skipFilters === 0) {
                         for (let key in filters) {
 
-                            //THIS MIGHT NOT WORK: idk if the cuisine array is always empty, might need to do another API call for this
-                            if (key === "cuisine") {
-                                if (!(data[k][key].includes(filters[key]))) {
-                                    include = 0
-                                }
-                            }
-                            else if (filters[key] !== data[k][key]) {
+                            //THIS DOESNT WORK: I think the cuisine array is always empty
+                            // if (key === "cuisine") {
+                            //     if (!(data[k][key].includes(filters[key]))) {
+                            //         include = 0
+                            //     }
+                            // }
+                            if (filters[key] !== data[k][key]) {
                                 include = 0
                             }
                         }
@@ -275,6 +275,7 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
     }
 })
 
+//expects ?recipename=xxx
 app.get("/searchRecipe", async (req, res) => {
     try {
         //TODO: check if Recipe is in cache
@@ -301,17 +302,15 @@ app.get("/searchRecipe", async (req, res) => {
     }
 })
 
+//expects ?recipeid=xxx
 app.get("/getRecipeDetails", async (req, res) => {
     try {
-        //req.query should contain recipeid: xx
         //getRecipeDetails: {"ingredientsAndAmounts": ["1 lb spaghetti", ""], 
         //                    "nutritionalDetails":  {"calories": "576k","carbs": "51g","fat": "32g","protein": "20g"}, 
         //                    "instructions: [{"name": "xxx", "steps": ["Preheat the oven to 200 degrees F.", ""] }, {...} ]} 
-        console.log(req.query["recipeid"])
         fetch("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
             response.json()
         ).then(data => {
-            console.log(data)
             var returnObj = {}
             var ingredients = []
             for (let i = 0; i < data["ingredients"].length; i++) {
