@@ -5,7 +5,6 @@ import fetch from 'node-fetch';
 var app = express()
 app.use(express.json())
 
-// const {MongoClient} = require("mongodb")
 const uri = "mongodb://localhost:27017"
 const client = new MongoClient(uri)
 
@@ -15,10 +14,9 @@ const client = new MongoClient(uri)
 //     return null;
 // }
 
-
+//req.body should contain data like {userID: xxx, recipeID: xxx, path:/home/xxx, title: xxx, image: xxx}
 app.post("/addToBookmarkedList", async (req, res) => {
     try {
-        //req.body should contain data like {userID: xxx, recipeID: xxx, path:home/xxx}
         console.log(req.body)
         client.db("RecipeDB").collection("BookmarkedRecipes").insertOne(req.body).then(result => {
             console.log(result)
@@ -31,10 +29,10 @@ app.post("/addToBookmarkedList", async (req, res) => {
     }
 })
 
+//req.body should contain data like {userID: xxx, recipeID: xxx}
 app.delete("/removeFromBookmarkedList", async (req, res) => {
     try {
         console.log(req.body)
-        //req.body should contain data like {userID: xxx, recipeID: xxx}
         client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne(req.body).then(result => {
             console.log(result)
             res.send("Successfully deleted recipe from bookmarked list")
@@ -46,9 +44,9 @@ app.delete("/removeFromBookmarkedList", async (req, res) => {
     }
 })
 
+//req.query should contain data like ?userid=xxx
 app.get("/getBookmarkedRecipes", async (req, res) => {
     try {
-        //req.query should contain data like ?userid=xxx
         console.log(req.query)
         client.db("RecipeDB").collection("BookmarkedRecipes").find({"userID": parseInt(req.query["userid"])}).toArray().then(result => {
             console.log(result)

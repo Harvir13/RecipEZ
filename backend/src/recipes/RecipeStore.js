@@ -154,24 +154,21 @@ app.get("/requestFilteredRecipes", async (req, res) => {
 
             fetch("https://api.spoonacular.com/recipes/informationBulk?ids=" + idList + "&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response2 =>
                 response2.json()
-            ).then(data2 => {
+            ).then(data => {
                 var returnList = []
-                // console.log(data2)
                 
-                for (let k = 0; k < data2.length; k++) {
+                for (let k = 0; k < data.length; k++) {
                     var include = 1
                     if (skipFilters === 0) {
                         for (let key in filters) {
-                            // console.log(key)
-                            // console.log(key)
-                            // console.log(filters[key])
-                            // console.log(data2[k][key])
+
+                            //THIS MIGHT NOT WORK: idk if the cuisine array is always empty, might need to do another API call for this
                             if (key === "cuisine") {
-                                if (!(data2[k][key].includes(filters[key]))) {
+                                if (!(data[k][key].includes(filters[key]))) {
                                     include = 0
                                 }
                             }
-                            else if (filters[key] !== data2[k][key]) {
+                            else if (filters[key] !== data[k][key]) {
                                 include = 0
                             }
                         }
@@ -181,7 +178,6 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                         returnList.push(data[k])
                     }
                 }
-                // console.log(returnList)
                 var recipesWithTitles = checkForTitles(returnList)
                 var retList = []
                 for (let i = 0; i < recipesWithTitles.length; i++) {
@@ -214,10 +210,10 @@ function checkForTitles(recipeList) {
     return hasTitle
 }
 
+//expects ?ingredientsinpantry=xxx,xxx,xx&restrictions=xxx,xxx where ingredientsinpantry is non-empty
 app.get("/generateSuggestedRecipesList", async (req, res) => {
     try {
         var ingredients = req.query["ingredientsinpantry"].split(",")
-        // console.log(ingredients[1])
 
         // do we really need this, might as well jsut give the entire list and they can be rendered accordingly
         //var maxValue = req.query["maxvalue"] 
@@ -233,22 +229,18 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
         }
 
         var skipRestrictions = 0
-        console.log(req.query["restrictions"])
         if (req.query["restrictions"] === '') {
             skipRestrictions = 1
         }
         else {
             var restrictions = req.query["restrictions"].split(",")
-            console.log(restrictions)
         }
 
 
         fetch("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
             response.json()
         ).then (data => {
-            // console.log(data)
             var recipesWithTitles = checkForTitles(data)
-            // console.log(recipesWithTitles)
             var retList = []
             var passesDietaryRestrictionsCheck
             for (let j = 0; j < recipesWithTitles.length; j++) {
@@ -257,30 +249,22 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
 
                 if (skipRestrictions === 0) {
                     var missingIngredients = recipesWithTitles[j]["missedIngredients"]
-                    // console.log(missingIngredients)
 
                     for (let a = 0; a < missingIngredients.length; a++) {
-                        // console.log(missingIngredients[a]["name"])
                         if (restrictions.indexOf(missingIngredients[a]["name"]) > -1) {
-                            // console.log(restrictions.indexOf(missingIngredients[a]["name"]))
-                            // console.log(missingIngredients[a]["name"])
                             passesDietaryRestrictionsCheck = 0
                             break
                         }
                     }
                 }
-                // console.log(passesDietaryRestrictionsCheck)
                 if (passesDietaryRestrictionsCheck === 1) {
-                    console.log("Adding " + recipesWithTitles[j]["title"] + " to ret list")
                     let currItem = {};
                     currItem["title"] = recipesWithTitles[j]["title"]
                     currItem["image"] = recipesWithTitles[j]["image"]
                     currItem["id"] = recipesWithTitles[j]["id"]
-                    // console.log(currItem)
                     retList.push(currItem)
                 }
             }
-            // console.log(retList)
             res.send(retList)
         })
 
@@ -298,7 +282,6 @@ app.get("/searchRecipe", async (req, res) => {
         fetch("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
             response.json()
         ).then (data => {
-            // console.log(data)
             var recipes = data["results"]
             var hasTitles = checkForTitles(recipes)
             var returnList = []
@@ -320,7 +303,7 @@ app.get("/searchRecipe", async (req, res) => {
 
 app.get("/getRecipeDetails", async (req, res) => {
     try {
-        //req.query should contain (recipeid: xx)
+        //req.query should contain recipeid: xx
         //getRecipeDetails: {"ingredientsAndAmounts": ["1 lb spaghetti", ""], 
         //                    "nutritionalDetails":  {"calories": "576k","carbs": "51g","fat": "32g","protein": "20g"}, 
         //                    "instructions: [{"name": "xxx", "steps": ["Preheat the oven to 200 degrees F.", ""] }, {...} ]} 
