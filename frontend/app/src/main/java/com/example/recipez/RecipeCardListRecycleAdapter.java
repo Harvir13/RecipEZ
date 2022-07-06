@@ -52,6 +52,8 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
                     Bundle bundle = new Bundle();
                     try {
                         bundle.putInt("RECIPE_ID", recipeArrayList.get(position).getInt("id"));
+                        bundle.putString("RECIPE_TITLE", recipeArrayList.get(position).getString("title"));
+                        bundle.putString("RECIPE_IMAGE", recipeArrayList.get(position).getString("image"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

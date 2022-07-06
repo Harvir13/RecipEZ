@@ -13,6 +13,8 @@
     <string name="recipe_detail_ingredient_list">Ingredients List</string>
     <string name="recipe_detail_instructions_title">Directions</string>
     <string name="recipe_detail_instructions_list">Instructions List</string>
+    <string name="recipe_detail_nutrition_title">Nutritional Details</string>
+    <string name="recipe_detail_nutrition_list">Nutritional Details List</string>
 
     <!-- Profile Fragment -->
     <string name="user_pref_name_text">Your name</string>
