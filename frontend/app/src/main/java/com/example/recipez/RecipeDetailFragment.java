@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -38,6 +39,11 @@ public class RecipeDetailFragment extends Fragment {
     private String mParam2;
 
     private TextView recipeIDText;
+    private TextView recipeTitle;
+    private TextView recipeImage;
+    private TextView recipeIngredients;
+    private TextView recipeInstructions;
+    private Button addToBookmarkButton;
 
     public RecipeDetailFragment() {
         // Required empty public constructor
@@ -85,5 +91,15 @@ public class RecipeDetailFragment extends Fragment {
 
         recipeIDText = view.findViewById(R.id.recipe_id_text);
         recipeIDText.setText(String.valueOf(bundle.getInt("RECIPE_ID", 0)));
+
+        recipeTitle = view.findViewById(R.id.recipe_detail_title);
+
+        recipeImage = view.findViewById(R.id.recipe_detail_image);
+
+        recipeIngredients = view.findViewById(R.id.recipe_detail_ingredient_list);
+
+        recipeInstructions = view.findViewById(R.id.recipe_detail_instructions_list);
+
+
     }
 }

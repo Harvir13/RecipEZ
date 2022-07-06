@@ -179,42 +179,43 @@ public class BookmarkListFragmentNew extends Fragment {
             }
         });
 
-        // need a way to make this smart + be able to add/delete folders
+        List<String> folderNames = new ArrayList<>(); // from backend
+        folderNames.add("folder1");
+        folderNames.add("folder2");
+        folderNames.add("folder3");
+
         folderList = new ArrayList<>();
 
-        List<JSONObject> folder1Recipes = new ArrayList<>();
-        List<JSONObject> folder2Recipes = new ArrayList<>();
-        List<JSONObject> folder3Recipes = new ArrayList<>();
         List<JSONObject> uncategorizedRecipes = new ArrayList<>();
 
         try {
             JSONArray recipesArray = new JSONArray(dummyList);
-            for (int i = 0; i < recipesArray.length(); i++) {
-                JSONObject recipeObject = recipesArray.getJSONObject(i);
-                String recipeFolderPath = recipeObject.getString("path");
+            JSONArray recipesArrayCopy = recipesArray;
 
-                if (recipeFolderPath.equals("folder1")) {
-                    folder1Recipes.add(recipeObject);
-                } else if (recipeFolderPath.equals("folder2")) {
-                    folder2Recipes.add(recipeObject);
-                } else if (recipeFolderPath.equals("folder3")) {
-                    folder3Recipes.add(recipeObject);
-                } else if (recipeFolderPath.equals("")) {
-                    uncategorizedRecipes.add(recipeObject);
+            for (int i = 0; i < folderNames.size(); i++) {
+                List<JSONObject> recipesInThisFolder = new ArrayList<>();
+
+                for (int j = 0; j < recipesArrayCopy.length(); j++) {
+                    JSONObject recipeObject = recipesArrayCopy.getJSONObject(j);
+                    String recipeFolderPath = recipeObject.getString("path");
+
+                    if (recipeFolderPath.equals(folderNames.get(i))) {
+                        recipesInThisFolder.add(recipeObject);
+                    } else if (recipeFolderPath.equals("")) {
+                        uncategorizedRecipes.add(recipeObject);
+                        recipesArrayCopy.remove(j);
+                    }
                 }
+
+                BookmarkFolder thisFolder = new BookmarkFolder(recipesInThisFolder, folderNames.get(i));
+                folderList.add(thisFolder);
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        BookmarkFolder folder1 = new BookmarkFolder(folder1Recipes, "folder1");
-        BookmarkFolder folder2 = new BookmarkFolder(folder2Recipes, "folder2");
-        BookmarkFolder folder3 = new BookmarkFolder(folder3Recipes, "folder3");
         BookmarkFolder folderUncategorized = new BookmarkFolder(uncategorizedRecipes, "uncategorized");
-
-        folderList.add(folder1);
-        folderList.add(folder2);
-        folderList.add(folder3);
         folderList.add(folderUncategorized);
 
         adapter = new BookmarkFolderAdapter(folderList);
