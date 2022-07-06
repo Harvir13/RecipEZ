@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,21 +28,14 @@ import java.util.ArrayList;
 public class FridgeFragment extends Fragment {
     final static String TAG = "FridgeFragment";
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private ListView fridgeListView;
-    private JSONArrayAdapter arrayAdapter;
+    private ArrayList<JSONObject> ingredients;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     String dummyList = "[\n" +
             "    {\n" +
-            "        \"name\": \"What to make for dinner tonight?? Bruschetta Style Pork & Pasta\",\n" +
+            "        \"name\": \"Apple\",\n" +
             "        \"image\": \"https://spoonacular.com/recipeImages/715538-312x231.jpg\",\n" +
             "        \"expiry\": \"123456\"\n" +
             "    },\n" +
@@ -72,8 +67,6 @@ public class FridgeFragment extends Fragment {
     public static FridgeFragment newInstance(String param1, String param2) {
         FridgeFragment fragment = new FridgeFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -81,10 +74,6 @@ public class FridgeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -102,22 +91,23 @@ public class FridgeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         try {
-            fridgeListView = view.findViewById(R.id.fridge_listview);
             JSONArray ingredientArray = new JSONArray(dummyList);
-            ArrayList<JSONObject> ingredients = new ArrayList<>();
+            ingredients = new ArrayList<>();
             for (int i = 0; i < ingredientArray.length(); i++) {
                 JSONObject ingredientObject = ingredientArray.getJSONObject(i);
                 ingredients.add(ingredientObject);
             }
-
-            arrayAdapter = new JSONArrayAdapter(getActivity(), R.layout.list_row_ingredient, ingredients, "ingredient");
-            if (fridgeListView != null) {
-                fridgeListView.setAdapter(arrayAdapter);
-            }
-
         } catch (JSONException e) {
             Log.d(TAG, e.toString());
             e.printStackTrace();
         }
+
+        mRecyclerView = view.findViewById(R.id.fridgeRecyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mAdapter = new FridgeAdapter(ingredients);
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
     }
 }
