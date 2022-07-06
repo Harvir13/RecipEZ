@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -142,56 +144,78 @@ public class BookmarkListFragmentNew extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        bookmarkListRecyclerView = view.findViewById(R.id.bookmark_list_recycler_view);
+        // bookmarkListRecyclerView.setHasFixedSize(true);
+        bookmarkListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
         addNewFolderButton = view.findViewById(R.id.add_folder_dialog_button);
         addNewFolderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Dialog dialog = new Dialog(getActivity());
                 dialog.setContentView(R.layout.dialog_new_folder);
+
+                EditText folderNameInput = dialog.findViewById(R.id.dialog_new_folder_name_input);
+                Button confirmButton = dialog.findViewById(R.id.dialog_new_folder_confirm_button);
+                confirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String folderName = "";
+
+                        if (!folderNameInput.getText().toString().equals("")) {
+                            folderName = folderNameInput.getText().toString();
+                        } else {
+                            Toast.makeText(getActivity(), "Please enter a folder name", Toast.LENGTH_SHORT).show();
+                        }
+
+                        List<JSONObject> recipeList = new ArrayList<>();
+                        folderList.add(new BookmarkFolder(recipeList, folderName));
+                        adapter.notifyItemInserted(folderList.size() - 1);
+                        bookmarkListRecyclerView.scrollToPosition(folderList.size() - 1);
+                    }
+                });
+
                 dialog.show();
             }
         });
 
-        bookmarkListRecyclerView = view.findViewById(R.id.bookmark_list_recycler_view);
-//        bookmarkListRecyclerView.setHasFixedSize(true);
-        bookmarkListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        List<String> folderNames = new ArrayList<>(); // from backend
+        folderNames.add("folder1");
+        folderNames.add("folder2");
+        folderNames.add("folder3");
 
-        // need a way to make this smart + be able to add/delete folders
         folderList = new ArrayList<>();
 
-        List<JSONObject> folder1Recipes = new ArrayList<>();
-        List<JSONObject> folder2Recipes = new ArrayList<>();
-        List<JSONObject> folder3Recipes = new ArrayList<>();
         List<JSONObject> uncategorizedRecipes = new ArrayList<>();
 
         try {
             JSONArray recipesArray = new JSONArray(dummyList);
-            for (int i = 0; i < recipesArray.length(); i++) {
-                JSONObject recipeObject = recipesArray.getJSONObject(i);
-                String recipeFolderPath = recipeObject.getString("path");
+            JSONArray recipesArrayCopy = recipesArray;
 
-                if (recipeFolderPath.equals("folder1")) {
-                    folder1Recipes.add(recipeObject);
-                } else if (recipeFolderPath.equals("folder2")) {
-                    folder2Recipes.add(recipeObject);
-                } else if (recipeFolderPath.equals("folder3")) {
-                    folder3Recipes.add(recipeObject);
-                } else if (recipeFolderPath.equals("")) {
-                    uncategorizedRecipes.add(recipeObject);
+            for (int i = 0; i < folderNames.size(); i++) {
+                List<JSONObject> recipesInThisFolder = new ArrayList<>();
+
+                for (int j = 0; j < recipesArrayCopy.length(); j++) {
+                    JSONObject recipeObject = recipesArrayCopy.getJSONObject(j);
+                    String recipeFolderPath = recipeObject.getString("path");
+
+                    if (recipeFolderPath.equals(folderNames.get(i))) {
+                        recipesInThisFolder.add(recipeObject);
+                    } else if (recipeFolderPath.equals("")) {
+                        uncategorizedRecipes.add(recipeObject);
+                        recipesArrayCopy.remove(j);
+                    }
                 }
+
+                BookmarkFolder thisFolder = new BookmarkFolder(recipesInThisFolder, folderNames.get(i));
+                folderList.add(thisFolder);
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        BookmarkFolder folder1 = new BookmarkFolder(folder1Recipes, "folder1");
-        BookmarkFolder folder2 = new BookmarkFolder(folder2Recipes, "folder2");
-        BookmarkFolder folder3 = new BookmarkFolder(folder3Recipes, "folder3");
         BookmarkFolder folderUncategorized = new BookmarkFolder(uncategorizedRecipes, "uncategorized");
-
-        folderList.add(folder1);
-        folderList.add(folder2);
-        folderList.add(folder3);
         folderList.add(folderUncategorized);
 
         adapter = new BookmarkFolderAdapter(folderList);

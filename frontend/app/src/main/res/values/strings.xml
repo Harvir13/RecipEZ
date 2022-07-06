@@ -7,6 +7,13 @@
     <string name="recipe_card_placeholder_text">Recipe Name</string>
     <string name="recipe_list_based_on_your_pantry_text">Based on your pantry</string>
 
+    <!-- Recipe (Details) Fragment -->
+    <string name="recipe_detail_title">Recipe Title</string>
+    <string name="recipe_detail_ingredient_title">Ingredients</string>
+    <string name="recipe_detail_ingredient_list">Ingredients List</string>
+    <string name="recipe_detail_instructions_title">Directions</string>
+    <string name="recipe_detail_instructions_list">Instructions List</string>
+
     <!-- Profile Fragment -->
     <string name="user_pref_name_text">Your name</string>
     <string name="allergy_and_restrictions_text">Allergy and Food Restrictions</string>
