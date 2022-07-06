@@ -14,4 +14,9 @@
 
     <!-- Bookmark List Fragment -->
     <string name="bookmarked_list_title_text">Bookmarked Recipes</string>
+    <string name="folder_name_text">Folder name</string>
+    <string name="add_folder_dialog_button">New Folder</string>
+    <string name="dialog_new_folder_title">Create new folder</string>
+    <string name="dialog_new_folder_name_input">Enter folder name</string>
+    <string name="dialog_new_folder_confirm_button">Done</string>
 </resources>

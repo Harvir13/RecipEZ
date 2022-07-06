@@ -123,7 +123,7 @@ public class ProfileFragment extends Fragment {
         bookmarkListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragment = new BookmarkListFragment();
+                Fragment fragment = new BookmarkListFragmentNew();
                 getParentFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
             }
         });

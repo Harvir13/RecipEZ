@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="6dp">
+
+    <TextView
+        android:id="@+id/dialog_new_folder_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/dialog_new_folder_title"
+        android:textSize="16sp"/>
+
+    <EditText
+        android:id="@+id/dialog_new_folder_name_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/dialog_new_folder_name_input"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/dialog_new_folder_confirm_button"
+        android:text="@string/dialog_new_folder_confirm_button"
+        android:layout_gravity="end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
