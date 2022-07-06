@@ -181,10 +181,10 @@ public class MainActivity extends AppCompatActivity {
             // 10.0.2.2 is a special alias to localhost for developers
 
             // Request a string response from the provided URL.
-            JsonArrayRequest jsonRequest = new JsonArrayRequest
-                    (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            JsonObjectRequest jsonRequest = new JsonObjectRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                         @Override
-                        public void onResponse(JSONArray response) {
+                        public void onResponse(JSONObject response) {
                             Log.d(TAG, response.toString());
                         }
                     }, new Response.ErrorListener() {
