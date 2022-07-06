@@ -41,7 +41,7 @@ public class FridgeFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    public final class Ingredient extends FridgeFragment {
+    public final class Ingredient extends MainActivity {
         private int myStaticMember;
         private String TAG = "Ingredient Class";
 
@@ -49,14 +49,34 @@ public class FridgeFragment extends Fragment {
             myStaticMember = 1;
         }
 
-        public void requestIngredients(String userID) {
-            RequestQueue queue = Volley.newRequestQueue(getActivity());
+        public void requestIngredients(String userID, View view) {
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
             String url = "http://10.0.2.2:8083/requestIngredients?userid=" + userID;
 
             JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                 @Override
                 public void onResponse(JSONArray response) {
+                    Log.d(TAG, "got here");
+
                     Log.d(TAG, response.toString());
+                    try {
+                        ingredients = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject ingredientObject = response.getJSONObject(i);
+                            ingredients.add(ingredientObject);
+                        }
+                    } catch (JSONException e) {
+                        Log.d(TAG, e.toString());
+                        e.printStackTrace();
+                    }
+
+                    mRecyclerView = view.findViewById(R.id.fridgeRecyclerView);
+                    mRecyclerView.setHasFixedSize(true);
+                    mLayoutManager = new LinearLayoutManager(getActivity());
+                    mAdapter = new FridgeAdapter(ingredients);
+
+                    mRecyclerView.setLayoutManager(mLayoutManager);
+                    mRecyclerView.setAdapter(mAdapter);
                 }}, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
@@ -125,26 +145,6 @@ public class FridgeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         Ingredient ingredient = new Ingredient();
-        ingredient.requestIngredients("11111");
-
-        try {
-            JSONArray ingredientArray = new JSONArray(dummyList);
-            ingredients = new ArrayList<>();
-            for (int i = 0; i < ingredientArray.length(); i++) {
-                JSONObject ingredientObject = ingredientArray.getJSONObject(i);
-                ingredients.add(ingredientObject);
-            }
-        } catch (JSONException e) {
-            Log.d(TAG, e.toString());
-            e.printStackTrace();
-        }
-
-        mRecyclerView = view.findViewById(R.id.fridgeRecyclerView);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mAdapter = new FridgeAdapter(ingredients);
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
+        ingredient.requestIngredients("11111", view);
     }
 }
