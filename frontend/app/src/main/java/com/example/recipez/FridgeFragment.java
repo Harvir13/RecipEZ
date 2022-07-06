@@ -1,5 +1,6 @@
 package com.example.recipez;
 
+import android.app.Dialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,7 +13,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -27,15 +30,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link FridgeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FridgeFragment extends Fragment {
+public class FridgeFragment extends Fragment implements AddIngredientDialog.AddIngredientListener {
     final static String TAG = "FridgeFragment";
 
+    private ImageButton addIngredientButton;
     private ArrayList<JSONObject> ingredients;
     private RecyclerView mRecyclerView;
     private FridgeAdapter mAdapter;
@@ -56,8 +62,6 @@ public class FridgeFragment extends Fragment {
             JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                 @Override
                 public void onResponse(JSONArray response) {
-                    Log.d(TAG, "got here");
-
                     Log.d(TAG, response.toString());
                     try {
                         ingredients = new ArrayList<>();
@@ -71,7 +75,8 @@ public class FridgeFragment extends Fragment {
                     }
 
                     buildRecyclerView(view);
-                }}, new Response.ErrorListener() {
+                }
+            }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG, error.toString());
@@ -79,7 +84,31 @@ public class FridgeFragment extends Fragment {
             });
             queue.add(jsonRequest);
         }
+
+        public void deleteIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://10.0.2.2:8083/deleteIngredient";
+
+            Map<String, String> jsonParams = new HashMap();
+            jsonParams.put("userid", userID);
+            jsonParams.put("ingredient", ingredient);
+
+            JsonObjectRequest jsonRequest = new JsonObjectRequest
+                    (Request.Method.DELETE, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    });
+            queue.add(jsonRequest);
+        }
     }
+
 
     String dummyList = "[\n" +
             "    {\n" +
@@ -124,6 +153,18 @@ public class FridgeFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    public void addIngredient(String name, String expiry) {
+        JSONObject newIngredient = new JSONObject();
+        try {
+            newIngredient.put("name", name);
+            newIngredient.put("expiry", expiry);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        insertItem(0, newIngredient);
+    }
+
     public void buildRecyclerView(View view) {
         mRecyclerView = view.findViewById(R.id.fridgeRecyclerView);
         mRecyclerView.setHasFixedSize(true);
@@ -147,6 +188,12 @@ public class FridgeFragment extends Fragment {
     }
 
     public void removeItem(int position) {
+        Ingredient ingredient = new Ingredient();   // TODO: should we make private instance of Ingredient?
+        try {
+            ingredient.deleteIngredient("11111", ingredients.get(position).getString("name"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         ingredients.remove(position);
         mAdapter.notifyItemRemoved(position);
     }
@@ -165,7 +212,41 @@ public class FridgeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        addIngredientButton = view.findViewById(R.id.addIngredientButton);
+        addIngredientButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialog();
+            }
+        });
+
         Ingredient ingredient = new Ingredient();
         ingredient.requestIngredients("11111", view);
+    }
+
+    private void openDialog() {
+//        AddIngredientDialog addIngredientDialog = new AddIngredientDialog();
+//        addIngredientDialog.show(getActivity().getSupportFragmentManager(), "add ingredient dialog");
+
+        Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_add_ingredient);
+
+        EditText editIngredientName = dialog.findViewById(R.id.editIngredientName);
+        EditText editIngredientExpiry = dialog.findViewById(R.id.editIngredientExpiry);
+
+        Button addIngredientConfirm = dialog.findViewById(R.id.addIngredientConfirm);
+        addIngredientConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = editIngredientName.getText().toString();
+                String expiry = editIngredientExpiry.getText().toString();
+                addIngredient(name, expiry);
+                dialog.dismiss();
+
+                // TODO: add API call to add ingredient to database
+            }
+        });
+
+        dialog.show();
     }
 }

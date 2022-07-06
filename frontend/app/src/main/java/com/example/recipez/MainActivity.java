@@ -16,7 +16,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AddIngredientDialog.AddIngredientListener {
     final static String TAG = "MainActivity";
 
     Fragment fragment = new RecipesFragment();
@@ -53,5 +53,9 @@ public class MainActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
             }
         });
+    }
+
+    @Override
+    public void addIngredient(String name, String expiry) {
     }
 }
