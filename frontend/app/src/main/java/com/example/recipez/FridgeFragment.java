@@ -14,6 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +40,32 @@ public class FridgeFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    public final class Ingredient extends FridgeFragment {
+        private int myStaticMember;
+        private String TAG = "Ingredient Class";
+
+        public Ingredient() {
+            myStaticMember = 1;
+        }
+
+        public void requestIngredients(String userID) {
+            RequestQueue queue = Volley.newRequestQueue(getActivity());
+            String url = "http://10.0.2.2:8083/requestIngredients?userid=" + userID;
+
+            JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    Log.d(TAG, response.toString());
+                }}, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, error.toString());
+                }
+            });
+            queue.add(jsonRequest);
+        }
+    }
 
     String dummyList = "[\n" +
             "    {\n" +
@@ -89,6 +123,9 @@ public class FridgeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Ingredient ingredient = new Ingredient();
+        ingredient.requestIngredients("11111");
 
         try {
             JSONArray ingredientArray = new JSONArray(dummyList);
