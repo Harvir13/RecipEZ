@@ -1,6 +1,5 @@
 import express from 'express';
 import {MongoClient} from 'mongodb';
-import fetch from 'node-fetch';
 
 var app = express()
 app.use(express.json())
@@ -18,9 +17,20 @@ const client = new MongoClient(uri)
 app.post("/addToBookmarkedList", async (req, res) => {
     try {
         console.log(req.body)
-        client.db("RecipeDB").collection("BookmarkedRecipes").insertOne(req.body).then(result => {
+        var newEntry = req.body
+        newEntry["userID"] = parseInt(req.body["userID"])
+        newEntry["recipeID"] = parseInt(req.body["recipeID"])
+        client.db("RecipeDB").collection("Paths").findOne({"userID": newEntry["userID"], "path": req.body["path"]}).then(result => {
             console.log(result)
-            res.send("Successfully added recipe to bookmarked list")
+            if(result === null) {
+                client.db("RecipeDB").collection("Paths").insertOne({"userID": newEntry["userID"], "path": req.body["path"]}).then(result => {
+                    console.log(result)
+                })
+            }
+        })
+        client.db("RecipeDB").collection("BookmarkedRecipes").insertOne(newEntry).then(result => {
+            console.log(result)
+            res.send({"result": "Successfully added recipe to bookmarked list"})
         })   
     }
     catch (err) {
@@ -33,9 +43,12 @@ app.post("/addToBookmarkedList", async (req, res) => {
 app.delete("/removeFromBookmarkedList", async (req, res) => {
     try {
         console.log(req.body)
-        client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne(req.body).then(result => {
+        var entryToDelete = req.body
+        entryToDelete["userID"] = parseInt(req.body["userID"])
+        entryToDelete["recipeID"] = parseInt(req.body["recipeID"])
+        client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne(entryToDelete).then(result => {
             console.log(result)
-            res.send("Successfully deleted recipe from bookmarked list")
+            res.send({"result": "Successfully deleted recipe from bookmarked list"})
         })   
     }
     catch (err) {
@@ -50,7 +63,15 @@ app.get("/getBookmarkedRecipes", async (req, res) => {
         console.log(req.query)
         client.db("RecipeDB").collection("BookmarkedRecipes").find({"userID": parseInt(req.query["userid"])}).toArray().then(result => {
             console.log(result)
-            res.send(result)
+            client.db("RecipeDB").collection("Paths").find({"userID": parseInt(req.query["userid"])}).toArray().then(result2 => {
+                console.log(result2)
+                var retObj = {};
+                retObj["paths"] = result2
+                retObj["recipes"] = result
+                console.log(retObj)
+                res.send(retObj)
+            })
+            
         })   
     }
     catch (err) {

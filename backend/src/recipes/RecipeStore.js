@@ -1,4 +1,3 @@
-import e from 'express';
 import express from 'express';
 import fetch from 'node-fetch';
 
@@ -16,7 +15,7 @@ app.post("/addRecipe", async (req, res) => {
             },
             body: JSON.stringify(req.body)
         }).then(response =>
-            response.text()
+            response.json()
         ).then(data => {
             res.send(data)
             console.log(data)
@@ -40,7 +39,7 @@ app.delete("/removeRecipe", async (req, res) => {
             },
             body: JSON.stringify(req.body)
         }).then(response =>
-            response.text()
+            response.json()
         ).then(data => {
             res.send(data)
             console.log(data)
@@ -61,18 +60,26 @@ app.get("/getRecipes", async (req, res) => {
             response.json()
         ).then(data => {
             console.log(data)
-            var retList = []
+            var recipeList = []
+            var pathList = []
             var currItem = {}
-            for (let i = 0; i < data.length; i++) {
-                currItem["userID"] = data[i]["userID"]
-                currItem["recipeID"] = data[i]["recipeID"]
-                currItem["title"] = data[i]["title"]
-                currItem["image"] = data[i]["image"]
-                currItem["path"] = data[i]["path"]
-                console.log(currItem)
-                retList.push(currItem)
+            var recipes = data["recipes"]
+            var paths = data["paths"]
+            for (let i = 0; i < recipes.length; i++) {
+                currItem["userID"] = recipes[i]["userID"]
+                currItem["recipeID"] = recipes[i]["recipeID"]
+                currItem["title"] = recipes[i]["title"]
+                currItem["image"] = recipes[i]["image"]
+                currItem["path"] = recipes[i]["path"]
+                // console.log(currItem)
+                recipeList.push(currItem)
             }
-            res.send(retList)
+            for (let j = 0; j < paths.length; j++) {
+                currItem["userID"] = paths[j]["userID"]
+                currItem["path"] = paths[j]["path"]
+                pathList.push(currItem)
+            }
+            res.send({"recipes": recipeList, "paths": pathList})
             // console.log(data)
         })  
     }
@@ -132,8 +139,13 @@ app.get("/requestFilteredRecipes", async (req, res) => {
 
             var idList = ""
             var passesDietaryRestrictionsCheck
+
+            var recipeIDToAmountOfIngredientsIhave = {};
+
             for (let j = 0; j < data.length; j++) {
                 passesDietaryRestrictionsCheck = 1
+
+                recipeIDToAmountOfIngredientsIhave[data[j]["id"]] = data[j]["usedIngredientCount"].toString() + " / " + (data[j]["missedIngredientCount"] + data[j]["usedIngredientCount"]).toString()
 
                 if (skipRestrictions === 0) {
                     var missingIngredients = data[j]["missedIngredients"]
@@ -185,14 +197,12 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                     currItem["title"] = recipesWithTitles[i]["title"]
                     currItem["image"] = recipesWithTitles[i]["image"]
                     currItem["id"] = recipesWithTitles[i]["id"]
+                    currItem["ingredientsIAlreadyHave"] = recipeIDToAmountOfIngredientsIhave[recipesWithTitles[i]["id"]]
                     retList.push(currItem)
                 }
                 res.send(retList)
             })
-
-
         })
-
     }
     catch (err) {
         console.log(err)
@@ -210,9 +220,31 @@ function checkForTitles(recipeList) {
     return hasTitle
 }
 
-//expects ?ingredientsinpantry=xxx,xxx,xx&restrictions=xxx,xxx where ingredientsinpantry is non-empty
+// async function checkForInstructions(recipeID) {
+//     try {
+//         fetch("https://api.spoonacular.com/recipes/" + recipeID + "/analyzedInstructions&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
+//             response.json()
+//         ).then(data => {
+//             if(data.length === 0) {
+//                 return 0
+//             } else if  (data[0].hasOwnProperty("steps")) {
+//                 return 1
+//             } else {
+//                 return 0
+//             }
+//         })
+//     }
+//     catch (err) {
+//         console.log(err)
+//         res.status(400).send(err)
+//     }
+// }
+
+// expects ?ingredientsinpantry=xxx,xxx,xx&restrictions=xxx,xxx where ingredientsinpantry is non-empty
+// should now expect ?userid=xx&restrictions=xxx,xxx !!!
 app.get("/generateSuggestedRecipesList", async (req, res) => {
     try {
+        console.log(req.query)
         var ingredients = req.query["ingredientsinpantry"].split(",")
 
         // do we really need this, might as well jsut give the entire list and they can be rendered accordingly
@@ -235,7 +267,6 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
         else {
             var restrictions = req.query["restrictions"].split(",")
         }
-
 
         fetch("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
             response.json()
@@ -262,6 +293,7 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
                     currItem["title"] = recipesWithTitles[j]["title"]
                     currItem["image"] = recipesWithTitles[j]["image"]
                     currItem["id"] = recipesWithTitles[j]["id"]
+                    currItem["ingredientsAlreadyHave"] = recipesWithTitles[j]["usedIngredientCount"].toString() + " / " + (recipesWithTitles[j]["missedIngredientCount"] + recipesWithTitles[j]["usedIngredientCount"]).toString()
                     retList.push(currItem)
                 }
             }
@@ -332,6 +364,7 @@ app.get("/getRecipeDetails", async (req, res) => {
                     response.json()
                 ).then(data => {
                     var instructions = []
+                    console.log(data)
                     var currStep = {}
                     for (let j = 0; j < data.length; j++) {
                         currStep["name"] = data[j]["name"]

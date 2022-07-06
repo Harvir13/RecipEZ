@@ -49,7 +49,7 @@ app.put("/updateRestrictions", async (req, res) => {
             },
             body: JSON.stringify(req.body)
         }).then(response =>
-            response.text()
+            response.json()
         ).then(data => {
             res.send(data)
             console.log(data)

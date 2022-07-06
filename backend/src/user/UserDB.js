@@ -65,21 +65,10 @@ app.post("/storeUserInfo", async (req, res) => {
 //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx,xxx]}
 app.put("/updateDietaryRestrictions", async (req, res) => {
     try {
-        client.db("UserDB").collection("Users").updateOne({"id": req.body["userID"]}, {$set: {"dietaryRestrictions": req.body["dietaryRestrictions"]}}).then(result => {
-            res.send("Successfully updated dietary restrictions list")
-        })   
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
-})
-
-//req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx,xxx]}
-app.put("/updateDietaryRestrictions", async (req, res) => {
-    try {
-        client.db("UserDB").collection("Users").updateOne({"id": req.body["userID"]}, {$set: {"dietaryRestrictions": req.body["dietaryRestrictions"]}}).then(result => {
-            res.send("Successfully updated dietary restrictions list")
+        console.log(req.body)
+        var restrictions = req.body["dietaryRestrictions"].split(",")
+        client.db("UserDB").collection("Users").updateOne({"id": parseInt(req.body["userID"])}, {$set: {"dietaryRestrictions": restrictions}}).then(result => {
+            res.send({"result": "Successfully updated dietary restrictions list"})
         })   
     }
     catch (err) {
