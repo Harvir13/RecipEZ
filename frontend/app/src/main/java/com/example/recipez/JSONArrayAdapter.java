@@ -58,9 +58,9 @@ public class JSONArrayAdapter extends ArrayAdapter<JSONObject> implements Filter
             }
         }
         else if (objectType.equals("ingredient")) {
-            ImageView ingredient_image = convertView.findViewById(R.id.ingredient_image);
-            TextView ingredient_name = convertView.findViewById(R.id.ingredient_name);
-            TextView ingredient_expiry = convertView.findViewById(R.id.ingredient_expiry);
+            ImageView ingredient_image = convertView.findViewById(R.id.ingredientImageView);
+            TextView ingredient_name = convertView.findViewById(R.id.ingredientName);
+            TextView ingredient_expiry = convertView.findViewById(R.id.ingredientExpiry);
 
             try {
                 Picasso.get().load(getItem(position).getString("image")).resize(60, 60).centerCrop().into(ingredient_image);
