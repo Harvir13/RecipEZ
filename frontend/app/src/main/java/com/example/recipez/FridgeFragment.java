@@ -38,7 +38,7 @@ public class FridgeFragment extends Fragment {
 
     private ArrayList<JSONObject> ingredients;
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private FridgeAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     public final class Ingredient extends MainActivity {
@@ -70,13 +70,7 @@ public class FridgeFragment extends Fragment {
                         e.printStackTrace();
                     }
 
-                    mRecyclerView = view.findViewById(R.id.fridgeRecyclerView);
-                    mRecyclerView.setHasFixedSize(true);
-                    mLayoutManager = new LinearLayoutManager(getActivity());
-                    mAdapter = new FridgeAdapter(ingredients);
-
-                    mRecyclerView.setLayoutManager(mLayoutManager);
-                    mRecyclerView.setAdapter(mAdapter);
+                    buildRecyclerView(view);
                 }}, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
@@ -128,6 +122,33 @@ public class FridgeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    public void buildRecyclerView(View view) {
+        mRecyclerView = view.findViewById(R.id.fridgeRecyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mAdapter = new FridgeAdapter(ingredients);
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(new FridgeAdapter.OnItemClickListener() {
+            @Override
+            public void onDeleteClick(int position) {
+                removeItem(position);
+            }
+        });
+    }
+
+    public void insertItem(int position, JSONObject insert) {
+        ingredients.add(position, insert);    // TODO: format maybe? how to decide the position?
+        mAdapter.notifyItemInserted(position);
+    }
+
+    public void removeItem(int position) {
+        ingredients.remove(position);
+        mAdapter.notifyItemRemoved(position);
     }
 
     @Override
