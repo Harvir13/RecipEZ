@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +16,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BookmarkListFragmentNew extends Fragment {
     final static String TAG = "BookmarkListFragmentNew";
@@ -168,8 +180,10 @@ public class BookmarkListFragmentNew extends Fragment {
                             Toast.makeText(getActivity(), "Please enter a folder name", Toast.LENGTH_SHORT).show();
                         }
 
-                        List<JSONObject> recipeList = new ArrayList<>();
-                        folderList.add(new BookmarkFolder(recipeList, folderName));
+                        List<JSONObject> emptyRecipeList = new ArrayList<>();
+                        folderList.add(new BookmarkFolder(emptyRecipeList, folderName));
+                        addPathToPathsList(1, folderName); // TODO: update user ID
+
                         adapter.notifyItemInserted(folderList.size() - 1);
                         bookmarkListRecyclerView.scrollToPosition(folderList.size() - 1);
                     }
@@ -220,6 +234,310 @@ public class BookmarkListFragmentNew extends Fragment {
 
         adapter = new BookmarkFolderAdapter(folderList);
         bookmarkListRecyclerView.setAdapter(adapter);
+    }
+
+    public String encodeString(String s) {
+        String result;
+        try {
+            result = URLEncoder.encode(s, "UTF-8").replaceAll("\\+", "%20").replaceAll("\\%21", "!")
+                    .replaceAll("\\%27", "'").replaceAll("\\%28", "(").replaceAll("\\%29", ")")
+                    .replaceAll("\\%7E", "~");
+        } // This exception should never occur.
+        catch (Exception e) {
+            result = s;
+        }
+
+        return result;
+    }
+
+    public String convertArrayToString(String[] s) {
+        String result = "";
+
+        for (int i = 0; i < s.length; i++) {
+            if (i == s.length - 1) {
+                result+= s[i];
+            }
+            else {
+                result+= s[i] + ",";
+            }
+        }
+        return result;
+    }
+
+    public String convertJSONArrayToString(JSONArray s) throws JSONException {
+        String result = "";
+
+        for (int i = 0; i < s.length(); i++) {
+            if (i == s.length() - 1) {
+                result+= s.get(i);
+            }
+            else {
+                result+= s.get(i) + ",";
+            }
+        }
+        return result;
+    }
+
+    public final class Recipe extends MainActivity {
+        private int myStaticMember;
+        private String TAG = "Recipe Class";
+
+        public Recipe () {
+            myStaticMember = 1;
+        }
+
+        public void addRecipeToBookmarkList(int userID, int recipeID, String path, String title, String image) {
+            // Instantiate the RequestQueue.
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://20.53.224.7:8084/addRecipe";
+            // 10.0.2.2 is a special alias to localhost for developers
+
+            Map<String, String> jsonParams = new HashMap();
+            jsonParams.put("userID", String.valueOf(userID));
+            jsonParams.put("recipeID", String.valueOf(recipeID));
+            jsonParams.put("path", path);
+            jsonParams.put("title", title);
+            jsonParams.put("image", image);
+
+            // Request a string response from the provided URL.
+            JsonObjectRequest jsonRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    }) {
+            };
+
+            // Add the request to the RequestQueue.
+            queue.add(jsonRequest);
+        }
+
+        public void removeRecipeFromBookmarkList(int userID, int recipeID) {
+            // Instantiate the RequestQueue.
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://20.53.224.7:8084/removeRecipe";
+            // 10.0.2.2 is a special alias to localhost for developers
+
+            Map<String, String> jsonParams = new HashMap();
+            jsonParams.put("userID", String.valueOf(userID));
+            jsonParams.put("recipeID", String.valueOf(recipeID));
+
+            // Request a string response from the provided URL.
+            JsonObjectRequest jsonRequest = new JsonObjectRequest
+                    (Request.Method.DELETE, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    }) {
+            };
+
+            // Add the request to the RequestQueue.
+            queue.add(jsonRequest);
+        }
+
+        public void getRecipesFromBookmarkList(int userID) {
+            // Instantiate the RequestQueue.
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID;
+            // 10.0.2.2 is a special alias to localhost for developers
+
+            // Request a string response from the provided URL.
+            JsonObjectRequest jsonRequest = new JsonObjectRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    });
+
+            // Add the request to the RequestQueue.
+            queue.add(jsonRequest);
+
+        }
+
+        public void filterRecipes(String[] ingredients, String[] filters, String[] restrictions) {
+            // Instantiate the RequestQueue.
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String ingredientsList = encodeString(convertArrayToString(ingredients));
+            String filtersList = encodeString(convertArrayToString(filters));
+            String restrictionsList = encodeString(convertArrayToString(restrictions));
+
+            String url = "http://20.53.224.7:8084/requestFilteredRecipes?ingredients=" + ingredientsList + "&restrictions=" + restrictionsList + "&filters=" + filtersList;
+            // 10.0.2.2 is a special alias to localhost for developers
+
+            // Request a string response from the provided URL.
+            JsonArrayRequest jsonRequest = new JsonArrayRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    });
+
+            // Add the request to the RequestQueue.
+            queue.add(jsonRequest);
+        }
+
+        public void getSuggestedRecipes(String[] ingredients, String[] restrictions) {
+            // Instantiate the RequestQueue.
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String ingredientsList = encodeString(convertArrayToString(ingredients));
+            String restrictionsList = encodeString(convertArrayToString(restrictions));
+
+            String url = "http://20.53.224.7:8084/generateSuggestedRecipesList?ingredientsinpantry=" + ingredientsList + "&restrictions=" + restrictionsList;
+            // 10.0.2.2 is a special alias to localhost for developers
+
+            // Request a string response from the provided URL.
+            JsonArrayRequest jsonRequest = new JsonArrayRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    });
+
+            // Add the request to the RequestQueue.
+            queue.add(jsonRequest);
+
+        }
+
+        public void searchRecipe(String recipeName) {// Instantiate the RequestQueue.
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://20.53.224.7:8084/searchRecipe?recipename=" + recipeName;
+            // 10.0.2.2 is a special alias to localhost for developers
+
+            // Request a string response from the provided URL.
+            JsonArrayRequest jsonRequest = new JsonArrayRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    });
+
+            // Add the request to the RequestQueue.
+            queue.add(jsonRequest);
+
+        }
+
+
+    }
+
+    public void addPathToPathsList(int userID, String path) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://10.0.2.2:8084/addNewPath";
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        Map<String, String> jsonParams = new HashMap();
+        jsonParams.put("userID", String.valueOf(userID));
+        jsonParams.put("path", path);
+
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }) {
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+
+    }
+
+    public void removePathFromPathsList(int userID, String path) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://10.0.2.2:8084/removeExistingPath";
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        Map<String, String> jsonParams = new HashMap();
+        jsonParams.put("userID", String.valueOf(userID));
+        jsonParams.put("path", path);
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.DELETE, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }) {
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+    }
+
+    public void getPathsList(int userID) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://10.0.2.2:8084/getAllPaths?userid=" + userID;
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        // Request a string response from the provided URL.
+        JsonArrayRequest jsonRequest = new JsonArrayRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+
     }
 }
 

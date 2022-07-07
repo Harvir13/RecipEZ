@@ -64,8 +64,6 @@ public class RecipeDetailFragment extends Fragment {
     private TextView recipeInstructions;
     private TextView recipeNutrition;
 
-    private SharedPreferences sharedpreferences;
-
     private ImageButton addToBookmarkButton;
     private BookmarkFolderClickListener bookmarkFolderClickListener;
     private Button addToBookmarkConfirmButton;
@@ -113,8 +111,6 @@ public class RecipeDetailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        sharedpreferences = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE);
 
         Bundle bundle = this.getArguments();
         int recipeID = bundle.getInt("RECIPE_ID", 0);
@@ -169,11 +165,12 @@ public class RecipeDetailFragment extends Fragment {
                 addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        Recipe recipe = new Recipe();
+                        recipe.addRecipeToBookmarkList(1, recipeID, selectedFolderName.toString(), recipeName, recipeImageUrl); // TODO: update user ID
                         Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName.toString(), Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                 });
-
 
                 folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                 dialogAdapter = new BookmarkFolderDialogAdapter(folderNames, bookmarkFolderClickListener);
@@ -237,7 +234,7 @@ public class RecipeDetailFragment extends Fragment {
         public void addRecipeToBookmarkList(int userID, int recipeID, String path, String title, String image) {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8084/addRecipe";
+            String url = "http://20.53.224.7:8084/addRecipe";
             // 10.0.2.2 is a special alias to localhost for developers
 
             Map<String, String> jsonParams = new HashMap();
@@ -269,7 +266,7 @@ public class RecipeDetailFragment extends Fragment {
         public void removeRecipeFromBookmarkList(int userID, int recipeID) {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8084/removeRecipe";
+            String url = "http://20.53.224.7:8084/removeRecipe";
             // 10.0.2.2 is a special alias to localhost for developers
 
             Map<String, String> jsonParams = new HashMap();
@@ -298,7 +295,7 @@ public class RecipeDetailFragment extends Fragment {
         public void getRecipesFromBookmarkList(int userID) {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8084/getRecipes?userid=" + userID;
+            String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID;
             // 10.0.2.2 is a special alias to localhost for developers
 
             // Request a string response from the provided URL.
@@ -327,7 +324,7 @@ public class RecipeDetailFragment extends Fragment {
             String filtersList = encodeString(convertArrayToString(filters));
             String restrictionsList = encodeString(convertArrayToString(restrictions));
 
-            String url = "http://10.0.2.2:8084/requestFilteredRecipes?ingredients=" + ingredientsList + "&restrictions=" + restrictionsList + "&filters=" + filtersList;
+            String url = "http://20.53.224.7:8084/requestFilteredRecipes?ingredients=" + ingredientsList + "&restrictions=" + restrictionsList + "&filters=" + filtersList;
             // 10.0.2.2 is a special alias to localhost for developers
 
             // Request a string response from the provided URL.
@@ -354,7 +351,7 @@ public class RecipeDetailFragment extends Fragment {
             String ingredientsList = encodeString(convertArrayToString(ingredients));
             String restrictionsList = encodeString(convertArrayToString(restrictions));
 
-            String url = "http://10.0.2.2:8084/generateSuggestedRecipesList?ingredientsinpantry=" + ingredientsList + "&restrictions=" + restrictionsList;
+            String url = "http://20.53.224.7:8084/generateSuggestedRecipesList?ingredientsinpantry=" + ingredientsList + "&restrictions=" + restrictionsList;
             // 10.0.2.2 is a special alias to localhost for developers
 
             // Request a string response from the provided URL.
@@ -378,7 +375,7 @@ public class RecipeDetailFragment extends Fragment {
 
         public void searchRecipe(String recipeName) {// Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8084/searchRecipe?recipename=" + recipeName;
+            String url = "http://20.53.224.7:8084/searchRecipe?recipename=" + recipeName;
             // 10.0.2.2 is a special alias to localhost for developers
 
             // Request a string response from the provided URL.
@@ -403,7 +400,7 @@ public class RecipeDetailFragment extends Fragment {
         public void getFullRecipeDetails(int recipeID) {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8084/getRecipeDetails?recipeid=" + recipeID;
+            String url = "http://20.53.224.7:8084/getRecipeDetails?recipeid=" + recipeID;
             // 10.0.2.2 is a special alias to localhost for developers
 
             // Request a string response from the provided URL.
