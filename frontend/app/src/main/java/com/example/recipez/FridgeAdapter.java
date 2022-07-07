@@ -1,5 +1,7 @@
 package com.example.recipez;
 
+import static java.lang.Integer.parseInt;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +17,10 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.FridgeViewHolder> {
     private ArrayList<JSONObject> mIngredientList;
@@ -75,8 +80,14 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.FridgeView
 
         try {
             Picasso.get().load("https://spoonacular.com/cdn/ingredients_100x100/" + currentItem.getString("image")).fit().centerCrop().into(holder.mIngredientImageView);
-            holder.mIngredientName.setText(currentItem.getString("name"));
-            holder.mIngredientExpiry.setText(currentItem.getString("expiry"));
+
+            String name = currentItem.getString("name");
+            holder.mIngredientName.setText(name.substring(0, 1).toUpperCase() + name.substring(1));
+
+            Date date = new Date(parseInt(currentItem.getString("expiry")) * 1000L);
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy");
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT-8"));
+            holder.mIngredientExpiry.setText(sdf.format(date));
         } catch (JSONException e) {
             e.printStackTrace();
         }
