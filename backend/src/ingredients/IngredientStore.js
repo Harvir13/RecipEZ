@@ -155,7 +155,7 @@ app.get("/requestExpiryDate", async (req, res) => {
             }
         }).then((response) => response.json()).then((data) => {
             if (data.length == 0 || data.code == 500) {
-                res.send("-1"); // maybe send -1
+                res.send("-1");
                 return;
             }
             console.log(data);
@@ -216,9 +216,8 @@ app.post("/addIngredient", async (req, res) => {
                 }
             }).then((response) => response.text()).then((expiryVal) => {
                 console.log(expiryVal);
-                console.log("here");
                 if (parseInt(expiryVal) == -1) {
-                res.send("No expiry date found for ingredient. Enter one manually");
+                res.status(400).send("No expiry date found for ingredient. Enter one manually");
                 return;
                 }
                 let expiryDate = Math.floor(Date.now() / 1000) + parseInt(expiryVal);
@@ -237,9 +236,9 @@ app.post("/addIngredient", async (req, res) => {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(ingredient)
-                }).then((response) => response.text()).then((data) => {
+                }).then((response) => response.json()).then((data) => {
                     console.log(data);
-                    res.send(data.toString());
+                    res.send(data.ingredient);
                 });
             });
         });
@@ -277,8 +276,8 @@ app.get("/checkDietaryRestrictions", async (req, res) => {
             ingredientRestricted = true;
         }
     });
-    if (ingredientRestricted) res.send("Cannot add ingredient");
-    else res.send("Allowed to add ingredient");
+    if (ingredientRestricted) res.send(false); // cannot add ingredient
+    else res.send(true); // allowed to add ingredient
 });
 
 function levenshtein_distance(inputString, realString) {

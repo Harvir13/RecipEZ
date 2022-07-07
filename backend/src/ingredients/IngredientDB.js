@@ -50,9 +50,7 @@ app.post("/storeIngredient", async (req, res) => {
             }));
             if (!alreadyHaveIng) result.ingredients.push(req.body.ingredient);
             let newIngredients = {$set: { ingredients: result.ingredients }};
-            client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid) }, newIngredients).then((result) => {
-                res.send("Updated ingredient list\n");
-            });
+            client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid) }, newIngredients).then(res.send(req.body));
         });
     } catch (err) {
         res.status(400).send(err);
@@ -67,8 +65,7 @@ app.delete("/removeIngredient", async (req, res) => {
                 return value.name != req.body.ingredient;
             });
         let updateString = {$set: { ingredients: newIngredients }};
-        client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid) }, updateString)
-			.then(res.send("Deleted ingredient\n"))
+        client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid) }, updateString).then((data) => res.send(data))
         });
     } catch (err) {
         res.status(400).send(err);
@@ -105,8 +102,7 @@ app.post("/changeExpiry", async (req, res) => {
                 }
             });
         let updateString = {$set: { ingredients: updatedIngredients }};
-        client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid), updateString})
-	  	    .then(res.send("Updated expiry date\n"))
+        client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid), updateString}).then(res.send(req.body))
         });
     } catch (err) {
         res.status(400).send(err);
