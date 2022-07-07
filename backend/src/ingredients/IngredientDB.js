@@ -51,7 +51,7 @@ app.post("/storeIngredient", async (req, res) => {
     client
       .db("IngredientDB")
       .collection("Users")
-      .findOne({ userid: req.body.userid })
+      .findOne({ userid: parseInt(req.body.userid) })
       .then((result) => {
         console.log(result.ingredients);
         result.ingredients.push(req.body.ingredient);
@@ -59,7 +59,7 @@ app.post("/storeIngredient", async (req, res) => {
         client
           .db("IngredientDB")
           .collection("Users")
-          .updateOne({ userid: req.body.userid }, newIngredients)
+          .updateOne({ userid: parseInt(req.body.userid) }, newIngredients)
           .then((result) => {
             res.send("Updated ingredient list\n");
           });
@@ -72,10 +72,11 @@ app.post("/storeIngredient", async (req, res) => {
 // expects body of {userid: xxx, ingredient: xxx}
 app.delete("/removeIngredient", async (req, res) => {
   try {
+    console.log(req.body);
     client
       .db("IngredientDB")
       .collection("Users")
-      .findOne({ userid: req.body.userid })
+      .findOne({ userid: parseInt(req.body.userid) })
       .then((result) => {
         let newIngredients = result.ingredients.filter(function (value) {
           return value.name != req.body.ingredient;
@@ -84,7 +85,7 @@ app.delete("/removeIngredient", async (req, res) => {
         client
           .db("IngredientDB")
           .collection("Users")
-          .updateOne({ userid: req.body.userid }, updateString)
+          .updateOne({ userid: parseInt(req.body.userid) }, updateString)
           .then((result) => {
             res.send("Deleted ingredient\n");
           });

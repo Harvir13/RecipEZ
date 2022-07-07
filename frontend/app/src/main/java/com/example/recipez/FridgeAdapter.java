@@ -1,5 +1,6 @@
 package com.example.recipez;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,7 +74,7 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.FridgeView
         JSONObject currentItem = mIngredientList.get(position);
 
         try {
-//            Picasso.get().load(currentItem.getString("image")).fit().centerCrop().into(holder.mIngredientImageView);
+            Picasso.get().load("https://spoonacular.com/cdn/ingredients_100x100/" + currentItem.getString("image")).fit().centerCrop().into(holder.mIngredientImageView);
             holder.mIngredientName.setText(currentItem.getString("name"));
             holder.mIngredientExpiry.setText(currentItem.getString("expiry"));
         } catch (JSONException e) {

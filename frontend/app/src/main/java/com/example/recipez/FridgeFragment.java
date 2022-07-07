@@ -94,7 +94,30 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
             jsonParams.put("ingredient", ingredient);
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest
-                    (Request.Method.DELETE, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
+                    (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    });
+            queue.add(jsonRequest);
+        }
+
+        public void storeIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://10.0.2.2:8083/addIngredient";
+
+            Map<String, String> jsonParams = new HashMap();
+            jsonParams.put("userid", userID);
+            jsonParams.put("ingredient", ingredient);
+
+            JsonObjectRequest jsonRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.d(TAG, response.toString());
@@ -163,6 +186,8 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
             e.printStackTrace();
         }
         insertItem(0, newIngredient);
+        Ingredient ingredient = new Ingredient();
+        ingredient.storeIngredient("11111", name);
     }
 
     public void buildRecyclerView(View view) {
@@ -225,9 +250,6 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
     }
 
     private void openDialog() {
-//        AddIngredientDialog addIngredientDialog = new AddIngredientDialog();
-//        addIngredientDialog.show(getActivity().getSupportFragmentManager(), "add ingredient dialog");
-
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_add_ingredient);
 
@@ -242,8 +264,6 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
                 String expiry = editIngredientExpiry.getText().toString();
                 addIngredient(name, expiry);
                 dialog.dismiss();
-
-                // TODO: add API call to add ingredient to database
             }
         });
 

@@ -77,7 +77,8 @@ app.get("/getAllIngredientsInPantry", async (req, res) => {
 });
 
 // expects {userid: xxx, ingredient: xxx}
-app.delete("/deleteIngredient", async (req, res) => {
+app.post("/deleteIngredient", async (req, res) => {
+  console.log("got here");
   try {
     fetch("http://localhost:8081/removeIngredient", {
       method: "DELETE",
@@ -169,10 +170,11 @@ app.get("/requestExpiryDate", async (req, res) => {
     )
       .then((response) => response.json())
       .then((data) => {
-        if (data.length == 0) {
+        if (data.length == 0 || data.code == 500) {
           res.send("-1"); // maybe send -1
           return;
         }
+        console.log(data);
         let minLevDistance = Number.MAX_VALUE;
         let desiredIngredient;
         data.forEach((ingredient) => {
@@ -232,9 +234,9 @@ app.post("/addIngredient", async (req, res) => {
       }
     )
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        if (data.length == 0) {
+      .then((spoonacularIng) => {
+        console.log(spoonacularIng);
+        if (spoonacularIng.length == 0) {
           res.send("No ingredient found");
           return;
         }
@@ -249,20 +251,23 @@ app.post("/addIngredient", async (req, res) => {
           }
         )
           .then((response) => response.text())
-          .then((expiryDate) => {
-            console.log(expiryDate);
+          .then((expiryVal) => {
+            console.log(expiryVal);
             console.log("here");
-            if (parseInt(expiryDate) == -1) {
+            if (parseInt(expiryVal) == -1) {
               res.send(
                 "No expiry date found for ingredient. Enter one manually"
               );
               return;
             }
+            let expiryDate =
+              Math.floor(Date.now() / 1000) + parseInt(expiryVal);
             let ingredient = {
               userid: req.body.userid,
               ingredient: {
                 name: req.body.ingredient,
-                expiry: parseInt(expiryDate),
+                expiry: expiryDate,
+                image: spoonacularIng[0].image,
               },
             };
             console.log(ingredient);
