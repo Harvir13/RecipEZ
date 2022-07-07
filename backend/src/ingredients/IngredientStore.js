@@ -16,7 +16,7 @@ const client = new MongoClient(uri);
 async function run() {
     try {
         await client.connect();
-        var server = app.listen(8083, (req, res) => {
+        var server = app.listen(8086, (req, res) => {
             var host = server.address().address;
             var port = server.address().port;
             console.log(
@@ -36,7 +36,7 @@ run();
 app.get("/requestIngredients", async (req, res) => {
     console.log(req.query);
     try {
-        fetch("http://localhost:8081/getIngredients?userid=" + req.query["userid"], {
+        fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"], {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -49,25 +49,10 @@ app.get("/requestIngredients", async (req, res) => {
     }
 });
 
-app.get("/getAllIngredientsInPantry", async (req, res) => {
-    try {
-        fetch("http://localhost:8081/getIngredients?userid=" + req.query["userid"], {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then((response) => response.text()).then((data) => {
-            res.send(data);
-        });
-    } catch (err) {
-        res.status(400).send(err);
-    }
-});
-
 // expects {userid: xxx, ingredient: xxx}
 app.post("/deleteIngredient", async (req, res) => {
     try {
-        fetch("http://localhost:8081/removeIngredient", {
+        fetch("http://20.53.224.7:8085/removeIngredient", {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json"
@@ -84,7 +69,7 @@ app.post("/deleteIngredient", async (req, res) => {
 // expects {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/updateExpiryDate", async (req, res) => {
     try {
-        fetch("http://localhost:8081/changeExpiry", {
+        fetch("http://20.53.224.7:8085/changeExpiry", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -96,34 +81,6 @@ app.post("/updateExpiryDate", async (req, res) => {
     }
 })
 
-//expects {userid: xxx}
-app.get("/requestSuggestedRecipes", async (req, res) => {
-    try {
-        fetch("http://localhost:8081/getIngredients?userid=" + req.query["userid"], {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then((response) => response.text()).then((data) => {
-            try {
-                fetch("http://localhost:8081/generateSuggestedRecipesList", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(data),
-                }).then((response) => response.text()).then((data) => {
-                    res.send(data);
-                });
-            } catch (err) {
-                res.status(400).send(err);
-            }
-        });
-    } catch (err) {
-        res.status(400).send(err);
-    }
-});
-
 //expects {ingredient: xxx}
 app.get("/searchForIngredient", async (req, res) => {
     try {
@@ -131,6 +88,27 @@ app.get("/searchForIngredient", async (req, res) => {
             "https://api.spoonacular.com/food/ingredients/search?query=" +
             req.query["ingredient"] +
             "&number=1&apiKey=" +
+            API_KEY, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        ).then((response) => response.json()).then((data) => {
+            res.send(data.results);
+        });
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
+
+// expects {string: xxx}
+app.get("/getIngredientSuggestions", async (req, res) => {
+    try {
+        fetch(
+            "https://api.spoonacular.com/food/ingredients/search?query=" +
+            req.query["string"] +
+            "&apiKey=" +
             API_KEY, {
                 method: "GET",
                 headers: {
@@ -198,7 +176,7 @@ app.get("/requestExpiryDate", async (req, res) => {
 // expects body of {userid: xxx, ingredient: xxx}
 app.post("/addIngredient", async (req, res) => {
     try {
-        fetch("http://localhost:8083/searchForIngredient?ingredient=" + req.body.ingredient, {
+        fetch("http://20.53.224.7:8086/searchForIngredient?ingredient=" + req.body.ingredient, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -209,7 +187,7 @@ app.post("/addIngredient", async (req, res) => {
                 res.send("No ingredient found");
                 return;
             }
-            fetch("http://localhost:8083/requestExpiryDate?ingredient=" + req.body.ingredient, {
+            fetch("http://20.53.224.7:8086/requestExpiryDate?ingredient=" + req.body.ingredient, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
@@ -230,7 +208,7 @@ app.post("/addIngredient", async (req, res) => {
                     }
                 };
                 console.log(ingredient);
-                fetch("http://localhost:8081/storeIngredient", {
+                fetch("http://20.53.224.7:8085/storeIngredient", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -250,7 +228,7 @@ app.post("/addIngredient", async (req, res) => {
 // expects {userid: xxx, time: xxx}
 app.get("/scanExpiryDates", async (req, res) => {
     try {
-        fetch("http://localhost:8081/getIngredients?userid=" + req.query["userid"], {
+        fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"], {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"

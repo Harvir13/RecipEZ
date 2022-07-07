@@ -1,8 +1,5 @@
 import express from "express";
 import { MongoClient } from "mongodb";
-// var express = require("express");
-// var fetch = require("node-fetch");
-// var { MongoClient } = require("mongodb");
 
 var app = express();
 app.use(express.json());
@@ -13,7 +10,7 @@ const client = new MongoClient(uri);
 async function run() {
     try {
         await client.connect();
-        var server = app.listen(8081, (req, res) => {
+        var server = app.listen(8085, (req, res) => {
             var host = server.address().address;
             var port = server.address().port;
             console.log(
@@ -71,8 +68,6 @@ app.delete("/removeIngredient", async (req, res) => {
         res.status(400).send(err);
     }
 });
-
-app.get("/getAllIngredientsInPantry"); //?
 
 // expects {userid: xxx, ingredient: xxx, time: xxx}
 app.get("/isExpired", async (req, res) => {
