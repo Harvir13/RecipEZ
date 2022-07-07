@@ -91,13 +91,13 @@ app.get("/isExpired", async (req, res) => {
 app.post("/changeExpiry", async (req, res) => {
     try {
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid) }).then((result) => {
-            let updatedIngredients = result.ingredients.filter(function (value) {
+            result.ingredients.forEach(function (value) {
                 if (value.name == req.body.ingredient) {
-                    value.expiry = req.body.expiry;
+                    value.expiry = parseInt(req.body.expiry);
                 }
             });
-        let updateString = {$set: { ingredients: updatedIngredients }};
-        client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid), updateString}).then(res.send(req.body))
+            let updateString = {$set: { ingredients: result.ingredients }};
+        client.db("IngredientDB").collection("Users").updateOne({ "userid": parseInt(req.body.userid)}, updateString).then(res.send(req.body))
         });
     } catch (err) {
         res.status(400).send(err);
