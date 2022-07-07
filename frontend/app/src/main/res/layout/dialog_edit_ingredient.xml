@@ -9,7 +9,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:text="TextView" />
+        android:layout_marginBottom="10dp"
+        android:text="TextView"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/newIngredientExpiry"
@@ -18,12 +22,13 @@
         android:layout_below="@id/currentIngredientName"
         android:ems="10"
         android:hint="MMDDYYYY"
-        android:inputType="date" />
+        android:inputType="date"
+        android:minHeight="48dp" />
 
     <Button
         android:id="@+id/editIngredientSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/newIngredientExpiry"
-        android:text="Button" />
+        android:text="Update" />
 </RelativeLayout>

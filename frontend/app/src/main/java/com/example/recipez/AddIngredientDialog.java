@@ -44,7 +44,6 @@ public class AddIngredientDialog extends AppCompatDialogFragment {
                 });
 
         editIngredientName = view.findViewById(R.id.editIngredientName);
-        editIngredientExpiry = view.findViewById(R.id.editIngredientExpiry);
 
         return builder.create();
     }

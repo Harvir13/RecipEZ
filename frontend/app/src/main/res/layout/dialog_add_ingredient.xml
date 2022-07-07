@@ -4,24 +4,28 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
+    <TextView
+        android:id="@+id/addIngredientTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="Add Ingredient"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
     <EditText
         android:id="@+id/editIngredientName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Name" />
-
-    <EditText
-        android:id="@+id/editIngredientExpiry"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editIngredientName"
-        android:layout_alignParentStart="true"
-        android:hint="Expiry Date" />
+        android:layout_below="@id/addIngredientTitle"
+        android:hint="Name"
+        android:minHeight="48dp" />
 
     <Button
         android:id="@+id/addIngredientConfirm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editIngredientExpiry"
-        android:text="Button" />
+        android:layout_below="@id/editIngredientName"
+        android:text="Add Ingredient" />
 </RelativeLayout>

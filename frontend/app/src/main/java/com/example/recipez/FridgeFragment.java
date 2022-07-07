@@ -43,7 +43,7 @@ import java.util.TimeZone;
  * Use the {@link FridgeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FridgeFragment extends Fragment implements AddIngredientDialog.AddIngredientListener {
+public class FridgeFragment extends Fragment {
     final static String TAG = "FridgeFragment";
 
     private ImageButton addIngredientButton;
@@ -129,7 +129,7 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
                     (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            insertItem(0, response);
+                            insertItem(response);
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -198,12 +198,10 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    public void addIngredient(String name, String expiry) {
+    public void addIngredient(String name) {
         JSONObject newIngredient = new JSONObject();
         try {
             newIngredient.put("name", name);
-            newIngredient.put("expiry", expiry);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -233,14 +231,9 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
         });
     }
 
-    public void insertItem(int position, JSONObject insert) {
+    public void insertItem(JSONObject insert) {
         ingredients.add(ingredients.size(), insert);    // TODO: format maybe? how to decide the position?
-        if (ingredients.size() == 1) {
-            mAdapter.notifyDataSetChanged();
-        }
-        else {
-            mAdapter.notifyItemChanged(ingredients.size());
-        }
+        mAdapter.notifyDataSetChanged();
     }
 
     public void removeItem(int position) {
@@ -289,15 +282,13 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
         dialog.setContentView(R.layout.dialog_add_ingredient);
 
         EditText editIngredientName = dialog.findViewById(R.id.editIngredientName);
-        EditText editIngredientExpiry = dialog.findViewById(R.id.editIngredientExpiry);
 
         Button addIngredientConfirm = dialog.findViewById(R.id.addIngredientConfirm);
         addIngredientConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String name = editIngredientName.getText().toString();
-                String expiry = editIngredientExpiry.getText().toString();
-                addIngredient(name, expiry);
+                addIngredient(name);
                 dialog.dismiss();
             }
         });
@@ -311,7 +302,7 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
 
         TextView currentIngredientName = dialog.findViewById(R.id.currentIngredientName);
         try {
-            currentIngredientName.setText(ingredients.get(position).getString("name"));
+            currentIngredientName.setText("Update expiry date for " + ingredients.get(position).getString("name"));
         } catch (Exception e) {
             e.printStackTrace();
         }
