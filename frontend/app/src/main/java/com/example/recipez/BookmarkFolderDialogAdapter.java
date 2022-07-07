@@ -13,10 +13,12 @@ import java.util.List;
 
 public class BookmarkFolderDialogAdapter extends RecyclerView.Adapter<BookmarkFolderDialogAdapter.ViewHolder> {
     List<String> folderNames;
+    BookmarkFolderClickListener bookmarkFolderClickListener;
     int selectedPosition = -1;
 
-    public BookmarkFolderDialogAdapter(List<String> folderNames) {
+    public BookmarkFolderDialogAdapter(List<String> folderNames, BookmarkFolderClickListener bookmarkFolderClickListener) {
         this.folderNames = folderNames;
+        this.bookmarkFolderClickListener = bookmarkFolderClickListener;
     }
 
     @NonNull
@@ -36,6 +38,7 @@ public class BookmarkFolderDialogAdapter extends RecyclerView.Adapter<BookmarkFo
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
                 if (checked) {
                     selectedPosition = holder.getAdapterPosition();
+                    bookmarkFolderClickListener.onClick(holder.folderRadioButton.getText().toString());
                 }
             }
         });

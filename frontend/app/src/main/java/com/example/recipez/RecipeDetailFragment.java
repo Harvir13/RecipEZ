@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,7 +66,9 @@ public class RecipeDetailFragment extends Fragment {
 
     private SharedPreferences sharedpreferences;
 
-    private Button addToBookmarkButton;
+    private ImageButton addToBookmarkButton;
+    private BookmarkFolderClickListener bookmarkFolderClickListener;
+    private Button addToBookmarkConfirmButton;
     private RecyclerView folderListRecyclerView;
 
     public RecipeDetailFragment() {
@@ -134,7 +137,7 @@ public class RecipeDetailFragment extends Fragment {
         Recipe recipe = new Recipe();
         recipe.getFullRecipeDetails(recipeID);
 
-        addToBookmarkButton = view.findViewById(R.id.add_folder_dialog_button);
+        addToBookmarkButton = view.findViewById(R.id.add_to_bookmark_button);
         addToBookmarkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -147,8 +150,33 @@ public class RecipeDetailFragment extends Fragment {
                 folderNames.add("folder3");
 
                 folderListRecyclerView = dialog.findViewById(R.id.recycler_view_bookmark_folder_list);
+
+                StringBuilder selectedFolderName = new StringBuilder();
+                bookmarkFolderClickListener = new BookmarkFolderClickListener() {
+                    @Override
+                    public void onClick(String str) {
+                        folderListRecyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialogAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        selectedFolderName.append(str);
+                    }
+                };
+
+                addToBookmarkConfirmButton = dialog.findViewById(R.id.dialog_add_to_bookmark_confirm_button);
+                addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName.toString(), Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+
+
                 folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                dialogAdapter = new BookmarkFolderDialogAdapter(folderNames);
+                dialogAdapter = new BookmarkFolderDialogAdapter(folderNames, bookmarkFolderClickListener);
                 folderListRecyclerView.setAdapter(dialogAdapter);
 
                 dialog.show();
