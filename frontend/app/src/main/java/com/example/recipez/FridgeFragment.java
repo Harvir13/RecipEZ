@@ -79,7 +79,7 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, error.toString());
+                    Log.d(TAG, error.toString() + "REQUEST");
                 }
             });
             queue.add(jsonRequest);
@@ -102,30 +102,35 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
+                            Log.d(TAG, error.toString() + "DELETE");
                         }
                     });
             queue.add(jsonRequest);
         }
 
-        public void storeIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
+        public void storeIngredient(String userID, JSONObject ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
             String url = "http://10.0.2.2:8083/addIngredient";
 
             Map<String, String> jsonParams = new HashMap();
-            jsonParams.put("userid", userID);
-            jsonParams.put("ingredient", ingredient);
+            try {
+                jsonParams.put("userid", userID);
+                jsonParams.put("ingredient", ingredient.getString("name"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest
                     (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.d(TAG, response.toString());
+                            insertItem(0, response);
+                            Log.d(TAG, "res" + response.toString());
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
+                            Log.d(TAG, error.toString() + "STORE");
                         }
                     });
             queue.add(jsonRequest);
@@ -185,9 +190,8 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        insertItem(0, newIngredient);
         Ingredient ingredient = new Ingredient();
-        ingredient.storeIngredient("11111", name);
+        ingredient.storeIngredient("11111", newIngredient);
     }
 
     public void buildRecyclerView(View view) {
@@ -208,8 +212,9 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
     }
 
     public void insertItem(int position, JSONObject insert) {
-        ingredients.add(position, insert);    // TODO: format maybe? how to decide the position?
-        mAdapter.notifyItemInserted(position);
+        ingredients.add(ingredients.size(), insert);    // TODO: format maybe? how to decide the position?
+        Log.d(TAG, "ingredient list: " + ingredients.toString());
+        mAdapter.notifyItemChanged(0);
     }
 
     public void removeItem(int position) {
