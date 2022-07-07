@@ -15,6 +15,7 @@
     <string name="recipe_detail_instructions_list">Instructions List</string>
     <string name="recipe_detail_nutrition_title">Nutritional Details</string>
     <string name="recipe_detail_nutrition_list">Nutritional Details List</string>
+    <string name="add_to_bookmark_title">Add to a bookmark folder</string>
 
     <!-- Profile Fragment -->
     <string name="user_pref_name_text">Your name</string>

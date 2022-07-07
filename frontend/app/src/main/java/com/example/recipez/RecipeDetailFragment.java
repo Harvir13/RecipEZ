@@ -1,5 +1,6 @@
 package com.example.recipez;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -16,8 +18,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -37,6 +41,7 @@ import org.json.JSONObject;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RecipeDetailFragment extends Fragment {
@@ -57,8 +62,11 @@ public class RecipeDetailFragment extends Fragment {
     private TextView recipeIngredients;
     private TextView recipeInstructions;
     private TextView recipeNutrition;
-    private Button addToBookmarkButton;
+
     private SharedPreferences sharedpreferences;
+
+    private Button addToBookmarkButton;
+    private RecyclerView folderListRecyclerView;
 
     public RecipeDetailFragment() {
         // Required empty public constructor
@@ -98,6 +106,7 @@ public class RecipeDetailFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_recipe_detail, container, false);
     }
 
+    BookmarkFolderDialogAdapter dialogAdapter;
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -124,6 +133,27 @@ public class RecipeDetailFragment extends Fragment {
 
         Recipe recipe = new Recipe();
         recipe.getFullRecipeDetails(recipeID);
+
+        addToBookmarkButton = view.findViewById(R.id.add_folder_dialog_button);
+        addToBookmarkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dialog dialog = new Dialog(getActivity());
+                dialog.setContentView(R.layout.dialog_add_to_bookmark);
+
+                List<String> folderNames = new ArrayList<>(); // from backend
+                folderNames.add("folder1");
+                folderNames.add("folder2");
+                folderNames.add("folder3");
+
+                folderListRecyclerView = dialog.findViewById(R.id.recycler_view_bookmark_folder_list);
+                folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                dialogAdapter = new BookmarkFolderDialogAdapter(folderNames);
+                folderListRecyclerView.setAdapter(dialogAdapter);
+
+                dialog.show();
+            }
+        });
     }
 
     public String encodeString(String s) {
