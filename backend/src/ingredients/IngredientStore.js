@@ -58,9 +58,7 @@ app.post("/deleteIngredient", async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(req.body),
-        }).then((response) => response.text()).then((data) => {
-            res.send(data);
-        });
+        }).then((response) => response.text()).then((data) => res.send(data));
     } catch (err) {
         res.status(400).send(err);
     }
