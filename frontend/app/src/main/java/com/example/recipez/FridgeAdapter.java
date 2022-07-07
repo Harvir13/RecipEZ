@@ -27,6 +27,7 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.FridgeView
     private OnItemClickListener mListener;
 
     public interface OnItemClickListener {
+        void onItemClick(int position);
         void onDeleteClick(int position);
     }
 
@@ -46,6 +47,18 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.FridgeView
             mIngredientName = itemView.findViewById(R.id.ingredientName);
             mIngredientExpiry = itemView.findViewById(R.id.ingredientExpiry);
             mIngredientDelete = itemView.findViewById(R.id.ingredientDelete);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onItemClick(position);
+                        }
+                    }
+                }
+            });
 
             mIngredientDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
