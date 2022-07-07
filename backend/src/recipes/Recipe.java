@@ -305,6 +305,92 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+
+        public void addPathToPathsList(int userID, String path) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+        String url = "http://10.0.2.2:8084/addNewPath";
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        Map<String, String> jsonParams = new HashMap();
+        jsonParams.put("userID", String.valueOf(userID));
+        jsonParams.put("path", path);
+     
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }) {
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+
+    }
+
+    public void removePathFromPathsList(int userID, String path) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+        String url = "http://10.0.2.2:8084/removeExistingPath";
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        Map<String, String> jsonParams = new HashMap();
+        jsonParams.put("userID", String.valueOf(userID));
+        jsonParams.put("path", path);
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.DELETE, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }) {
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+    }
+
+        public void getPathsList(int userID) {
+            // Instantiate the RequestQueue.
+            RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+            String url = "http://10.0.2.2:8084/getAllPaths?userid=" + userID;
+            // 10.0.2.2 is a special alias to localhost for developers
+
+            // Request a string response from the provided URL.
+            JsonArrayRequest jsonRequest = new JsonArrayRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    });
+
+            // Add the request to the RequestQueue.
+            queue.add(jsonRequest);
+
+        }
+
     }
 
     public final class UserAccount extends MainActivity {

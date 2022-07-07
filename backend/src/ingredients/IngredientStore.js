@@ -16,7 +16,7 @@ const client = new MongoClient(uri);
 async function run() {
   try {
     await client.connect();
-    var server = app.listen(8083, (req, res) => {
+    var server = app.listen(8086, (req, res) => {
       var host = server.address().address;
       var port = server.address().port;
       console.log(
@@ -37,29 +37,7 @@ app.get("/requestIngredients", async (req, res) => {
   console.log(req.query);
   try {
     fetch(
-      "http://localhost:8081/getIngredients?userid=" + req.query["userid"],
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((response) => response.text())
-      .then((data) => {
-        res.send(data);
-        console.log(data);
-      });
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
-
-app.get("/getAllIngredientsInPantry", async (req, res) => {
-  // same as requestIngredients?
-  try {
-    fetch(
-      "http://localhost:8081/getIngredients?userid=" + req.query["userid"],
+      "http://localhost:8085/getIngredients?userid=" + req.query["userid"],
       {
         method: "GET",
         headers: {
@@ -77,29 +55,46 @@ app.get("/getAllIngredientsInPantry", async (req, res) => {
 });
 
 // expects {userid: xxx, ingredient: xxx}
-app.delete("/deleteIngredient", async (req, res) => {
+app.post("/deleteIngredient", async (req, res) => {
+    try {
+        fetch("http://20.53.224.7:8085/removeIngredient", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(req.body),
+        }).then((response) => response.text()).then((data) => res.send(data));
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
+
+// expects {userid: xxx, ingredient: xxx, expiry: xxx}
+app.post("/updateExpiryDate", async (req, res) => {
   try {
-    fetch("http://localhost:8081/removeIngredient", {
-      method: "DELETE",
+    console.log(req.body);
+    fetch("http://localhost:8085/changeExpiry", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(req.body),
     })
       .then((response) => response.text())
-      .then((data) => {
-        res.send(data);
-      });
+      .then((data) => res.send(data));
   } catch (err) {
     res.status(400).send(err);
   }
 });
 
-//expects {userid: xxx}
-app.get("/requestSuggestedRecipes", async (req, res) => {
+//expects {ingredient: xxx}
+app.get("/searchForIngredient", async (req, res) => {
   try {
     fetch(
-      "http://localhost:8081/getIngredients?userid=" + req.query["userid"],
+      "https://api.spoonacular.com/food/ingredients/search?query=" +
+        req.query["ingredient"] +
+        "&number=1&apiKey=" +
+        API_KEY,
       {
         method: "GET",
         headers: {
@@ -107,36 +102,22 @@ app.get("/requestSuggestedRecipes", async (req, res) => {
         },
       }
     )
-      .then((response) => response.text())
+      .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        try {
-          fetch("http://localhost:8081/generateSuggestedRecipesList", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          })
-            .then((response) => response.text())
-            .then((data) => {
-              res.send(data);
-            });
-        } catch (err) {
-          res.status(400).send(err);
-        }
+        res.send(data.results);
       });
   } catch (err) {
     res.status(400).send(err);
   }
 });
 
-app.get("/searchForIngredient", async (req, res) => {
+// expects {string: xxx}
+app.get("/getIngredientSuggestions", async (req, res) => {
   try {
     fetch(
       "https://api.spoonacular.com/food/ingredients/search?query=" +
-        req.query["ingredient"] +
-        "&number=1&apiKey=" +
+        req.query["string"] +
+        "&apiKey=" +
         API_KEY,
       {
         method: "GET",
@@ -169,10 +150,11 @@ app.get("/requestExpiryDate", async (req, res) => {
     )
       .then((response) => response.json())
       .then((data) => {
-        if (data.length == 0) {
-          res.send("-1"); // maybe send -1
+        if (data.length == 0 || data.code == 500) {
+          res.send("-1");
           return;
         }
+        console.log(data);
         let minLevDistance = Number.MAX_VALUE;
         let desiredIngredient;
         data.forEach((ingredient) => {
@@ -222,7 +204,7 @@ app.get("/requestExpiryDate", async (req, res) => {
 app.post("/addIngredient", async (req, res) => {
   try {
     fetch(
-      "http://localhost:8083/searchForIngredient?ingredient=" +
+      "http://localhost:8086/searchForIngredient?ingredient=" +
         req.body.ingredient,
       {
         method: "GET",
@@ -232,14 +214,14 @@ app.post("/addIngredient", async (req, res) => {
       }
     )
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        if (data.length == 0) {
+      .then((spoonacularIng) => {
+        console.log(spoonacularIng);
+        if (spoonacularIng.length == 0) {
           res.send("No ingredient found");
           return;
         }
         fetch(
-          "http://localhost:8083/requestExpiryDate?ingredient=" +
+          "http://localhost:8086/requestExpiryDate?ingredient=" +
             req.body.ingredient,
           {
             method: "GET",
@@ -249,34 +231,38 @@ app.post("/addIngredient", async (req, res) => {
           }
         )
           .then((response) => response.text())
-          .then((expiryDate) => {
-            console.log(expiryDate);
-            console.log("here");
-            if (parseInt(expiryDate) == -1) {
-              res.send(
-                "No expiry date found for ingredient. Enter one manually"
-              );
+          .then((expiryVal) => {
+            console.log(expiryVal);
+            if (parseInt(expiryVal) == -1) {
+              res
+                .status(400)
+                .send(
+                  "No expiry date found for ingredient. Enter one manually"
+                );
               return;
             }
+            let expiryDate =
+              Math.floor(Date.now() / 1000) + parseInt(expiryVal);
             let ingredient = {
               userid: req.body.userid,
               ingredient: {
                 name: req.body.ingredient,
-                expiry: parseInt(expiryDate),
+                expiry: expiryDate,
+                image: spoonacularIng[0].image,
               },
             };
             console.log(ingredient);
-            fetch("http://localhost:8081/storeIngredient", {
+            fetch("http://localhost:8085/storeIngredient", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify(ingredient),
             })
-              .then((response) => response.text())
+              .then((response) => response.json())
               .then((data) => {
                 console.log(data);
-                res.send(data.toString());
+                res.send(data.ingredient);
               });
           });
       });
@@ -289,7 +275,7 @@ app.post("/addIngredient", async (req, res) => {
 app.get("/scanExpiryDates", async (req, res) => {
   try {
     fetch(
-      "http://localhost:8081/getIngredients?userid=" + req.query["userid"],
+      "http://localhost:8085/getIngredients?userid=" + req.query["userid"],
       {
         method: "GET",
         headers: {
@@ -320,8 +306,8 @@ app.get("/checkDietaryRestrictions", async (req, res) => {
       ingredientRestricted = true;
     }
   });
-  if (ingredientRestricted) res.send("Cannot add ingredient");
-  else res.send("Allowed to add ingredient");
+  if (ingredientRestricted) res.send(false); // cannot add ingredient
+  else res.send(true); // allowed to add ingredient
 });
 
 function levenshtein_distance(inputString, realString) {

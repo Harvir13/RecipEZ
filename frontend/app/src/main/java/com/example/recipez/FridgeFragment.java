@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -29,16 +30,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link FridgeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FridgeFragment extends Fragment implements AddIngredientDialog.AddIngredientListener {
+public class FridgeFragment extends Fragment {
     final static String TAG = "FridgeFragment";
 
     private ImageButton addIngredientButton;
@@ -57,7 +62,7 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
 
         public void requestIngredients(String userID, View view) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8083/requestIngredients?userid=" + userID;
+            String url = "http://10.0.2.2:8086/requestIngredients?userid=" + userID;
 
             JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                 @Override
@@ -79,7 +84,7 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, error.toString());
+                    Log.d(TAG, error.toString() + "REQUEST");
                 }
             });
             queue.add(jsonRequest);
@@ -87,14 +92,70 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
 
         public void deleteIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8083/deleteIngredient";
+            String url = "http://10.0.2.2:8086/deleteIngredient";
 
             Map<String, String> jsonParams = new HashMap();
             jsonParams.put("userid", userID);
             jsonParams.put("ingredient", ingredient);
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest
-                    (Request.Method.DELETE, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
+                    (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString() + "DELETE");
+                        }
+                    });
+            queue.add(jsonRequest);
+        }
+
+        public void storeIngredient(String userID, JSONObject ingredient) { // or the actual ingredient, just need the name here
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://10.0.2.2:8086/addIngredient";
+
+            Map<String, String> jsonParams = new HashMap();
+            try {
+                jsonParams.put("userid", userID);
+                jsonParams.put("ingredient", ingredient.getString("name"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            JsonObjectRequest jsonRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            insertItem(response);
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString() + "STORE");
+                        }
+                    });
+            queue.add(jsonRequest);
+        }
+
+        public void updateExpiryDate(String userID, JSONObject ingredient) {
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://10.0.2.2:8086/updateExpiryDate";
+
+
+            Map<String, String> jsonParams = new HashMap();
+            try {
+                jsonParams.put("userid", userID);
+                jsonParams.put("ingredient", ingredient.getString("name"));
+                jsonParams.put("expiry", ingredient.getString("expiry"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            JsonObjectRequest jsonRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.d(TAG, response.toString());
@@ -104,29 +165,13 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
                         public void onErrorResponse(VolleyError error) {
                             Log.d(TAG, error.toString());
                         }
-                    });
+                    }) {
+            };
+
+            // Add the request to the RequestQueue.
             queue.add(jsonRequest);
         }
     }
-
-
-    String dummyList = "[\n" +
-            "    {\n" +
-            "        \"name\": \"Apple\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/715538-312x231.jpg\",\n" +
-            "        \"expiry\": \"123456\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"name\": \"Toasted\\\" Agnolotti (or Ravioli)\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/631807-312x231.jpg\",\n" +
-            "        \"expiry\": \"123456\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"name\": \"Penne with Goat Cheese and Basil\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/655589-312x231.jpg\",\n" +
-            "        \"expiry\": \"123456\"\n" +
-            "    }\n" +
-            "]";
 
     public FridgeFragment() {
         // Required empty public constructor
@@ -153,16 +198,15 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    public void addIngredient(String name, String expiry) {
+    public void addIngredient(String name) {
         JSONObject newIngredient = new JSONObject();
         try {
             newIngredient.put("name", name);
-            newIngredient.put("expiry", expiry);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        insertItem(0, newIngredient);
+        Ingredient ingredient = new Ingredient();
+        ingredient.storeIngredient("11111", newIngredient);
     }
 
     public void buildRecyclerView(View view) {
@@ -176,15 +220,20 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
 
         mAdapter.setOnItemClickListener(new FridgeAdapter.OnItemClickListener() {
             @Override
+            public void onItemClick(int position) {
+                openEditIngredientDialog(position);
+            }
+
+            @Override
             public void onDeleteClick(int position) {
                 removeItem(position);
             }
         });
     }
 
-    public void insertItem(int position, JSONObject insert) {
-        ingredients.add(position, insert);    // TODO: format maybe? how to decide the position?
-        mAdapter.notifyItemInserted(position);
+    public void insertItem(JSONObject insert) {
+        ingredients.add(ingredients.size(), insert);    // TODO: format maybe? how to decide the position?
+        mAdapter.notifyDataSetChanged();
     }
 
     public void removeItem(int position) {
@@ -198,14 +247,18 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
         mAdapter.notifyItemRemoved(position);
     }
 
+    public void editItem(int position, JSONObject editedItem) {
+        Ingredient ingredient = new Ingredient();
+        ingredient.updateExpiryDate("11111", editedItem);
+        ingredients.set(position, editedItem);
+        mAdapter.notifyItemChanged(position);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_fridge, container, false);
-
-        // Maybe make API call here to get JSONArray
-
     }
 
     @Override
@@ -216,7 +269,7 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
         addIngredientButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openDialog();
+                openAddIngredientDialog();
             }
         });
 
@@ -224,26 +277,61 @@ public class FridgeFragment extends Fragment implements AddIngredientDialog.AddI
         ingredient.requestIngredients("11111", view);
     }
 
-    private void openDialog() {
-//        AddIngredientDialog addIngredientDialog = new AddIngredientDialog();
-//        addIngredientDialog.show(getActivity().getSupportFragmentManager(), "add ingredient dialog");
-
+    private void openAddIngredientDialog() {
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_add_ingredient);
 
         EditText editIngredientName = dialog.findViewById(R.id.editIngredientName);
-        EditText editIngredientExpiry = dialog.findViewById(R.id.editIngredientExpiry);
 
         Button addIngredientConfirm = dialog.findViewById(R.id.addIngredientConfirm);
         addIngredientConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String name = editIngredientName.getText().toString();
-                String expiry = editIngredientExpiry.getText().toString();
-                addIngredient(name, expiry);
+                addIngredient(name);
                 dialog.dismiss();
+            }
+        });
 
-                // TODO: add API call to add ingredient to database
+        dialog.show();
+    }
+
+    private void openEditIngredientDialog(int position) {
+        Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_edit_ingredient);
+
+        TextView currentIngredientName = dialog.findViewById(R.id.currentIngredientName);
+        try {
+            currentIngredientName.setText("Update expiry date for " + ingredients.get(position).getString("name"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        EditText newIngredientExpiry = dialog.findViewById(R.id.newIngredientExpiry);
+
+        Button editIngredientSubmit = dialog.findViewById(R.id.editIngredientSubmit);
+        editIngredientSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newExpiryDateString = newIngredientExpiry.getText().toString();
+                if ("".equals(newExpiryDateString)) {
+                    // TODO: CONFIRM EXPIRY DATE IS VALID AND TOAST IF NOT
+                }
+                else {
+                    try {
+                        SimpleDateFormat format = new SimpleDateFormat("MMddyyyy");
+                        format.setTimeZone(TimeZone.getTimeZone("GMT-8"));
+                        String newExpiryDateUnixString = String.valueOf(format.parse(newExpiryDateString).getTime() / 1000L);
+                        JSONObject newIngredientObject = ingredients.get(position);
+                        newIngredientObject.put("expiry", newExpiryDateUnixString);
+                        Log.d(TAG, newExpiryDateUnixString);
+                        editItem(position, newIngredientObject);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    dialog.dismiss();
+                }
             }
         });
 

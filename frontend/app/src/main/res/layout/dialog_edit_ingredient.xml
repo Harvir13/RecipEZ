@@ -5,27 +5,30 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/addIngredientTitle"
+        android:id="@+id/currentIngredientName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_marginBottom="10dp"
-        android:text="Add Ingredient"
+        android:text="TextView"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         android:textStyle="bold" />
 
     <EditText
-        android:id="@+id/editIngredientName"
-        android:layout_width="match_parent"
+        android:id="@+id/newIngredientExpiry"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/addIngredientTitle"
-        android:hint="Name"
+        android:layout_below="@id/currentIngredientName"
+        android:ems="10"
+        android:hint="MMDDYYYY"
+        android:inputType="date"
         android:minHeight="48dp" />
 
     <Button
-        android:id="@+id/addIngredientConfirm"
+        android:id="@+id/editIngredientSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editIngredientName"
-        android:text="Add Ingredient" />
+        android:layout_below="@id/newIngredientExpiry"
+        android:text="Update" />
 </RelativeLayout>

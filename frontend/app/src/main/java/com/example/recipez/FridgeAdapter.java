@@ -1,5 +1,8 @@
 package com.example.recipez;
 
+import static java.lang.Integer.parseInt;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +17,17 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.FridgeViewHolder> {
     private ArrayList<JSONObject> mIngredientList;
     private OnItemClickListener mListener;
 
     public interface OnItemClickListener {
+        void onItemClick(int position);
         void onDeleteClick(int position);
     }
 
@@ -40,6 +47,18 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.FridgeView
             mIngredientName = itemView.findViewById(R.id.ingredientName);
             mIngredientExpiry = itemView.findViewById(R.id.ingredientExpiry);
             mIngredientDelete = itemView.findViewById(R.id.ingredientDelete);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onItemClick(position);
+                        }
+                    }
+                }
+            });
 
             mIngredientDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -73,9 +92,15 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.FridgeView
         JSONObject currentItem = mIngredientList.get(position);
 
         try {
-//            Picasso.get().load(currentItem.getString("image")).fit().centerCrop().into(holder.mIngredientImageView);
-            holder.mIngredientName.setText(currentItem.getString("name"));
-            holder.mIngredientExpiry.setText(currentItem.getString("expiry"));
+            Picasso.get().load("https://spoonacular.com/cdn/ingredients_100x100/" + currentItem.getString("image")).fit().centerCrop().into(holder.mIngredientImageView);
+
+            String name = currentItem.getString("name");
+            holder.mIngredientName.setText(name.substring(0, 1).toUpperCase() + name.substring(1));
+
+            Date date = new Date(parseInt(currentItem.getString("expiry")) * 1000L);
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy");
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT-8"));
+            holder.mIngredientExpiry.setText(sdf.format(date));
         } catch (JSONException e) {
             e.printStackTrace();
         }
