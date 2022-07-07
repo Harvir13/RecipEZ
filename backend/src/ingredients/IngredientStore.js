@@ -56,21 +56,17 @@ app.get("/requestIngredients", async (req, res) => {
 
 // expects {userid: xxx, ingredient: xxx}
 app.post("/deleteIngredient", async (req, res) => {
-  try {
-    fetch("http://localhost:8085/removeIngredient", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(req.body),
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        res.send(data);
-      });
-  } catch (err) {
-    res.status(400).send(err);
-  }
+    try {
+        fetch("http://20.53.224.7:8085/removeIngredient", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(req.body),
+        }).then((response) => response.text()).then((data) => res.send(data));
+    } catch (err) {
+        res.status(400).send(err);
+    }
 });
 
 // expects {userid: xxx, ingredient: xxx, expiry: xxx}

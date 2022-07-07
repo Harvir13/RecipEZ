@@ -37,7 +37,7 @@ app.get("/getIngredients", async (req, res) => {
     }
 });
 
-// expects body of {userid: xxx, ingredient: {name: xxx, expiry: yyy}}
+// expects body of {userid: xxx, ingredient: {name: xxx, expiry: yyy, image: zzz}}
 app.post("/storeIngredient", async (req, res) => {
     try {
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid) }).then((result) => {
@@ -97,7 +97,7 @@ app.post("/changeExpiry", async (req, res) => {
                 }
             });
             let updateString = {$set: { ingredients: result.ingredients }};
-        client.db("IngredientDB").collection("Users").updateOne({ "userid": parseInt(req.body.userid)}, updateString).then(res.send(req.body))
+            client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid) }, updateString).then(res.send(req.body))
         });
     } catch (err) {
         res.status(400).send(err);
