@@ -13,9 +13,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -136,6 +140,38 @@ public class AllergiesListFragment extends Fragment {
                     });
             queue.add(jsonRequest);
         }
+
+        public void getIngredientSuggestions(String string) {
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://20.53.224.7:8086/getIngredientSuggestions?string=" + string;
+            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            try {
+                                ArrayList<String> ingredientSuggestions = new ArrayList<>();
+                                for (int i = 0; i < response.length(); i++) {
+                                    ingredientSuggestions.add(response.getJSONObject(i).getString("name"));
+                                }
+                                if (ingredientSuggestions.size() == 0) {
+                                    Toast.makeText(getActivity().getApplicationContext(), "No ingredients found, please try a different search", Toast.LENGTH_LONG).show();
+                                    openAddAllergyDialog();
+                                }
+                                else {
+                                    openSelectIngredientDialog(ingredientSuggestions);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    });
+            queue.add(jsonArrayRequest);
+        }
     }
 
         public AllergiesListFragment() {
@@ -229,7 +265,27 @@ public class AllergiesListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String name = editIngredientName.getText().toString();
-                addItem(name);
+                Ingredient ingredient = new Ingredient();
+                ingredient.getIngredientSuggestions(name);
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void openSelectIngredientDialog(ArrayList<String> selectIngredients) {
+        Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_select_ingredient);
+
+        ListView selectIngredientList = dialog.findViewById(R.id.selectIngredientList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), R.layout.list_row_select_ingredient, selectIngredients);
+        selectIngredientList.setAdapter(adapter);
+
+        selectIngredientList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                addItem(selectIngredients.get(position));
                 dialog.dismiss();
             }
         });
