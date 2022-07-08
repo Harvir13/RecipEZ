@@ -69,6 +69,8 @@ public class RecipeDetailFragment extends Fragment {
     private Button addToBookmarkConfirmButton;
     private RecyclerView folderListRecyclerView;
 
+    private int userID = 1;
+
     public RecipeDetailFragment() {
         // Required empty public constructor
     }
@@ -107,15 +109,20 @@ public class RecipeDetailFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_recipe_detail, container, false);
     }
 
-    BookmarkFolderDialogAdapter dialogAdapter;
+    private BookmarkFolderDialogAdapter dialogAdapter;
+    private List<String> folderNames = new ArrayList<>();
+    int recipeID;
+    String recipeName;
+    String recipeImageUrl;
+
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         Bundle bundle = this.getArguments();
-        int recipeID = bundle.getInt("RECIPE_ID", 0);
-        String recipeName = bundle.getString("RECIPE_TITLE", "");
-        String recipeImageUrl = bundle.getString("RECIPE_IMAGE", "");
+        recipeID = bundle.getInt("RECIPE_ID", 0);
+        recipeName = bundle.getString("RECIPE_TITLE", "");
+        recipeImageUrl = bundle.getString("RECIPE_IMAGE", "");
 
         recipeIDText = view.findViewById(R.id.recipe_id_text);
         recipeIDText.setText(String.valueOf(bundle.getInt("RECIPE_ID", 0)));
@@ -140,41 +147,39 @@ public class RecipeDetailFragment extends Fragment {
                 Dialog dialog = new Dialog(getActivity());
                 dialog.setContentView(R.layout.dialog_add_to_bookmark);
 
-                List<String> folderNames = new ArrayList<>(); // from backend
-                folderNames.add("folder1");
-                folderNames.add("folder2");
-                folderNames.add("folder3");
+                getPathsList(userID);
+                getRecipesFromBookmarkList(userID);
 
                 folderListRecyclerView = dialog.findViewById(R.id.recycler_view_bookmark_folder_list);
 
-                StringBuilder selectedFolderName = new StringBuilder();
-                bookmarkFolderClickListener = new BookmarkFolderClickListener() {
-                    @Override
-                    public void onClick(String str) {
-                        folderListRecyclerView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialogAdapter.notifyDataSetChanged();
-                            }
-                        });
-                        selectedFolderName.append(str);
-                    }
-                };
+//                StringBuilder selectedFolderName = new StringBuilder();
+//                bookmarkFolderClickListener = new BookmarkFolderClickListener() {
+//                    @Override
+//                    public void onClick(String str) {
+//                        folderListRecyclerView.post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                dialogAdapter.notifyDataSetChanged();
+//                            }
+//                        });
+//                        selectedFolderName.append(str);
+//                    }
+//                };
 
                 addToBookmarkConfirmButton = dialog.findViewById(R.id.dialog_add_to_bookmark_confirm_button);
-                addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Recipe recipe = new Recipe();
-                        recipe.addRecipeToBookmarkList(1, recipeID, selectedFolderName.toString(), recipeName, recipeImageUrl); // TODO: update user ID
-                        Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName.toString(), Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                    }
-                });
-
-                folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                dialogAdapter = new BookmarkFolderDialogAdapter(folderNames, bookmarkFolderClickListener);
-                folderListRecyclerView.setAdapter(dialogAdapter);
+//                addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        Recipe recipe = new Recipe();
+//                        recipe.addRecipeToBookmarkList(userID, recipeID, selectedFolderName.toString(), recipeName, recipeImageUrl); // TODO: update user ID
+//                        Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName.toString(), Toast.LENGTH_SHORT).show();
+//                        dialog.dismiss();
+//                    }
+//                });
+//
+//                folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+//                dialogAdapter = new BookmarkFolderDialogAdapter(folderNames, bookmarkFolderClickListener);
+//                folderListRecyclerView.setAdapter(dialogAdapter);
 
                 dialog.show();
             }
@@ -231,38 +236,6 @@ public class RecipeDetailFragment extends Fragment {
             myStaticMember = 1;
         }
 
-        public void addRecipeToBookmarkList(int userID, int recipeID, String path, String title, String image) {
-            // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8084/addRecipe";
-            // 10.0.2.2 is a special alias to localhost for developers
-
-            Map<String, String> jsonParams = new HashMap();
-            jsonParams.put("userID", String.valueOf(userID));
-            jsonParams.put("recipeID", String.valueOf(recipeID));
-            jsonParams.put("path", path);
-            jsonParams.put("title", title);
-            jsonParams.put("image", image);
-
-            // Request a string response from the provided URL.
-            JsonObjectRequest jsonRequest = new JsonObjectRequest
-                    (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.d(TAG, response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
-                        }
-                    }) {
-            };
-
-            // Add the request to the RequestQueue.
-            queue.add(jsonRequest);
-        }
-
         public void removeRecipeFromBookmarkList(int userID, int recipeID) {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
@@ -290,31 +263,6 @@ public class RecipeDetailFragment extends Fragment {
 
             // Add the request to the RequestQueue.
             queue.add(jsonRequest);
-        }
-
-        public void getRecipesFromBookmarkList(int userID) {
-            // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID;
-            // 10.0.2.2 is a special alias to localhost for developers
-
-            // Request a string response from the provided URL.
-            JsonObjectRequest jsonRequest = new JsonObjectRequest
-                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.d(TAG, response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
-                        }
-                    });
-
-            // Add the request to the RequestQueue.
-            queue.add(jsonRequest);
-
         }
 
         public void filterRecipes(String[] ingredients, String[] filters, String[] restrictions) {
@@ -455,5 +403,188 @@ public class RecipeDetailFragment extends Fragment {
             // Add the request to the RequestQueue.
             queue.add(jsonObjectRequest);
         }
+    }
+
+    public void addRecipeToBookmarkList(int userID, int recipeID, String path, String title, String image) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://20.53.224.7:8084/addRecipe";
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        Map<String, String> jsonParams = new HashMap();
+        jsonParams.put("userID", String.valueOf(userID));
+        jsonParams.put("recipeID", String.valueOf(recipeID));
+        jsonParams.put("path", path);
+        jsonParams.put("title", title);
+        jsonParams.put("image", image);
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }) {
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+    }
+
+    public void getRecipesFromBookmarkList(int userID) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID;
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+
+    }
+
+    public void addPathToPathsList(int userID, String path) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://20.53.224.7:8084/addNewPath";
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        Map<String, String> jsonParams = new HashMap();
+        jsonParams.put("userID", String.valueOf(userID));
+        jsonParams.put("path", path);
+
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }) {
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+
+    }
+
+    public void removePathFromPathsList(int userID, String path) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://20.53.224.7:8084/removeExistingPath";
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        Map<String, String> jsonParams = new HashMap();
+        jsonParams.put("userID", String.valueOf(userID));
+        jsonParams.put("path", path);
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }) {
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+    }
+
+    public void getPathsList(int userID) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://20.53.224.7:8084/getAllPaths?userid=" + userID;
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        // Request a string response from the provided URL.
+        JsonArrayRequest jsonRequest = new JsonArrayRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            for (int i = 0; i < response.length(); i++) {
+                                if (response.getJSONObject(i).getInt("userID") == userID) {
+                                    JSONArray pathsArray = response.getJSONObject(i).getJSONArray("paths");
+                                    for (int j = 0; j < pathsArray.length(); j++) {
+                                        folderNames.add(pathsArray.get(j).toString());
+                                    }
+                                    break;
+                                }
+                            }
+
+                            final String[] selectedFolderName = new String[1];
+                            bookmarkFolderClickListener = new BookmarkFolderClickListener() {
+                                @Override
+                                public void onClick(String str) {
+                                    folderListRecyclerView.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            dialogAdapter.notifyDataSetChanged();
+                                        }
+                                    });
+                                    selectedFolderName[0] = str;
+                                }
+                            };
+
+                            addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    addRecipeToBookmarkList(userID, recipeID, selectedFolderName[0].toString(), recipeName, recipeImageUrl); // TODO: update user ID
+                                    Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName[0].toString(), Toast.LENGTH_SHORT).show();
+//                                    dialog.dismiss();
+                                }
+                            });
+
+                            folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                            dialogAdapter = new BookmarkFolderDialogAdapter(folderNames, bookmarkFolderClickListener);
+                            folderListRecyclerView.setAdapter(dialogAdapter);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+
     }
 }

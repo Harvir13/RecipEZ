@@ -17,6 +17,9 @@
     <string name="recipe_detail_nutrition_list">Nutritional Details List</string>
     <string name="add_to_bookmark_title">Add to a bookmark folder</string>
     <string name="dialog_add_to_bookmark_confirm_button">Confirm</string>
+    <string name="dialog_add_to_bookmark_new_folder_text">Create new folders in Profile -> Bookmarked Recipes</string>
+    <string name="dialog_add_to_bookmark_existing_folder_text">This recipe is not in any folders</string>
+    <string name="dialog_add_to_bookmark_remove_button">Remove bookmark</string>
 
     <!-- Profile Fragment -->
     <string name="user_pref_name_text">Your name</string>

@@ -3,7 +3,7 @@
     android:layout_width="350dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="6dp">
+    android:padding="10dp">
 
     <TextView
         android:id="@+id/dialog_new_folder_title"
