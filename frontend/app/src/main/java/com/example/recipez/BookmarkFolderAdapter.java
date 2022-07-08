@@ -1,8 +1,12 @@
 package com.example.recipez;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -12,10 +16,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAdapter.FolderViewHolder> {
     final static String TAG = "BookmarkFolderAdapter";
@@ -23,6 +36,7 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
     private List<BookmarkFolder> foldersList;
     private List<JSONObject> recipesInFolder = new ArrayList<>();
 
+    private int userID = 1; // todo: change user id
     public BookmarkFolderAdapter(List<BookmarkFolder> foldersList){
         this.foldersList  = foldersList;
     }
@@ -35,8 +49,8 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FolderViewHolder holder, int position) {
-        BookmarkFolder folder = foldersList.get(position);
+    public void onBindViewHolder(@NonNull FolderViewHolder holder, @SuppressLint("RecyclerView") int position) {
+        BookmarkFolder folder = foldersList.get(holder.getAdapterPosition());
         holder.folderName.setText(folder.getFolderName());
 
         boolean isExpandable = folder.isExpandable();
@@ -54,6 +68,18 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
                 notifyItemChanged(holder.getAdapterPosition());
             }
         });
+
+        holder.deleteFolderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removePathFromPathsList(userID, folder.getFolderName(), holder.deleteFolderButton.getContext());
+                foldersList.remove(holder.getAdapterPosition());
+                notifyItemRemoved(holder.getAdapterPosition());
+                if (holder.getAdapterPosition() != getItemCount() - 1) {
+                    notifyItemRangeChanged(holder.getAdapterPosition(), getItemCount() - holder.getAdapterPosition());
+                }
+            }
+        });
     }
 
     @Override
@@ -66,6 +92,7 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
         private RelativeLayout expandableFolderLayout;
         private TextView folderName;
         private RecyclerView folderNestedRecyclerView;
+        private ImageButton deleteFolderButton;
 
         public FolderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -74,6 +101,36 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
             expandableFolderLayout = itemView.findViewById(R.id.expandable_folder_layout);
             folderName = itemView.findViewById(R.id.folder_name_text);
             folderNestedRecyclerView = itemView.findViewById(R.id.folder_child_recycler_view);
+            deleteFolderButton = itemView.findViewById(R.id.folder_delete_button);
         }
+    }
+
+    public void removePathFromPathsList(int userID, String path, Context context) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(context);
+        String url = "http://20.53.224.7:8084/removeExistingPath";
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        Map<String, String> jsonParams = new HashMap();
+        jsonParams.put("userID", String.valueOf(userID));
+        jsonParams.put("path", path);
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }) {
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
     }
 }
