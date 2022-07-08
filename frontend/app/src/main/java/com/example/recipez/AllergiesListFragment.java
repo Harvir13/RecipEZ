@@ -1,5 +1,6 @@
 package com.example.recipez;
 
+import android.app.Dialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.android.volley.Request;
@@ -29,6 +32,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,9 +64,14 @@ public class AllergiesListFragment extends Fragment {
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Log.d(TAG, response.toString());
+                    Log.d(TAG, "requested: " + response.toString());
                     try {
-                        allergiesList = new ArrayList(Arrays.asList(response.get("dietaryRestrictions")));
+                        allergiesList = new ArrayList<>();
+                        JSONArray restrictions = (JSONArray) response.get("dietaryRestrictions");
+                        for (int i = 0; i < restrictions.length(); i++) {
+                            Log.d(TAG, restrictions.get(i).toString());
+                            allergiesList.add(restrictions.get(i).toString());
+                        }
                     } catch (JSONException e) {
                         Log.d(TAG, e.toString());
                         e.printStackTrace();
@@ -84,7 +93,7 @@ public class AllergiesListFragment extends Fragment {
             String url = "http://20.53.224.7:8082/deleteRestrictions";
 
             Map<String, String> jsonParams = new HashMap();
-            jsonParams.put("userid", userID);
+            jsonParams.put("userID", userID);
             jsonParams.put("restriction", ingredient);
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -108,7 +117,7 @@ public class AllergiesListFragment extends Fragment {
 
             Map<String, String> jsonParams = new HashMap();
             try {
-                jsonParams.put("userid", userID);
+                jsonParams.put("userID", userID);
                 jsonParams.put("restriction", ingredient);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -179,6 +188,13 @@ public class AllergiesListFragment extends Fragment {
         mAdapter.notifyItemRemoved(position);
     }
 
+    public void addItem(String restriction) {
+        Ingredient ingredient = new Ingredient();
+        ingredient.addAllergy("11111", restriction);
+        allergiesList.add(allergiesList.size(), restriction);
+        mAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -190,11 +206,34 @@ public class AllergiesListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        addAllergyButton = view.findViewById(R.id.addAllergyButton);
+        addAllergyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAddAllergyDialog();
+            }
+        });
+
         Ingredient ingredient = new Ingredient();
         ingredient.requestAllergiesList("11111", view); // TODO
+    }
 
-//        allergiesList = new ArrayList<String>(Arrays.asList(new String[]{"Peanuts", "Walnuts"}));
+    public void openAddAllergyDialog() {
+        Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_add_ingredient);
 
-        buildRecyclerView(view);
+        EditText editIngredientName = dialog.findViewById(R.id.editIngredientName);
+
+        Button addIngredientConfirm = dialog.findViewById(R.id.addIngredientConfirm);
+        addIngredientConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = editIngredientName.getText().toString();
+                addItem(name);
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 }
