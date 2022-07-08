@@ -59,6 +59,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/allergy_and_food_restrictions_button"
             android:layout_width="182dp"
             android:layout_height="wrap_content"
             android:clickable="true"

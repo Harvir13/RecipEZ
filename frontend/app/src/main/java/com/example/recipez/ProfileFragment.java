@@ -47,6 +47,7 @@ public class ProfileFragment extends Fragment {
     private ImageView userGooglePhoto;
     private ListView settingsList;
     private CardView bookmarkListButton;
+    private CardView allergyAndFoodRestrictionButton;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -116,6 +117,15 @@ public class ProfileFragment extends Fragment {
                     Fragment fragment = new AppSettingsFragment();
                     getParentFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
                 }
+            }
+        });
+
+        allergyAndFoodRestrictionButton = view.findViewById(R.id.allergy_and_food_restrictions_button);
+        allergyAndFoodRestrictionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new AllergiesListFragment();
+                getParentFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
             }
         });
 
