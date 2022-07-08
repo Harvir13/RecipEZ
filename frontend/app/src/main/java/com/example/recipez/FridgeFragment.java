@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -184,7 +185,13 @@ public class FridgeFragment extends Fragment {
                                 for (int i = 0; i < response.length(); i++) {
                                     ingredientSuggestions.add(response.getJSONObject(i).getString("name"));
                                 }
-                                openSelectIngredientDialog(ingredientSuggestions);
+                                if (ingredientSuggestions.size() == 0) {
+                                    Toast.makeText(getActivity().getApplicationContext(), "No ingredients found, please try a different search", Toast.LENGTH_LONG).show();
+                                    openAddIngredientDialog();
+                                }
+                                else {
+                                    openSelectIngredientDialog(ingredientSuggestions);
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
