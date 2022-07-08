@@ -13,9 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -60,14 +63,13 @@ public class FridgeFragment extends Fragment {
             myStaticMember = 1;
         }
 
-        public void requestIngredients(String userID, View view) {
+        public void requestIngredients(String userID) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8086/requestIngredients?userid=" + userID;
+            String url = "http://20.53.224.7:8086/requestIngredients?userid=" + userID;
 
             JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                 @Override
                 public void onResponse(JSONArray response) {
-                    Log.d(TAG, response.toString());
                     try {
                         ingredients = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
@@ -75,11 +77,10 @@ public class FridgeFragment extends Fragment {
                             ingredients.add(ingredientObject);
                         }
                     } catch (JSONException e) {
-                        Log.d(TAG, e.toString());
                         e.printStackTrace();
                     }
 
-                    buildRecyclerView(view);
+                    buildFridgeRecyclerView();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -92,7 +93,7 @@ public class FridgeFragment extends Fragment {
 
         public void deleteIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8086/deleteIngredient";
+            String url = "http://20.53.224.7:8086/deleteIngredient";
 
             Map<String, String> jsonParams = new HashMap();
             jsonParams.put("userid", userID);
@@ -115,7 +116,7 @@ public class FridgeFragment extends Fragment {
 
         public void storeIngredient(String userID, JSONObject ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8086/addIngredient";
+            String url = "http://20.53.224.7:8086/addIngredient";
 
             Map<String, String> jsonParams = new HashMap();
             try {
@@ -142,8 +143,7 @@ public class FridgeFragment extends Fragment {
 
         public void updateExpiryDate(String userID, JSONObject ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://10.0.2.2:8086/updateExpiryDate";
-
+            String url = "http://20.53.224.7:8086/updateExpiryDate";
 
             Map<String, String> jsonParams = new HashMap();
             try {
@@ -163,13 +163,39 @@ public class FridgeFragment extends Fragment {
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
+                            Log.d(TAG, error.toString() + "::updateExpiryDate");
                         }
                     }) {
             };
 
             // Add the request to the RequestQueue.
             queue.add(jsonRequest);
+        }
+
+        public void getIngredientSuggestions(String string) {
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://20.53.224.7:8086/getIngredientSuggestions?string=" + string;
+            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            try {
+                                ArrayList<String> ingredientSuggestions = new ArrayList<>();
+                                for (int i = 0; i < response.length(); i++) {
+                                    ingredientSuggestions.add(response.getJSONObject(i).getString("name"));
+                                }
+                                openSelectIngredientDialog(ingredientSuggestions);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    });
+            queue.add(jsonArrayRequest);
         }
     }
 
@@ -209,8 +235,8 @@ public class FridgeFragment extends Fragment {
         ingredient.storeIngredient("11111", newIngredient);
     }
 
-    public void buildRecyclerView(View view) {
-        mRecyclerView = view.findViewById(R.id.fridgeRecyclerView);
+    public void buildFridgeRecyclerView() {
+        mRecyclerView = getView().findViewById(R.id.fridgeRecyclerView);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getActivity());
         mAdapter = new FridgeAdapter(ingredients);
@@ -274,7 +300,26 @@ public class FridgeFragment extends Fragment {
         });
 
         Ingredient ingredient = new Ingredient();
-        ingredient.requestIngredients("11111", view);
+        ingredient.requestIngredients("11111");
+    }
+
+    private void openSelectIngredientDialog(ArrayList<String> selectIngredients) {
+        Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_select_ingredient);
+
+        ListView selectIngredientList = dialog.findViewById(R.id.selectIngredientList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), R.layout.list_row_select_ingredient, selectIngredients);
+        selectIngredientList.setAdapter(adapter);
+
+        selectIngredientList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                addIngredient(selectIngredients.get(position));
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     private void openAddIngredientDialog() {
@@ -288,7 +333,9 @@ public class FridgeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String name = editIngredientName.getText().toString();
-                addIngredient(name);
+//                addIngredient(name);
+                Ingredient ingredient = new Ingredient();
+                ingredient.getIngredientSuggestions(name);
                 dialog.dismiss();
             }
         });
