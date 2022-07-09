@@ -1,27 +1,31 @@
 import express from "express";
-import { MongoClient } from "mongodb";
 import fetch from "node-fetch";
-
-const uri = "mongodb://localhost:27017";
-const client = new MongoClient(uri);
+// import admin from "firebase-admin";
+// import { createRequire } from 'module';
 
 const API_KEY = "1b961ea726c449868f6bffe1dd76da71";
-var registrationToken = "dQeP0tUfTCmXF_TUVvk615:APA91bFbY6JuIRlxVzPv4EDvzkP1ubgQJm7VEplUpNCm1jedXaNEzrbad9Bs0DnmTKB2TbjLlgKqZj47Hm4lRyK2jZB5aHCa5N7iGiVDk9eJ7xF2QfiVeTEtpYJ0qyHYZ1pi6efATAms";
-const SERVER_KEY = "key=AAAAPdt3dzY:APA91bFC9GpDCB1ZNHT4f9M7vWtZu39390qdypz6gQMhe0gwXQj47TSS9V-HHB5hjIB6EO0WHWw8CYt5vSvgzgl6E4HKbUxRV0T9QnQWCEyqz4aTZL4mfjgdILHl-VPyQLJ_eBD_ntyz";
+// var registrationToken = "dQeP0tUfTCmXF_TUVvk615:APA91bFbY6JuIRlxVzPv4EDvzkP1ubgQJm7VEplUpNCm1jedXaNEzrbad9Bs0DnmTKB2TbjLlgKqZj47Hm4lRyK2jZB5aHCa5N7iGiVDk9eJ7xF2QfiVeTEtpYJ0qyHYZ1pi6efATAms";
+const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
 
 var app = express();
 app.use(express.json());
 
+
+// const require = createRequire(import.meta.url);
+// var serviceAccount = require("./recipez-92366-firebase-adminsdk-i7kge-e682dcca8c.json");
+
+// admin.initializeApp({
+// 	credential: admin.credential.cert(serviceAccount),
+//   })
+
 async function run() {
   	try {
-		await client.connect();
 		var server = app.listen(8086, (req, res) => {
 			var host = server.address().address;
 			var port = server.address().port;
 			console.log("Example server successfully running at http://%s:%s", host, port);
 		});
 	} catch (err) {
-		await client.close();
 	}
 }
 
@@ -231,26 +235,32 @@ app.get("/scanExpiryDates", async (req, res) => {
 	}
 });
 
-// expects {userid: xxx}
+// expects {userid: xxx, time: zzz}
 app.get("/expiringIngredients", async (req, res) => {
-	try {
-		fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"],
-		{
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		}).then((response) => response.json()).then((data) => {
-			let expiringSoon = [];
-			data.forEach((ingredient) => {
-				if (ingredient.expiry - 86400 * 2 <= req.query["time"])
-					expiringSoon.push(ingredient); // 86400 = 1 day in seconds
-			});
-			res.send(expiringSoon);
-		});
-	} catch (err) {
-		res.status(400).send(err);
-	}
+    try {
+        fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"],
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then((response) => response.json()).then((data) => {
+            let expiringSoon = [];
+            data.forEach((ingredient) => {
+                let ingDate = new Date(0);
+                let currDate = new Date(0);
+                ingDate.setUTCSeconds(ingredient.expiry - (86400 * 2)); // 86400 = 1 day in seconds
+                currDate.setUTCSeconds(parseInt(req.query["time"]));
+                if (ingDate <= currDate) {
+					console.log(ingredient)
+					expiringSoon.push(ingredient);
+				}
+            });
+            res.send(expiringSoon);
+        });
+    } catch (err) {
+        res.status(400).send(err);
+    }
 });
 
 // expects { {restrictions: xxx, yyy, zzz}, ingredient: xxx}
@@ -287,8 +297,10 @@ function levenshtein_distance(inputString, realString) {
 }
 
 // checks expiry dates and sends a notification to the user, if something is expiring
-function sendExpiryNotification() {
-	let currTime = Date.now().toString();
+function sendExpiryNotification(res) {
+	let currTime = Math.round(Date.now() / 1000).toString();
+	// let currTime = Date.now().toString()
+	console.log("Current time: " + currTime)
 	fetch("http://20.53.224.7:8086/scanExpiryDates?time=" + currTime, {
 		method: "GET",
 		headers: {
@@ -301,6 +313,7 @@ function sendExpiryNotification() {
 			userids += data.toString();
 			userids += ",";
 		}
+		userids = userids.slice(0,-1)
 		console.log(userids);
 		fetch("http://20.53.224.7:8082/getUserTokens?userids=" + userids, {
 			method: "GET",
@@ -308,19 +321,22 @@ function sendExpiryNotification() {
 				"Content-type": "application/json"
 			}
 		}).then((response) => response.json()).then((tokens) => {
+			console.log(tokens)
 			data.forEach((user) => {
 				console.log(user)
-				fetch("http://20.53.224.7:8086/expiringIngredients?userid=" + user.toString(), {
+				fetch("http://20.53.224.7:8086/expiringIngredients?userid=" + user.toString() + "&time=" + currTime, {
 					method: "GET",
 					headers: {
 						"Content-type": "application/json"
 					}
 				}).then((response) => response.json()).then((ingredient) => {
-					let json = {
+					console.log("Expiring Ingredients:" + ingredient)
+					var currToken = tokens.find((pair) => pair.userID == user).token
+					var json = {
 						"data": {
 							"ingredients": ingredient
 						},
-						"to": tokens.find((pair) => pair.userID == user).token
+						"to": currToken.toString()
 					}
 					fetch("https://fcm.googleapis.com/fcm/send", {
 						method: "POST",
@@ -332,6 +348,18 @@ function sendExpiryNotification() {
 					}).then((response) => response.text()).then((data) => {
 						console.log(data);
 					});
+					// admin.messaging().sendToDevice(currToken.toString(), {"data": {"ingredients": ingredient.toString()}}, {
+					// 	priority: "high",
+					// 	timeToLive: 60 * 60 * 24
+					//   })
+					// .then( response => {
+					// 	console.log(response)
+					// 	console.log("Send to: " + currToken.toString())
+					// })
+					// .catch( error => {
+					// 	console.log(error);
+					// });
+
 				})
 			})
 		})
