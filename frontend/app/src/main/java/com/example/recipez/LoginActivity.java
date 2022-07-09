@@ -1,5 +1,6 @@
 package com.example.recipez;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -21,7 +22,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,7 +75,26 @@ public class LoginActivity extends AppCompatActivity {
                 signIn();
             }
         });
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // Log
+                        Log.d(TAG, "Token: " + token);
+                    }
+                });
     }
+
+
 
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -162,6 +186,83 @@ public class LoginActivity extends AppCompatActivity {
         return result;
     }
 
+    public class MyFirebaseMessagingService extends FirebaseMessagingService {
+
+        private static final String TAG = "MyFirebaseMsgService";
+
+        @Override
+        public void onMessageReceived(RemoteMessage remoteMessage) {
+            // TODO(developer): Handle FCM messages here.
+            // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
+            Log.d(TAG, "Received message");
+            Log.d(TAG, "From: " + remoteMessage.getFrom());
+
+            // Check if message contains a data payload.
+//            if (remoteMessage.getData().size() > 0) {
+//                Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+//
+//            }
+//
+//            // Check if message contains a notification payload.
+            if (remoteMessage.getNotification() != null) {
+                Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            }
+
+            // Also if you intend on generating your own notifications as a result of a received FCM
+            // message, here is where that should be initiated. See sendNotification method below.
+        }
+
+        /**
+         * There are two scenarios when onNewToken is called:
+         * 1) When a new token is generated on initial app startup
+         * 2) Whenever an existing token is changed
+         * Under #2, there are three scenarios when the existing token is changed:
+         * A) App is restored to a new device
+         * B) User uninstalls/reinstalls the app
+         * C) User clears app data
+         */
+        @Override
+        public void onNewToken(@NonNull String token) {
+            Log.d(TAG, "Refreshed token: " + token);
+
+            // If you want to send messages to this application instance or
+            // manage this apps subscriptions on the server side, send the
+            // FCM registration token to your app server.
+            int userID = sharedpreferences.getInt("userID", 0);
+            sendRegistrationToServer(token, userID);
+        }
+
+        private void sendRegistrationToServer(String token, int userID) {
+            // Instantiate the RequestQueue.
+            RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
+            String url = "http://20.53.224.7:8082/storeUserToken";
+            // 10.0.2.2 is a special alias to localhost for developers
+
+            Map<String, String> jsonParams = new HashMap();
+            jsonParams.put("token", token);
+            jsonParams.put("userID", String.valueOf(userID));
+
+
+            // Request a string response from the provided URL.
+            JsonObjectRequest jsonRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    }) {
+            };
+
+            // Add the request to the RequestQueue.
+            queue.add(jsonRequest);
+        }
+    }
+
     public final class UserAccount extends MainActivity {
         private int myStaticMember;
         private String TAG = "User Class";
@@ -184,11 +285,8 @@ public class LoginActivity extends AppCompatActivity {
                             //TODO: locally store user account information
 
                             try {
-                                String restrictions = convertJSONArrayToString((JSONArray) response.get("dietaryRestrictions"));
-                                Log.d(TAG, restrictions);
                                 SharedPreferences.Editor myEdit = sharedpreferences.edit();
-                                myEdit.putString("dietaryRestrictions", restrictions);
-                                myEdit.putInt("userID", (int) response.get("id"));
+                                myEdit.putInt("userID", (int) response.get("userID"));
                                 myEdit.apply();
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -212,37 +310,6 @@ public class LoginActivity extends AppCompatActivity {
 //        public void notifyUser(String message) {
 //
 //        }
-
-        public void updateRestrictions (int userID, String[] dietaryRestrictions) {
-            // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-            String url = "http://20.53.224.7:8082/updateRestrictions";
-            // 10.0.2.2 is a special alias to localhost for developers
-
-            Map<String, String> jsonParams = new HashMap();
-            jsonParams.put("userID", String.valueOf(userID));
-            jsonParams.put("dietaryRestrictions", encodeString(convertArrayToString(dietaryRestrictions)));
-
-
-            // Request a string response from the provided URL.
-            JsonObjectRequest jsonRequest = new JsonObjectRequest
-                    (Request.Method.PUT, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.d(TAG, response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
-                        }
-                    }) {
-            };
-
-            // Add the request to the RequestQueue.
-            queue.add(jsonRequest);
-        }
-
     }
 
 }

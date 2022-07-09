@@ -28,7 +28,7 @@ async function run() {
 run();
 
 setInterval(function() {
-	sendExpiryNotification("22222", registrationToken);
+	sendExpiryNotification();
 }, 10000)
 
 //expects {userid: xxx}
