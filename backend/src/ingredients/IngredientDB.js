@@ -69,23 +69,24 @@ app.delete("/removeIngredient", async (req, res) => {
     }
 });
 
-// expects {userid: xxx, ingredient: xxx, time: xxx}
-app.get("/isExpired", async (req, res) => {
+// expects {time: xxx}
+app.get("/usersWithExpiringIngredients", async (req, res) => {
+    let expiringUsers = []
     try {
-        client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.query["userid"]) }).then((result) => {
-            let ingredient = result.ingredients.filter(function (value) {
-                return value.name == req.query["ingredient"];
+        client.db("IngredientDB").collection("Users").find().toArray().then((result) => {
+            result.forEach((user) => {
+                let hasExpiring = false;
+                user.ingredients.forEach((ingredient) => {
+                    if (ingredient.expiry <= req.query["time"] + (86400 * 2)) hasExpiring = true;
+                });
+                if (hasExpiring) expiringUsers.push(user.userid);
             });
-            if (ingredient[0].expiry <= parseInt(req.query["time"])) {
-                res.send(true);
-            } else {
-                res.send(false);
-            }
+            res.send(expiringUsers);
         });
     } catch (err) {
         res.status(400).send(err);
     }
-});
+})
 
 // expects {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/changeExpiry", async (req, res) => {
