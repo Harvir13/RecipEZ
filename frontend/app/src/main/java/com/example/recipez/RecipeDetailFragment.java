@@ -440,19 +440,19 @@ public class RecipeDetailFragment extends Fragment {
                             JSONArray recipesArray = response.getJSONArray("recipes");
                             boolean alreadyBookmarked = false;
                             outerloop:
-//                            for (int i = 0; i < folderNames.size(); i++) {
+                            for (int i = 0; i < folderNames.size(); i++) {
                                 for (int j = 0; j < recipesArray.length(); j++) {
                                     JSONObject recipeObject = recipesArray.getJSONObject(j);
                                     String recipeFolderPath = recipeObject.getString("path");
 
-                                    if ((recipeObject.getInt("recipeID") == recipeID)) {//&& recipeFolderPath.equals(folderNames.get(i))) {
-                                        existingFolderText.setText("This recipe is already bookmarked in: ");// + folderNames.get(i));
+                                    if ((recipeObject.getInt("recipeID") == recipeID) && recipeFolderPath.equals(folderNames.get(i))) {
+                                        existingFolderText.setText("This recipe is already bookmarked in: " + folderNames.get(i));
                                         addToBookmarkConfirmButton.setEnabled(false);
                                         alreadyBookmarked = true;
                                         break outerloop;
                                     }
                                 }
-//                            }
+                            }
                             if (!alreadyBookmarked) {
                                 existingFolderText.setText("This recipe is not in any folders");
                                 removeFromBookmarkButton.setEnabled(false);
