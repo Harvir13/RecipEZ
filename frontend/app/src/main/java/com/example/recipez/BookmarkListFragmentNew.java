@@ -90,68 +90,6 @@ public class BookmarkListFragmentNew extends Fragment {
         return inflater.inflate(R.layout.fragment_bookmark_list_new, container, false);
     }
 
-    String dummyList = "[\n" +
-            "    {\n" +
-            "        \"id\": 715538,\n" +
-            "        \"title\": \"What to make for dinner tonight?? Bruschetta Style Pork & Pasta\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/715538-312x231.jpg\",\n" +
-            "        \"path\": \"folder1\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": 631807,\n" +
-            "        \"title\": \"Toasted\\\" Agnolotti (or Ravioli)\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/631807-312x231.jpg\",\n" +
-            "        \"path\": \"folder1\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": 655589,\n" +
-            "        \"title\": \"Penne with Goat Cheese and Basil\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/655589-312x231.jpg\",\n" +
-            "        \"path\": \"folder1\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": 631870,\n" +
-            "        \"title\": \"4th of July RASPBERRY, WHITE & BLUEBERRY FARM TO TABLE Cocktail From Harvest Spirits\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/631870-312x231.jpg\",\n" +
-            "        \"path\": \"folder2\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": 647465,\n" +
-            "        \"title\": \"Hot Garlic and Oil Pasta\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/647465-312x231.jpg\",\n" +
-            "        \"path\": \"folder2\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": 660101,\n" +
-            "        \"title\": \"Simple Garlic Pasta\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/660101-312x231.jpg\",\n" +
-            "        \"path\": \"folder2\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": 650132,\n" +
-            "        \"title\": \"Linguine With Chick Peas and Bacon\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/650132-312x231.jpg\",\n" +
-            "        \"path\": \"folder3\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": 654830,\n" +
-            "        \"title\": \"Pasta Con Pepe E Caciotta Al Tartufo\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/654830-312x231.jpg\",\n" +
-            "        \"path\": \"folder3\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": 633876,\n" +
-            "        \"title\": \"Baked Ziti\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/633876-312x231.jpg\",\n" +
-            "        \"path\": \"folder3\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": 634995,\n" +
-            "        \"title\": \"Bird's Nest Marinara\",\n" +
-            "        \"image\": \"https://spoonacular.com/recipeImages/634995-312x231.jpg\",\n" +
-            "        \"path\": \"\"\n" +
-            "    }\n" +
-            "]";
     private List<BookmarkFolder> folderList = new ArrayList<>();
     private BookmarkFolderAdapter adapter;
     private List<String> folderNames = new ArrayList<>();
@@ -451,7 +389,6 @@ public class BookmarkListFragmentNew extends Fragment {
                             e.printStackTrace();
                         }
 
-                        Log.d(TAG, "PLS WOR");
                         Log.d(TAG, response.toString());
                     }
                 }, new Response.ErrorListener() {
@@ -537,57 +474,6 @@ public class BookmarkListFragmentNew extends Fragment {
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-//                        try {
-//                            for (int i = 0; i < response.length(); i++) {
-//                                if (response.getJSONObject(i).getInt("userID") == userID) {
-//                                    JSONArray pathsArray = response.getJSONObject(i).getJSONArray("paths");
-//                                    for (int j = 0; j < pathsArray.length(); j++) {
-//                                        folderNames.add(pathsArray.get(j).toString());
-//                                    }
-//                                    break;
-//                                }
-//                            }
-//
-////                            List<JSONObject> uncategorizedRecipes = new ArrayList<>();
-////                            getRecipesFromBookmarkList(userID);
-////                            Log.d(TAG, "PLEASE WORK please please");
-////                            Log.d(TAG, String.valueOf(allBookmarkedRecipes));
-//                            try {
-//                                JSONArray recipesArray = new JSONArray(dummyList);
-//                                JSONArray recipesArrayCopy = recipesArray;
-//
-//                                for (int i = 0; i < folderNames.size(); i++) {
-//                                    List<JSONObject> recipesInThisFolder = new ArrayList<>();
-//
-//                                    for (int j = 0; j < recipesArrayCopy.length(); j++) {
-//                                        JSONObject recipeObject = recipesArrayCopy.getJSONObject(j);
-//                                        String recipeFolderPath = recipeObject.getString("path");
-//
-//                                        if (recipeFolderPath.equals(folderNames.get(i))) {
-//                                            recipesInThisFolder.add(recipeObject);
-//                                        }
-////                                        else if (recipeFolderPath.equals("")) {
-////                                            uncategorizedRecipes.add(recipeObject);
-////                                            recipesArrayCopy.remove(j);
-////                                        }
-//                                    }
-//
-//                                    BookmarkFolder thisFolder = new BookmarkFolder(recipesInThisFolder, folderNames.get(i));
-//                                    folderList.add(thisFolder);
-//                                }
-//
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//
-////                            BookmarkFolder folderUncategorized = new BookmarkFolder(uncategorizedRecipes, "uncategorized");
-////                            folderList.add(folderUncategorized);
-//
-//                            adapter = new BookmarkFolderAdapter(folderList);
-//                            bookmarkListRecyclerView.setAdapter(adapter);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
                         Log.d(TAG, response.toString());
                     }
                 }, new Response.ErrorListener() {

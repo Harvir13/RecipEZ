@@ -1,6 +1,7 @@
 package com.example.recipez;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import org.json.JSONObject;
 import java.util.List;
 
 public class BookmarkFolderRecipesAdapter extends RecyclerView.Adapter<BookmarkFolderRecipesAdapter.BookmarkFolderRecipesViewHolder> {
+    final static String TAG = "BookmarkFolderRecipesAdapter";
+
     private List<JSONObject> recipesInFolder;
 
     public BookmarkFolderRecipesAdapter(List<JSONObject> recipesInFolder){
@@ -47,9 +50,9 @@ public class BookmarkFolderRecipesAdapter extends RecyclerView.Adapter<BookmarkF
                     Fragment fragment = new RecipeDetailFragment();
                     Bundle bundle = new Bundle();
                     try {
-                        bundle.putInt("RECIPE_ID", recipesInFolder.get(position).getInt("id"));
-                        bundle.putString("RECIPE_TITLE", recipesInFolder.get(position).getString("title"));
-                        bundle.putString("RECIPE_IMAGE", recipesInFolder.get(position).getString("image"));
+                        bundle.putInt("RECIPE_ID", recipesInFolder.get(holder.getAdapterPosition()).getInt("recipeID"));
+                        bundle.putString("RECIPE_TITLE", recipesInFolder.get(holder.getAdapterPosition()).getString("title"));
+                        bundle.putString("RECIPE_IMAGE", recipesInFolder.get(holder.getAdapterPosition()).getString("image"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

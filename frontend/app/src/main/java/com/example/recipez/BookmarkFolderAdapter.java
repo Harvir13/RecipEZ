@@ -1,7 +1,10 @@
 package com.example.recipez;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,6 +27,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -72,12 +77,31 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
         holder.deleteFolderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                removePathFromPathsList(userID, folder.getFolderName(), holder.deleteFolderButton.getContext());
-                foldersList.remove(holder.getAdapterPosition());
-                notifyItemRemoved(holder.getAdapterPosition());
-                if (holder.getAdapterPosition() != getItemCount() - 1) {
-                    notifyItemRangeChanged(holder.getAdapterPosition(), getItemCount() - holder.getAdapterPosition());
-                }
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(holder.deleteFolderButton.getContext());
+                alertDialogBuilder.setTitle("Deleting " + folder.getFolderName());
+                alertDialogBuilder.setMessage("This will delete this folder and any recipes saved in it. Continue?")
+                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                for (int j = 0; j < recipesInFolder.size(); j++) {
+                                    try {
+                                        removeRecipeFromBookmarkList(userID, recipesInFolder.get(j).getInt("recipeID"), holder.deleteFolderButton.getContext());
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                removePathFromPathsList(userID, folder.getFolderName(), holder.deleteFolderButton.getContext());
+                                foldersList.remove(holder.getAdapterPosition());
+                                notifyItemRemoved(holder.getAdapterPosition());
+                                if (holder.getAdapterPosition() != getItemCount() - 1) {
+                                    notifyItemRangeChanged(holder.getAdapterPosition(), getItemCount() - holder.getAdapterPosition());
+                                }
+                            }
+                        }).setNegativeButton("Cancel", null);
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
             }
         });
     }
@@ -103,6 +127,35 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
             folderNestedRecyclerView = itemView.findViewById(R.id.folder_child_recycler_view);
             deleteFolderButton = itemView.findViewById(R.id.folder_delete_button);
         }
+    }
+
+    public void removeRecipeFromBookmarkList(int userID, int recipeID, Context context) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(context);
+        String url = "http://20.53.224.7:8084/removeRecipe";
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        Map<String, String> jsonParams = new HashMap();
+        jsonParams.put("userID", String.valueOf(userID));
+        jsonParams.put("recipeID", String.valueOf(recipeID));
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }) {
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
     }
 
     public void removePathFromPathsList(int userID, String path, Context context) {

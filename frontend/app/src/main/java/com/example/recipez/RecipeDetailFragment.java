@@ -67,7 +67,9 @@ public class RecipeDetailFragment extends Fragment {
     private ImageButton addToBookmarkButton;
     private BookmarkFolderClickListener bookmarkFolderClickListener;
     private Button addToBookmarkConfirmButton;
+    private Button removeFromBookmarkButton;
     private RecyclerView folderListRecyclerView;
+    private TextView existingFolderText;
 
     private int userID = 1;
 
@@ -110,7 +112,6 @@ public class RecipeDetailFragment extends Fragment {
     }
 
     private BookmarkFolderDialogAdapter dialogAdapter;
-    private List<String> folderNames = new ArrayList<>();
     int recipeID;
     String recipeName;
     String recipeImageUrl;
@@ -147,39 +148,19 @@ public class RecipeDetailFragment extends Fragment {
                 Dialog dialog = new Dialog(getActivity());
                 dialog.setContentView(R.layout.dialog_add_to_bookmark);
 
-                getPathsList(userID);
-                getRecipesFromBookmarkList(userID);
+                getRecipesFromBookmarkList(userID, dialog);
 
                 folderListRecyclerView = dialog.findViewById(R.id.recycler_view_bookmark_folder_list);
-
-//                StringBuilder selectedFolderName = new StringBuilder();
-//                bookmarkFolderClickListener = new BookmarkFolderClickListener() {
-//                    @Override
-//                    public void onClick(String str) {
-//                        folderListRecyclerView.post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                dialogAdapter.notifyDataSetChanged();
-//                            }
-//                        });
-//                        selectedFolderName.append(str);
-//                    }
-//                };
-
                 addToBookmarkConfirmButton = dialog.findViewById(R.id.dialog_add_to_bookmark_confirm_button);
-//                addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        Recipe recipe = new Recipe();
-//                        recipe.addRecipeToBookmarkList(userID, recipeID, selectedFolderName.toString(), recipeName, recipeImageUrl); // TODO: update user ID
-//                        Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName.toString(), Toast.LENGTH_SHORT).show();
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//                folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//                dialogAdapter = new BookmarkFolderDialogAdapter(folderNames, bookmarkFolderClickListener);
-//                folderListRecyclerView.setAdapter(dialogAdapter);
+                existingFolderText = dialog.findViewById(R.id.dialog_add_to_bookmark_existing_folder_text);
+
+                removeFromBookmarkButton = dialog.findViewById(R.id.dialog_add_to_bookmark_remove_button);
+                removeFromBookmarkButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        removeRecipeFromBookmarkList(userID, recipeID, dialog);
+                    }
+                });
 
                 dialog.show();
             }
@@ -205,10 +186,9 @@ public class RecipeDetailFragment extends Fragment {
 
         for (int i = 0; i < s.length; i++) {
             if (i == s.length - 1) {
-                result+= s[i];
-            }
-            else {
-                result+= s[i] + ",";
+                result += s[i];
+            } else {
+                result += s[i] + ",";
             }
         }
         return result;
@@ -219,10 +199,9 @@ public class RecipeDetailFragment extends Fragment {
 
         for (int i = 0; i < s.length(); i++) {
             if (i == s.length() - 1) {
-                result+= s.get(i);
-            }
-            else {
-                result+= s.get(i) + ",";
+                result += s.get(i);
+            } else {
+                result += s.get(i) + ",";
             }
         }
         return result;
@@ -232,37 +211,8 @@ public class RecipeDetailFragment extends Fragment {
         private int myStaticMember;
         private String TAG = "Recipe Class";
 
-        public Recipe () {
+        public Recipe() {
             myStaticMember = 1;
-        }
-
-        public void removeRecipeFromBookmarkList(int userID, int recipeID) {
-            // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8084/removeRecipe";
-            // 10.0.2.2 is a special alias to localhost for developers
-
-            Map<String, String> jsonParams = new HashMap();
-            jsonParams.put("userID", String.valueOf(userID));
-            jsonParams.put("recipeID", String.valueOf(recipeID));
-
-            // Request a string response from the provided URL.
-            JsonObjectRequest jsonRequest = new JsonObjectRequest
-                    (Request.Method.DELETE, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.d(TAG, response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
-                        }
-                    }) {
-            };
-
-            // Add the request to the RequestQueue.
-            queue.add(jsonRequest);
         }
 
         public void filterRecipes(String[] ingredients, String[] filters, String[] restrictions) {
@@ -420,7 +370,7 @@ public class RecipeDetailFragment extends Fragment {
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
-                (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
@@ -437,7 +387,38 @@ public class RecipeDetailFragment extends Fragment {
         queue.add(jsonRequest);
     }
 
-    public void getRecipesFromBookmarkList(int userID) {
+    public void removeRecipeFromBookmarkList(int userID, int recipeID, Dialog dialog) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://20.53.224.7:8084/removeRecipe";
+        // 10.0.2.2 is a special alias to localhost for developers
+
+        Map<String, String> jsonParams = new HashMap();
+        jsonParams.put("userID", String.valueOf(userID));
+        jsonParams.put("recipeID", String.valueOf(recipeID));
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Toast.makeText(getActivity(), "Removed recipe from bookmark", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, response.toString());
+                        dialog.dismiss();
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }) {
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+    }
+
+    public void getRecipesFromBookmarkList(int userID, Dialog dialog) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID;
@@ -448,6 +429,65 @@ public class RecipeDetailFragment extends Fragment {
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        List<String> folderNames = new ArrayList<>();
+
+                        try {
+                            JSONArray pathsArray = response.getJSONArray("paths");
+                            for (int i = 0; i < pathsArray.length(); i++) {
+                                folderNames.add(pathsArray.get(i).toString());
+                            }
+
+                            JSONArray recipesArray = response.getJSONArray("recipes");
+                            boolean alreadyBookmarked = false;
+                            outerloop:
+//                            for (int i = 0; i < folderNames.size(); i++) {
+                                for (int j = 0; j < recipesArray.length(); j++) {
+                                    JSONObject recipeObject = recipesArray.getJSONObject(j);
+                                    String recipeFolderPath = recipeObject.getString("path");
+
+                                    if ((recipeObject.getInt("recipeID") == recipeID)) {//&& recipeFolderPath.equals(folderNames.get(i))) {
+                                        existingFolderText.setText("This recipe is already bookmarked in: ");// + folderNames.get(i));
+                                        addToBookmarkConfirmButton.setEnabled(false);
+                                        alreadyBookmarked = true;
+                                        break outerloop;
+                                    }
+                                }
+//                            }
+                            if (!alreadyBookmarked) {
+                                existingFolderText.setText("This recipe is not in any folders");
+                                removeFromBookmarkButton.setEnabled(false);
+                            }
+
+                            final String[] selectedFolderName = new String[1];
+                            bookmarkFolderClickListener = new BookmarkFolderClickListener() {
+                                @Override
+                                public void onClick(String str) {
+                                    folderListRecyclerView.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            dialogAdapter.notifyDataSetChanged();
+                                        }
+                                    });
+                                    selectedFolderName[0] = str;
+                                }
+                            };
+
+                            addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    addRecipeToBookmarkList(userID, recipeID, selectedFolderName[0].toString(), recipeName, recipeImageUrl); // TODO: update user ID
+                                    Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName[0].toString(), Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                            dialogAdapter = new BookmarkFolderDialogAdapter(alreadyBookmarked ? new ArrayList<>() : folderNames, bookmarkFolderClickListener);
+                            folderListRecyclerView.setAdapter(dialogAdapter);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         Log.d(TAG, response.toString());
                     }
                 }, new Response.ErrorListener() {
@@ -475,7 +515,7 @@ public class RecipeDetailFragment extends Fragment {
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
-                (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
@@ -505,7 +545,7 @@ public class RecipeDetailFragment extends Fragment {
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
-                (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
@@ -533,47 +573,6 @@ public class RecipeDetailFragment extends Fragment {
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        try {
-                            for (int i = 0; i < response.length(); i++) {
-                                if (response.getJSONObject(i).getInt("userID") == userID) {
-                                    JSONArray pathsArray = response.getJSONObject(i).getJSONArray("paths");
-                                    for (int j = 0; j < pathsArray.length(); j++) {
-                                        folderNames.add(pathsArray.get(j).toString());
-                                    }
-                                    break;
-                                }
-                            }
-
-                            final String[] selectedFolderName = new String[1];
-                            bookmarkFolderClickListener = new BookmarkFolderClickListener() {
-                                @Override
-                                public void onClick(String str) {
-                                    folderListRecyclerView.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            dialogAdapter.notifyDataSetChanged();
-                                        }
-                                    });
-                                    selectedFolderName[0] = str;
-                                }
-                            };
-
-                            addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    addRecipeToBookmarkList(userID, recipeID, selectedFolderName[0].toString(), recipeName, recipeImageUrl); // TODO: update user ID
-                                    Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName[0].toString(), Toast.LENGTH_SHORT).show();
-//                                    dialog.dismiss();
-                                }
-                            });
-
-                            folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                            dialogAdapter = new BookmarkFolderDialogAdapter(folderNames, bookmarkFolderClickListener);
-                            folderListRecyclerView.setAdapter(dialogAdapter);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
                         Log.d(TAG, response.toString());
                     }
                 }, new Response.ErrorListener() {
