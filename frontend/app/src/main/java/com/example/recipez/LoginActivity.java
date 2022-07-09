@@ -2,10 +2,16 @@ package com.example.recipez;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +44,7 @@ import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
     final static String TAG = "LoginActivity";
+    private static final String CHANNEL_ID = "1";
     private Button signInButton;
     private GoogleSignInClient mGoogleSignInClient;
     private SharedPreferences sharedpreferences;
@@ -50,6 +57,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         sharedpreferences = this.getSharedPreferences("UserData", Context.MODE_PRIVATE);
+
+        createNotificationChannel();
 
 
         // Configure sign-in to request the user's ID, email address, and basic
@@ -186,7 +195,23 @@ public class LoginActivity extends AppCompatActivity {
         return result;
     }
 
-    public class MyFirebaseMessagingService extends FirebaseMessagingService {
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name ="Expirations";
+            String description = "Display ingredients about to expire soon";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    public static class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         private static final String TAG = "MyFirebaseMsgService";
 
@@ -198,10 +223,28 @@ public class LoginActivity extends AppCompatActivity {
             Log.d(TAG, "From: " + remoteMessage.getFrom());
 
             // Check if message contains a data payload.
-//            if (remoteMessage.getData().size() > 0) {
-//                Log.d(TAG, "Message data payload: " + remoteMessage.getData());
-//
-//            }
+            if (remoteMessage.getData().size() > 0) {
+                Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                        .setSmallIcon(R.drawable.notification_icon)
+                        .setContentTitle("Ingredients Expiring Soon")
+                        .setContentText(remoteMessage.getData().get("ingredients"))
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(pendingIntent)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setAutoCancel(true);
+
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+                // notificationId is a unique int for each notification that you must define
+                notificationManager.notify(1, builder.build());
+
+            }
 //
 //            // Check if message contains a notification payload.
             if (remoteMessage.getNotification() != null) {
@@ -228,42 +271,42 @@ public class LoginActivity extends AppCompatActivity {
             // If you want to send messages to this application instance or
             // manage this apps subscriptions on the server side, send the
             // FCM registration token to your app server.
-            int userID = sharedpreferences.getInt("userID", 0);
-            sendRegistrationToServer(token, userID);
+//            int userID = sharedpreferences.getInt("userID", 0);
+//            sendRegistrationToServer(token, userID);
         }
 
-        private void sendRegistrationToServer(String token, int userID) {
-            // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-            String url = "http://20.53.224.7:8082/storeUserToken";
-            // 10.0.2.2 is a special alias to localhost for developers
-
-            Map<String, String> jsonParams = new HashMap();
-            jsonParams.put("token", token);
-            jsonParams.put("userID", String.valueOf(userID));
-
-
-            // Request a string response from the provided URL.
-            JsonObjectRequest jsonRequest = new JsonObjectRequest
-                    (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.d(TAG, response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
-                        }
-                    }) {
-            };
-
-            // Add the request to the RequestQueue.
-            queue.add(jsonRequest);
-        }
+//        private void sendRegistrationToServer(String token, int userID) {
+//            // Instantiate the RequestQueue.
+//            RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
+//            String url = "http://20.53.224.7:8082/storeUserToken";
+//            // 10.0.2.2 is a special alias to localhost for developers
+//
+//            Map<String, String> jsonParams = new HashMap();
+//            jsonParams.put("token", token);
+//            jsonParams.put("userID", String.valueOf(userID));
+//
+//
+//            // Request a string response from the provided URL.
+//            JsonObjectRequest jsonRequest = new JsonObjectRequest
+//                    (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+//                        @Override
+//                        public void onResponse(JSONObject response) {
+//                            Log.d(TAG, response.toString());
+//                        }
+//                    }, new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError error) {
+//                            Log.d(TAG, error.toString());
+//                        }
+//                    }) {
+//            };
+//
+//            // Add the request to the RequestQueue.
+//            queue.add(jsonRequest);
+//        }
     }
 
-    public final class UserAccount extends MainActivity {
+    public final class UserAccount {
         private int myStaticMember;
         private String TAG = "User Class";
 
