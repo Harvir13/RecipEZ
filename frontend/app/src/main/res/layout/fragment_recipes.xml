@@ -11,17 +11,34 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/recipe_list_search_bar"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:iconifiedByDefault="false"
-            app:queryHint="Search for a recipe" />
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/recipe_list_search_bar"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                app:iconifiedByDefault="false"
+                app:queryHint="Search for a recipe">
+
+            </androidx.appcompat.widget.SearchView>
+
+            <ImageButton
+                android:id="@+id/recipe_fragment_filter_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignEnd="@id/recipe_list_search_bar"
+                android:elevation="6dp"
+                android:src="@drawable/ic_filter" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/recipe_list_based_on_your_pantry_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="@string/recipe_list_based_on_your_pantry_text"
             android:textSize="18sp" />
 

@@ -5,7 +5,16 @@
 
     <!-- Recipe (Main Screen) Fragment -->
     <string name="recipe_card_placeholder_text">Recipe Name</string>
-    <string name="recipe_list_based_on_your_pantry_text">Based on your pantry</string>
+    <string name="recipe_list_based_on_your_pantry_text">Suggestions based on your pantry</string>
+    <string name="dialog_filter_search_title">Search By Custom Filters</string>
+    <string name="dialog_filter_list_title">Filters</string>
+    <string name="dialog_filter_search_button">Search</string>
+    <string name="dialog_filter_dairy_free_checkbox">Dairy free</string>
+    <string name="dialog_filter_gluten_free_checkbox">Gluten free</string>
+    <string name="dialog_filter_vegetarian_checkbox">Vegetarian</string>
+    <string name="dialog_filter_vegan_checkbox">Vegan</string>
+    <string name="dialog_ingredient_list_title">Ingredients</string>
+    <string name="filter_ingredient_item_checkbox">Ingredient name</string>
 
     <!-- Recipe (Details) Fragment -->
     <string name="recipe_detail_title">Recipe Title</string>
@@ -17,7 +26,7 @@
     <string name="recipe_detail_nutrition_list">Nutritional Details List</string>
     <string name="add_to_bookmark_title">Add to a bookmark folder</string>
     <string name="dialog_add_to_bookmark_confirm_button">Confirm</string>
-    <string name="dialog_add_to_bookmark_new_folder_text">\nManage and create new folders in: Profile -> Bookmarked Recipes</string>
+    <string name="dialog_add_to_bookmark_new_folder_text">\nCreate new folders in: Profile -> Bookmarked Recipes</string>
     <string name="dialog_add_to_bookmark_existing_folder_text">This recipe is not in any folders</string>
     <string name="dialog_add_to_bookmark_remove_button">Remove bookmark</string>
 

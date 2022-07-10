@@ -50,7 +50,7 @@ public class BookmarkListFragmentNew extends Fragment {
     private RecyclerView bookmarkListRecyclerView;
     private Button addNewFolderButton;
 
-    private int userID = 1;
+    private int userID = 1; // todo: update user id
 
     public BookmarkListFragmentNew() {
         // Required empty public constructor

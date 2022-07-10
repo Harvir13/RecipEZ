@@ -1,13 +1,10 @@
 package com.example.recipez;
 
 import android.app.Dialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,10 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,8 +25,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -71,7 +63,7 @@ public class RecipeDetailFragment extends Fragment {
     private RecyclerView folderListRecyclerView;
     private TextView existingFolderText;
 
-    private int userID = 1;
+    private int userID = 1; // todo: change user id
 
     public RecipeDetailFragment() {
         // Required empty public constructor
@@ -151,8 +143,8 @@ public class RecipeDetailFragment extends Fragment {
                 getRecipesFromBookmarkList(userID, dialog);
 
                 folderListRecyclerView = dialog.findViewById(R.id.recycler_view_bookmark_folder_list);
-                addToBookmarkConfirmButton = dialog.findViewById(R.id.dialog_add_to_bookmark_confirm_button);
-                existingFolderText = dialog.findViewById(R.id.dialog_add_to_bookmark_existing_folder_text);
+                addToBookmarkConfirmButton = dialog.findViewById(R.id.dialog_filter_search_button);
+                existingFolderText = dialog.findViewById(R.id.dialog_filter_list_title);
 
                 removeFromBookmarkButton = dialog.findViewById(R.id.dialog_add_to_bookmark_remove_button);
                 removeFromBookmarkButton.setOnClickListener(new View.OnClickListener() {
@@ -472,6 +464,9 @@ public class RecipeDetailFragment extends Fragment {
                                 }
                             };
 
+                            if (folderNames.size() == 0) {
+                                addToBookmarkConfirmButton.setEnabled(false);
+                            }
                             addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
