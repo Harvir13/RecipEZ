@@ -218,7 +218,7 @@ app.post("/addIngredient", async (req, res) => {
 	}
 });
 
-// expects {userid: xxx, time: xxx}
+// expects {time: xxx}
 app.get("/scanExpiryDates", async (req, res) => {
 	try {
 		fetch("http://20.53.224.7:8085/usersWithExpiringIngredients?time=" + req.query["time"],
