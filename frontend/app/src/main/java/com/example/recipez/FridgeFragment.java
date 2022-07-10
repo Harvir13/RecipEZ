@@ -1,5 +1,7 @@
 package com.example.recipez;
 
+import static java.lang.Integer.parseInt;
+
 import android.app.Dialog;
 import android.os.Bundle;
 
@@ -28,6 +30,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -123,6 +126,7 @@ public class FridgeFragment extends Fragment {
             try {
                 jsonParams.put("userid", userID);
                 jsonParams.put("ingredient", ingredient.getString("name"));
+                jsonParams.put("expiry", ingredient.getString("expiry"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -204,21 +208,45 @@ public class FridgeFragment extends Fragment {
                     });
             queue.add(jsonArrayRequest);
         }
+
+        public void checkIngredient(String name) {
+            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            String url = "http://20.53.224.7:8086/requestExpiryDate?ingredient=" + name;
+
+            StringRequest stringRequest = new StringRequest
+                    (Request.Method.GET, url, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            if ("-1".equals(response)) {
+                                openIngredientExpiryDialog(name);
+                            }
+                            else {
+                                JSONObject newIngredient = new JSONObject();
+                                try {
+                                    newIngredient.put("name", name);
+                                    newIngredient.put("expiry", response);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                storeIngredient("11111", newIngredient);
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString() + "::updateExpiryDate");
+                        }
+                    }) {
+            };
+
+            queue.add(stringRequest);
+        }
     }
 
     public FridgeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FridgeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static FridgeFragment newInstance(String param1, String param2) {
         FridgeFragment fragment = new FridgeFragment();
         Bundle args = new Bundle();
@@ -232,14 +260,8 @@ public class FridgeFragment extends Fragment {
     }
 
     public void addIngredient(String name) {
-        JSONObject newIngredient = new JSONObject();
-        try {
-            newIngredient.put("name", name);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         Ingredient ingredient = new Ingredient();
-        ingredient.storeIngredient("11111", newIngredient);
+        ingredient.checkIngredient(name);
     }
 
     public void buildFridgeRecyclerView() {
@@ -329,6 +351,49 @@ public class FridgeFragment extends Fragment {
         dialog.show();
     }
 
+    private void openIngredientExpiryDialog(String ingredient) {
+        Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_edit_ingredient);
+
+        EditText expiry = dialog.findViewById(R.id.newIngredientExpiry);
+
+        TextView currentIngredientName = dialog.findViewById(R.id.currentIngredientName);
+        try {
+            currentIngredientName.setText("Set expiry date for " + ingredient);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Button submitButton = dialog.findViewById(R.id.editIngredientSubmit);   // BIG TODO: change these to new dialog potentially
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newExpiryDateString = expiry.getText().toString();
+                if ("".equals(newExpiryDateString)) {
+                    // TODO: CONFIRM EXPIRY DATE IS VALID AND TOAST IF NOT
+                }
+                else {
+                    try {
+                        JSONObject addIngredient = new JSONObject();
+                        addIngredient.put("name", ingredient);
+                        SimpleDateFormat format = new SimpleDateFormat("MMddyyyy");
+                        format.setTimeZone(TimeZone.getTimeZone("GMT-8"));
+                        String newExpiryDateUnixString = String.valueOf(format.parse(newExpiryDateString).getTime() / 1000L);
+                        addIngredient.put("expiry", newExpiryDateUnixString);
+                        Ingredient i = new Ingredient();
+                        i.storeIngredient("11111", addIngredient);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        dialog.show();
+    }
+
     private void openAddIngredientDialog() {
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_add_ingredient);
@@ -340,7 +405,6 @@ public class FridgeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String name = editIngredientName.getText().toString();
-//                addIngredient(name);
                 Ingredient ingredient = new Ingredient();
                 ingredient.getIngredientSuggestions(name);
                 dialog.dismiss();
