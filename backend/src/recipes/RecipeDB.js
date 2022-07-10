@@ -23,7 +23,7 @@ app.post("/addToBookmarkedList", async (req, res) => {
         client.db("RecipeDB").collection("Paths").findOne({"userID": newEntry["userID"], "path": req.body["path"]}).then(result => {
             console.log(result)
             if(result === null) {
-                client.db("RecipeDB").collection("Paths").insertOne({"userID": newEntry["userID"], "path": req.body["path"]}).then(result => {
+                client.db("RecipeDB").collection("BookmarkedRecipes").insertOne({"userID": newEntry["userID"], "path": req.body["path"]}).then(result => {
                     console.log(result)
                 })
             }
@@ -40,7 +40,7 @@ app.post("/addToBookmarkedList", async (req, res) => {
 })
 
 //req.body should contain data like {userID: xxx, recipeID: xxx}
-app.delete("/removeFromBookmarkedList", async (req, res) => {
+app.post("/removeFromBookmarkedList", async (req, res) => {
     try {
         console.log(req.body)
         var entryToDelete = req.body
@@ -48,7 +48,12 @@ app.delete("/removeFromBookmarkedList", async (req, res) => {
         entryToDelete["recipeID"] = parseInt(req.body["recipeID"])
         client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne(entryToDelete).then(result => {
             console.log(result)
-            res.send({"result": "Successfully deleted recipe from bookmarked list"})
+            if (result["deletedCount"] != 1) {
+                res.send({"result": "Error occured when deleting"})
+            }
+            else {
+                res.send({"result": "Successfully deleted recipe from bookmarked list"})
+            }
         })   
     }
     catch (err) {
@@ -62,9 +67,9 @@ app.get("/getBookmarkedRecipes", async (req, res) => {
     try {
         console.log(req.query)
         client.db("RecipeDB").collection("BookmarkedRecipes").find({"userID": parseInt(req.query["userid"])}).toArray().then(result => {
-            console.log(result)
+            console.log("BOOKMARKED RECIPES:" + result)
             client.db("RecipeDB").collection("Paths").find({"userID": parseInt(req.query["userid"])}).toArray().then(result2 => {
-                console.log(result2)
+                console.log("PATHS:" + result2)
                 var retObj = {};
                 retObj["paths"] = result2
                 retObj["recipes"] = result
@@ -80,25 +85,60 @@ app.get("/getBookmarkedRecipes", async (req, res) => {
     }
 })
 
+//req.body should contain data like {userID: xxx, recipeID: xxx, path:/home/xxx, title: xxx, image: xxx}
+app.post("/addToPathList", async (req, res) => {
+    try {
+        console.log(req.body)
+        var newEntry = req.body
+        newEntry["userID"] = parseInt(req.body["userID"])
+        client.db("RecipeDB").collection("Paths").insertOne(newEntry).then(result => {
+            console.log(result)
+            res.send({"result": "Successfully added path to path list"})
+        })  
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
 
-// app.get("/getRecipeFromAPI", async (req, res) => {
-//     try {
-//         //req.query should contain {recipeName: xxxx}
-//         var name = encodeURIComponent(req.query["recipename"])
-//         console.log(name)
-//         fetch("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=34a0f8a88c9544c0a48bd2be360b3b04").then(response =>
-//             response.json()
-//         ).then (data => {
-//             console.log(data)
-//             res.send(data)
-//         })
-        
-//     }
-//     catch (err) {
-//         console.log(err)
-//         res.status(400).send(err)
-//     }
-// })
+//req.body should contain data like {userID: xxx, recipeID: xxx}
+app.post("/removeFromPathList", async (req, res) => {
+    try {
+        console.log(req.body)
+        var entryToDelete = req.body
+        entryToDelete["userID"] = parseInt(req.body["userID"])
+        client.db("RecipeDB").collection("Paths").deleteOne(entryToDelete).then(result => {
+            console.log(result)
+            if (result["deletedCount"] != 1) {
+                res.send({"result": "Error occured when deleting"})
+            }
+            else {
+                res.send({"result": "Successfully deleted recipe from paths list"})
+            }
+        })   
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
+//req.query should contain data like ?userid=xxx
+app.get("/getPaths", async (req, res) => {
+    try {
+        console.log(req.query)
+        client.db("RecipeDB").collection("Paths").find({"userID": parseInt(req.query["userid"])}).toArray().then(result => {
+            console.log(result)
+            res.send(result)
+            
+        })   
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
 
 async function run () {
     try {
