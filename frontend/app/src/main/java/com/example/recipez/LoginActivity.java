@@ -1,10 +1,17 @@
 package com.example.recipez;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +28,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,9 +44,10 @@ import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
     final static String TAG = "LoginActivity";
+    private static final String CHANNEL_ID = "1";
     private Button signInButton;
     private GoogleSignInClient mGoogleSignInClient;
-    private SharedPreferences sharedpreferences;
+    public SharedPreferences sharedpreferences;
     private Integer RC_SIGN_IN = 1;
     UserAccount newUser = new UserAccount();
 
@@ -45,6 +57,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         sharedpreferences = this.getSharedPreferences("UserData", Context.MODE_PRIVATE);
+
+        createNotificationChannel();
 
 
         // Configure sign-in to request the user's ID, email address, and basic
@@ -70,7 +84,26 @@ public class LoginActivity extends AppCompatActivity {
                 signIn();
             }
         });
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // Log
+                        Log.d(TAG, "Token: " + token);
+                    }
+                });
     }
+
+
 
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -162,7 +195,89 @@ public class LoginActivity extends AppCompatActivity {
         return result;
     }
 
-    public final class UserAccount extends MainActivity {
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name ="Expirations";
+            String description = "Display ingredients about to expire soon";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    public static class MyFirebaseMessagingService extends FirebaseMessagingService {
+
+        private static final String TAG = "MyFirebaseMsgService";
+
+        @Override
+        public void onMessageReceived(RemoteMessage remoteMessage) {
+            // TODO(developer): Handle FCM messages here.
+            // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
+            Log.d(TAG, "Received message");
+            Log.d(TAG, "From: " + remoteMessage.getFrom());
+
+            // Check if message contains a data payload.
+            if (remoteMessage.getData().size() > 0) {
+                Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                        .setSmallIcon(R.drawable.notification_icon)
+                        .setContentTitle("Ingredients Expiring Soon:")
+                        .setContentText(remoteMessage.getData().get("ingredients"))
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(pendingIntent)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setAutoCancel(true);
+
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+                // notificationId is a unique int for each notification that you must define
+                notificationManager.notify(1, builder.build());
+
+            }
+//
+//            // Check if message contains a notification payload.
+            if (remoteMessage.getNotification() != null) {
+                Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            }
+
+            // Also if you intend on generating your own notifications as a result of a received FCM
+            // message, here is where that should be initiated. See sendNotification method below.
+        }
+
+        /**
+         * There are two scenarios when onNewToken is called:
+         * 1) When a new token is generated on initial app startup
+         * 2) Whenever an existing token is changed
+         * Under #2, there are three scenarios when the existing token is changed:
+         * A) App is restored to a new device
+         * B) User uninstalls/reinstalls the app
+         * C) User clears app data
+         */
+//        @Override
+//        public void onNewToken(@NonNull String token) {
+//            Log.d(TAG, "Refreshed token: " + token);
+//
+//            // If you want to send messages to this application instance or
+//            // manage this apps subscriptions on the server side, send the
+//            // FCM registration token to your app server.
+//            SharedPreferences sharedpreferences = getApplicationContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
+//            int userID = sharedpreferences.getInt("userID", 0);
+//            sendRegistrationToServer(token, userID);
+//        }
+    }
+
+    public final class UserAccount {
         private int myStaticMember;
         private String TAG = "User Class";
 
@@ -184,15 +299,33 @@ public class LoginActivity extends AppCompatActivity {
                             //TODO: locally store user account information
 
                             try {
-                                String restrictions = convertJSONArrayToString((JSONArray) response.get("dietaryRestrictions"));
-                                Log.d(TAG, restrictions);
                                 SharedPreferences.Editor myEdit = sharedpreferences.edit();
-                                myEdit.putString("dietaryRestrictions", restrictions);
-                                myEdit.putInt("userID", (int) response.get("id"));
+                                int userID = (int) response.get("userID");
+                                myEdit.putInt("userID", userID);
                                 myEdit.apply();
+
+                                FirebaseMessaging.getInstance().getToken()
+                                        .addOnCompleteListener(new OnCompleteListener<String>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<String> task) {
+                                                if (!task.isSuccessful()) {
+                                                    Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                                                    return;
+                                                }
+
+                                                // Get new FCM registration token
+                                                String token = task.getResult();
+
+                                                sendRegistrationToServer(token, userID);
+
+                                                // Log
+                                                Log.d(TAG, token);
+                                            }
+                                        });
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+
 
                             Log.d(TAG, response.toString());
                         }
@@ -208,25 +341,20 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
-        //TODO: set up this endpoint
-//        public void notifyUser(String message) {
-//
-//        }
-
-        public void updateRestrictions (int userID, String[] dietaryRestrictions) {
+        private void sendRegistrationToServer(String token, int userID) {
             // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-            String url = "http://20.53.224.7:8082/updateRestrictions";
+            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+            String url = "http://20.53.224.7:8082/storeUserToken";
             // 10.0.2.2 is a special alias to localhost for developers
 
             Map<String, String> jsonParams = new HashMap();
+            jsonParams.put("token", token);
             jsonParams.put("userID", String.valueOf(userID));
-            jsonParams.put("dietaryRestrictions", encodeString(convertArrayToString(dietaryRestrictions)));
 
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest
-                    (Request.Method.PUT, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                    (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.d(TAG, response.toString());

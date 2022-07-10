@@ -30,7 +30,12 @@ run();
 app.get("/getIngredients", async (req, res) => {
     try {
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.query["userid"]) }).then((result) => {
-            res.send(result.ingredients);
+            if (result === null) {
+                res.send([])
+            }
+            else {
+                res.send(result.ingredients);
+            }
         });
     } catch (err) {
         res.status(400).send(err);
