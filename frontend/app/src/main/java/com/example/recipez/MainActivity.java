@@ -80,19 +80,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, token);
                     }
                 });
-
-        FirebaseMessaging.getInstance().subscribeToTopic("expiryDates")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        String msg = "Subscribed";
-                        if (!task.isSuccessful()) {
-                            msg = "Subscribe failed";
-                        }
-                        Log.d(TAG, msg);
-                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
 //    // Declare the launcher at the top of your Activity/Fragment:
