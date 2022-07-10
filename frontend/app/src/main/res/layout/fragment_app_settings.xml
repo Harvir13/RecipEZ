@@ -8,7 +8,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="App Settings"
-        tools:layout_editor_absoluteX="32dp"
-        tools:layout_editor_absoluteY="24dp" />
+        android:text="To be possibly implemented for the final product (not currently a major use case)"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="1dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

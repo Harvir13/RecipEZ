@@ -1,5 +1,7 @@
 package com.example.recipez;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -110,9 +112,25 @@ public class ProfileFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 // this is so scuffed rn, pls look away
                 // (prob gonna get rid of the list/adapter all together)
-                if (i == 0) {
-                    Fragment fragment = new AppSettingsFragment();
-                    getParentFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
+                if (i == 0) { // app settings
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("To be implemented");
+                    builder.setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+                if (i == 1) { // google sign out
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("To be implemented");
+                    builder.setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
             }
         });
