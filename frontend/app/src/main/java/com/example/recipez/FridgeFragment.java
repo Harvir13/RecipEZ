@@ -292,12 +292,12 @@ public class FridgeFragment extends Fragment {
     }
 
     public void insertItem(JSONObject insert) {
-        ingredients.add(ingredients.size(), insert);    // TODO: format maybe? how to decide the position?
+        ingredients.add(ingredients.size(), insert);
         mAdapter.notifyDataSetChanged();
     }
 
     public void removeItem(int position) {
-        Ingredient ingredient = new Ingredient();   // TODO: should we make private instance of Ingredient?
+        Ingredient ingredient = new Ingredient();
         try {
             ingredient.deleteIngredient(String.valueOf(userID), ingredients.get(position).getString("name"));
         } catch (Exception e) {
@@ -372,13 +372,13 @@ public class FridgeFragment extends Fragment {
             e.printStackTrace();
         }
 
-        Button submitButton = dialog.findViewById(R.id.editIngredientSubmit);   // BIG TODO: change these to new dialog potentially
+        Button submitButton = dialog.findViewById(R.id.editIngredientSubmit);
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String newExpiryDateString = expiry.getText().toString();
-                if ("".equals(newExpiryDateString)) {
-                    // TODO: CONFIRM EXPIRY DATE IS VALID AND TOAST IF NOT
+                if ("".equals(newExpiryDateString) || newExpiryDateString.length() != 8) {
+                    Toast.makeText(getActivity(), "Please enter a valid date!", Toast.LENGTH_LONG).show();
                 }
                 else {
                     try {

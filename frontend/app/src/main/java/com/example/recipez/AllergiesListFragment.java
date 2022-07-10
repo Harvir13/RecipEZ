@@ -96,7 +96,7 @@ public class AllergiesListFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void deleteAllergy(String userID, String ingredient) { // or the actual ingredient, just need the name here
+        public void deleteAllergy(String userID, String ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
             String url = "http://20.53.224.7:8082/deleteRestrictions";
 
@@ -119,7 +119,7 @@ public class AllergiesListFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void addAllergy(String userID, String ingredient) { // or the actual ingredient, just need the name here
+        public void addAllergy(String userID, String ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
             String url = "http://20.53.224.7:8082/addRestrictions";
 
