@@ -1,22 +1,11 @@
 import express from "express";
 import fetch from "node-fetch";
-// import admin from "firebase-admin";
-// import { createRequire } from 'module';
 
 const API_KEY = "1b961ea726c449868f6bffe1dd76da71";
-// var registrationToken = "dQeP0tUfTCmXF_TUVvk615:APA91bFbY6JuIRlxVzPv4EDvzkP1ubgQJm7VEplUpNCm1jedXaNEzrbad9Bs0DnmTKB2TbjLlgKqZj47Hm4lRyK2jZB5aHCa5N7iGiVDk9eJ7xF2QfiVeTEtpYJ0qyHYZ1pi6efATAms";
 const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
 
 var app = express();
 app.use(express.json());
-
-
-// const require = createRequire(import.meta.url);
-// var serviceAccount = require("./recipez-92366-firebase-adminsdk-i7kge-e682dcca8c.json");
-
-// admin.initializeApp({
-// 	credential: admin.credential.cert(serviceAccount),
-//   })
 
 async function run() {
   	try {
@@ -38,12 +27,14 @@ setInterval(function() {
 //expects {userid: xxx}
 app.get("/requestIngredients", async (req, res) => {
 	try {
+		console.log(req.query)
 		fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"], {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
 			}
 		}).then((response) => response.text()).then((data) => {
+			console.log(data)
 			res.send(data);
 		});
 	} catch (err) {
@@ -134,10 +125,6 @@ app.get("/requestExpiryDate", async (req, res) => {
 			let desiredIngredient;
 			data.forEach((ingredient) => {
 				let generalName = ingredient.name;
-				//let generalName = ingredient.name.split('-')
-				//console.log(generalName[0].trim().toLowerCase())
-				//console.log(req.query["ingredient"].toLowerCase())
-				//console.log(generalName)
 				let levDistance = levenshtein_distance(generalName, req.query["ingredient"]);
 				console.log("" + generalName + " : " + levDistance);
 				if (levDistance < minLevDistance) {
@@ -158,7 +145,7 @@ app.get("/requestExpiryDate", async (req, res) => {
 					else wantedMethod = method;
 				});
 				console.log(expiryData);
-				res.send(wantedMethod.expirationTime.toString());
+				res.send((wantedMethod.expirationTime + Math.round(Date.now() / 1000)).toString());
 			});
 		});
 	} catch (err) {
@@ -166,7 +153,7 @@ app.get("/requestExpiryDate", async (req, res) => {
 	}
 });
 
-// expects body of {userid: xxx, ingredient: xxx}
+// expects body of {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/addIngredient", async (req, res) => {
 	try {
 		fetch("http://20.53.224.7:8086/searchForIngredient?ingredient=" + req.body.ingredient, {
@@ -180,37 +167,22 @@ app.post("/addIngredient", async (req, res) => {
 				res.send("No ingredient found");
 				return;
 			}
-			fetch("http://20.53.224.7:8086/requestExpiryDate?ingredient=" + req.body.ingredient, {
-				method: "GET",
+			let ingredient = {
+				userid: req.body.userid,
+				ingredient: {
+					name: req.body.ingredient,
+					expiry: req.body.expiry,
+					image: spoonacularIng[0].image,
+				}
+			};
+			fetch("http://20.53.224.7:8085/storeIngredient", {
+				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-			}).then((response) => response.text()).then((expiryVal) => {
-				console.log(expiryVal);
-				let expiryDate;
-				if (parseInt(expiryVal) == -1) {
-					expiryDate = -1;
-				} else {
-					expiryDate = Math.floor(Date.now() / 1000) + parseInt(expiryVal);
-				}
-				let ingredient = {
-					userid: req.body.userid,
-					ingredient: {
-						name: req.body.ingredient,
-						expiry: expiryDate,
-						image: spoonacularIng[0].image,
-					}
-				};
-				console.log(ingredient);
-				fetch("http://20.53.224.7:8085/storeIngredient", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(ingredient)
-				}).then((response) => response.json()).then((data) => {
-					res.send(data.ingredient);
-				});
+				body: JSON.stringify(ingredient)
+			}).then((response) => response.json()).then((data) => {
+				res.send(data.ingredient);
 			});
 		});
 	} catch (err) {
@@ -235,7 +207,7 @@ app.get("/scanExpiryDates", async (req, res) => {
 	}
 });
 
-// expects {userid: xxx, time: zzz}
+// expects {userid: xxx, time: xxx}
 app.get("/expiringIngredients", async (req, res) => {
     try {
         fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"],
@@ -263,7 +235,7 @@ app.get("/expiringIngredients", async (req, res) => {
     }
 });
 
-// expects { {restrictions: xxx, yyy, zzz}, ingredient: xxx}
+// expects { {restrictions: xxx, xxx, xxx}, ingredient: xxx}
 app.get("/checkDietaryRestrictions", async (req, res) => {
 	let restrictions = req.query["restrictions"].split(",");
 	let ingredientRestricted = false;
@@ -299,12 +271,11 @@ function levenshtein_distance(inputString, realString) {
 // checks expiry dates and sends a notification to the user, if something is expiring
 function sendExpiryNotification(res) {
 	let currTime = Math.round(Date.now() / 1000).toString();
-	// let currTime = Date.now().toString()
 	console.log("Current time: " + currTime)
 	fetch("http://20.53.224.7:8086/scanExpiryDates?time=" + currTime, {
 		method: "GET",
 		headers: {
-			"Content-type": "application/json"
+			"Content-Type": "application/json"
 		}
 	}).then((response) => response.json()).then((data) => {
         console.log(data);
@@ -318,7 +289,7 @@ function sendExpiryNotification(res) {
 		fetch("http://20.53.224.7:8082/getUserTokens?userids=" + userids, {
 			method: "GET",
 			headers: {
-				"Content-type": "application/json"
+				"Content-Type": "application/json"
 			}
 		}).then((response) => response.json()).then((tokens) => {
 			console.log(tokens)
@@ -327,63 +298,34 @@ function sendExpiryNotification(res) {
 				fetch("http://20.53.224.7:8086/expiringIngredients?userid=" + user.toString() + "&time=" + currTime, {
 					method: "GET",
 					headers: {
-						"Content-type": "application/json"
+						"Content-Type": "application/json"
 					}
 				}).then((response) => response.json()).then((ingredient) => {
 					console.log("Expiring Ingredients:" + ingredient)
 					var currToken = tokens.find((pair) => pair.userID == user).token
+					var expiring = ""
+					for (let i = 0; i < ingredient.length; i++) {
+						expiring = expiring + ingredient[i]["name"] + ","
+					}
+					expiring = expiring.slice(0,-1)
 					var json = {
 						"data": {
-							"ingredients": ingredient
+							"ingredients": expiring
 						},
 						"to": currToken.toString()
 					}
 					fetch("https://fcm.googleapis.com/fcm/send", {
 						method: "POST",
 						headers: {
-							"Content-type": "application/json",
+							"Content-Type": "application/json",
 							Authorization: SERVER_KEY
 						},
 						body: JSON.stringify(json)
 					}).then((response) => response.text()).then((data) => {
 						console.log(data);
 					});
-					// admin.messaging().sendToDevice(currToken.toString(), {"data": {"ingredients": ingredient.toString()}}, {
-					// 	priority: "high",
-					// 	timeToLive: 60 * 60 * 24
-					//   })
-					// .then( response => {
-					// 	console.log(response)
-					// 	console.log("Send to: " + currToken.toString())
-					// })
-					// .catch( error => {
-					// 	console.log(error);
-					// });
-
 				})
 			})
 		})
-		
-        // let json = {
-        //     "data": {
-        //         "ingredients": data
-        //     },
-        //     "to": token
-        // }
-        // fetch("https://fcm.googleapis.com/fcm/send", {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-type": "application/json",
-        //         Authorization: SERVER_KEY
-        //     },
-        //     body: JSON.stringify(json)
-        // }).then((response) => response.text()).then((data) => {
-        //     console.log(data);
-        // });
 	});
 }
-
-app.get("/test", async (req, res) => {
-	let dist = levenshtein_distance(req.query["input"], req.query["word"]);
-	res.send(dist.toString());
-});

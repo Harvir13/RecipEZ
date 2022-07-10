@@ -14,8 +14,8 @@ app.get("/scanDB", async (req, res) => {
             console.log(result)
             if (result > 0) {
                 console.log("User found")
-                client.db("UserDB").collection("Users").find(req.query).toArray().then(result =>{
-                    res.send({"id": result[0]["id"], "dietaryRestrictions": result[0]["dietaryRestrictions"]})
+                client.db("UserDB").collection("Users").findOne(req.query).then(result =>{
+                    res.send({"userID": result["userID"]})
                 })
             }
             else {
@@ -49,10 +49,10 @@ app.post("/storeUserInfo", async (req, res) => {
     try {
         const id = await generateUserID()
         var newUser = req.body
-        newUser["id"] = id;
+        newUser["userID"] = id;
         newUser["dietaryRestrictions"] = [];
         await client.db("UserDB").collection("Users").insertOne(newUser).then(result =>
-            res.send({"id": id, "dietaryRestrictions": []})
+            res.send({"userID": id})
         )
     }
     catch (err) {
@@ -62,12 +62,55 @@ app.post("/storeUserInfo", async (req, res) => {
     
 })
 
-//req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx,xxx]}
-app.put("/updateDietaryRestrictions", async (req, res) => {
+//expects {userID: xxx, token: xxx}
+app.post("/storeToken", async (req, res) => {
     try {
         console.log(req.body)
-        var restrictions = req.body["dietaryRestrictions"].split(",")
-        client.db("UserDB").collection("Users").updateOne({"id": parseInt(req.body["userID"])}, {$set: {"dietaryRestrictions": restrictions}}).then(result => {
+        await client.db("UserDB").collection("Tokens").findOne({"userID": parseInt(req.body["userID"])}).then(result => {
+            if (result === null) {
+                var newToken = {"userID": parseInt(req.body["userID"]), "token": req.body["token"]}
+                client.db("UserDB").collection("Tokens").insertOne(newToken).then(result =>
+                    res.send({"result": "New user's token has been added to DB"})
+                )
+            }
+            else {
+                res.send({"result": "User already exists, in Token Table. Did not add user to Token table again."})
+            }
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+    
+})
+
+//expects ?uderids=xxx,xxx,xxx
+app.get("/getTokens", async (req, res) => {
+    try {
+        console.log(req.query)
+        var userIds = []
+        var stringIdsArray = req.query["userids"].split(",")
+        for (let i = 0; i < stringIdsArray.length; i++) {
+            userIds.push(parseInt(stringIdsArray[i]))
+        }
+        await client.db("UserDB").collection("Tokens").find({"userID": {$in: userIds}}).toArray().then(result =>
+            res.send(result)
+        )
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+    
+})
+
+//req.body - {userID: xxx, ingredient: xxx}
+app.put("/addToDietaryRestrictions", async(req, res) => {
+    try {
+        console.log(req.body)
+        var restrictions = req.body["restriction"]
+        client.db("UserDB").collection("Users").updateOne({"userID": parseInt(req.body["userID"])}, {$push: {"dietaryRestrictions": restrictions}}).then(result => {
             res.send({"result": "Successfully updated dietary restrictions list"})
         })   
     }
@@ -77,6 +120,34 @@ app.put("/updateDietaryRestrictions", async (req, res) => {
     }
 })
 
+//req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx,xxx]}
+app.put("/deleteFromDietaryRestrictions", async (req, res) => {
+    try {
+        console.log(req.body)
+        var restrictions = req.body["restriction"]
+        client.db("UserDB").collection("Users").updateOne({"userID": parseInt(req.body["userID"])}, {$pull: {"dietaryRestrictions": restrictions}}).then(result => {
+            res.send({"result": "Successfully updated dietary restrictions list"})
+        })   
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
+app.get("/getDietaryRestrictions", async (req, res) => {
+    try {
+        console.log(req.query)
+        var userID = parseInt(req.query["userid"])
+        client.db("UserDB").collection("Users").findOne({"userID": userID}).then(result => {
+            res.send(result)
+        })   
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
 
 async function run () {
     try {
@@ -96,4 +167,3 @@ async function run () {
 }
 
 run()
-

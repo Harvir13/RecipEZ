@@ -29,11 +29,14 @@ run();
 // expects {userid: xxx}
 app.get("/getIngredients", async (req, res) => {
     try {
+        console.log(req.query)
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.query["userid"]) }).then((result) => {
             if (result === null) {
+                console.log("result is empty")
                 res.send([])
             }
             else {
+                console.log(result.ingredients)
                 res.send(result.ingredients);
             }
         });
