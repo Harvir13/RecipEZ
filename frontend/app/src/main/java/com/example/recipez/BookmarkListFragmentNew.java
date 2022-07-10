@@ -133,7 +133,9 @@ public class BookmarkListFragmentNew extends Fragment {
                         Log.d(TAG, "add path to paths list");
                         addPathToPathsList(userID, folderName);
 
+                        adapter = new BookmarkFolderAdapter(folderList);
                         adapter.notifyItemInserted(folderList.size() - 1);
+                        bookmarkListRecyclerView.setAdapter(adapter);
                         bookmarkListRecyclerView.scrollToPosition(folderList.size() - 1);
 
                         dialog.dismiss();
