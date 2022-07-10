@@ -1,7 +1,9 @@
 package com.example.recipez;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -295,6 +297,18 @@ public class RecipesFragment extends Fragment {
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
+                        if (response.length() == 0 ) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("Your fridge is empty").setMessage("Try adding ingredients in your fridge to see suggested recipes just for you! :)");
+                            builder.setPositiveButton("Open fridge", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Fragment fragment = new FridgeFragment();
+                                    getParentFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
                         try {
                             JSONArray recipesArray = response;
                             recipes = new ArrayList<>();
