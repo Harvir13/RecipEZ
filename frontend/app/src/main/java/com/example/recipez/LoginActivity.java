@@ -47,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "1";
     private Button signInButton;
     private GoogleSignInClient mGoogleSignInClient;
-    private SharedPreferences sharedpreferences;
+    public SharedPreferences sharedpreferences;
     private Integer RC_SIGN_IN = 1;
     UserAccount newUser = new UserAccount();
 
@@ -232,7 +232,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                         .setSmallIcon(R.drawable.notification_icon)
-                        .setContentTitle("Ingredients Expiring Soon")
+                        .setContentTitle("Ingredients Expiring Soon:")
                         .setContentText(remoteMessage.getData().get("ingredients"))
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                         .setContentIntent(pendingIntent)
@@ -264,45 +264,16 @@ public class LoginActivity extends AppCompatActivity {
          * B) User uninstalls/reinstalls the app
          * C) User clears app data
          */
-        @Override
-        public void onNewToken(@NonNull String token) {
-            Log.d(TAG, "Refreshed token: " + token);
-
-            // If you want to send messages to this application instance or
-            // manage this apps subscriptions on the server side, send the
-            // FCM registration token to your app server.
+//        @Override
+//        public void onNewToken(@NonNull String token) {
+//            Log.d(TAG, "Refreshed token: " + token);
+//
+//            // If you want to send messages to this application instance or
+//            // manage this apps subscriptions on the server side, send the
+//            // FCM registration token to your app server.
+//            SharedPreferences sharedpreferences = getApplicationContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
 //            int userID = sharedpreferences.getInt("userID", 0);
 //            sendRegistrationToServer(token, userID);
-        }
-
-//        private void sendRegistrationToServer(String token, int userID) {
-//            // Instantiate the RequestQueue.
-//            RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-//            String url = "http://20.53.224.7:8082/storeUserToken";
-//            // 10.0.2.2 is a special alias to localhost for developers
-//
-//            Map<String, String> jsonParams = new HashMap();
-//            jsonParams.put("token", token);
-//            jsonParams.put("userID", String.valueOf(userID));
-//
-//
-//            // Request a string response from the provided URL.
-//            JsonObjectRequest jsonRequest = new JsonObjectRequest
-//                    (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
-//                        @Override
-//                        public void onResponse(JSONObject response) {
-//                            Log.d(TAG, response.toString());
-//                        }
-//                    }, new Response.ErrorListener() {
-//                        @Override
-//                        public void onErrorResponse(VolleyError error) {
-//                            Log.d(TAG, error.toString());
-//                        }
-//                    }) {
-//            };
-//
-//            // Add the request to the RequestQueue.
-//            queue.add(jsonRequest);
 //        }
     }
 
@@ -329,11 +300,32 @@ public class LoginActivity extends AppCompatActivity {
 
                             try {
                                 SharedPreferences.Editor myEdit = sharedpreferences.edit();
-                                myEdit.putInt("userID", (int) response.get("userID"));
+                                int userID = (int) response.get("userID");
+                                myEdit.putInt("userID", userID);
                                 myEdit.apply();
+
+                                FirebaseMessaging.getInstance().getToken()
+                                        .addOnCompleteListener(new OnCompleteListener<String>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<String> task) {
+                                                if (!task.isSuccessful()) {
+                                                    Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                                                    return;
+                                                }
+
+                                                // Get new FCM registration token
+                                                String token = task.getResult();
+
+                                                sendRegistrationToServer(token, userID);
+
+                                                // Log
+                                                Log.d(TAG, token);
+                                            }
+                                        });
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+
 
                             Log.d(TAG, response.toString());
                         }
@@ -349,10 +341,36 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
-        //TODO: set up this endpoint
-//        public void notifyUser(String message) {
-//
-//        }
+        private void sendRegistrationToServer(String token, int userID) {
+            // Instantiate the RequestQueue.
+            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+            String url = "http://20.53.224.7:8082/storeUserToken";
+            // 10.0.2.2 is a special alias to localhost for developers
+
+            Map<String, String> jsonParams = new HashMap();
+            jsonParams.put("token", token);
+            jsonParams.put("userID", String.valueOf(userID));
+
+
+            // Request a string response from the provided URL.
+            JsonObjectRequest jsonRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
+                    }) {
+            };
+
+            // Add the request to the RequestQueue.
+            queue.add(jsonRequest);
+        }
+
     }
 
 }
