@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +42,9 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
     private List<BookmarkFolder> foldersList;
     private List<JSONObject> recipesInFolder = new ArrayList<>();
 
-    private int userID = 1; // todo: change user id
+    SharedPreferences sharedpreferences;
+    private int userID; // todo: test if works
+
     public BookmarkFolderAdapter(List<BookmarkFolder> foldersList){
         this.foldersList  = foldersList;
     }
@@ -55,6 +58,9 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
 
     @Override
     public void onBindViewHolder(@NonNull FolderViewHolder holder, @SuppressLint("RecyclerView") int position) {
+        sharedpreferences = holder.folderNestedRecyclerView.getContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
+        userID = sharedpreferences.getInt("userID", 0);
+
         BookmarkFolder folder = foldersList.get(holder.getAdapterPosition());
         holder.folderName.setText(folder.getFolderName());
 

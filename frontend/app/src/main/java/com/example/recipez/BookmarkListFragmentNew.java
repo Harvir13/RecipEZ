@@ -2,6 +2,7 @@ package com.example.recipez;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -38,19 +39,18 @@ import java.util.Map;
 public class BookmarkListFragmentNew extends Fragment {
     final static String TAG = "BookmarkListFragmentNew";
 
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     private RecyclerView bookmarkListRecyclerView;
     private Button addNewFolderButton;
 
-    private int userID = 1; // todo: update user id
+    SharedPreferences sharedpreferences;
+    private int userID; // todo: test if works
 
     public BookmarkListFragmentNew() {
         // Required empty public constructor
@@ -64,7 +64,6 @@ public class BookmarkListFragmentNew extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment RecipesFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static BookmarkListFragmentNew newInstance(String param1, String param2) {
         BookmarkListFragmentNew fragment = new BookmarkListFragmentNew();
         Bundle args = new Bundle();
@@ -98,6 +97,9 @@ public class BookmarkListFragmentNew extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        sharedpreferences = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE);
+        userID = sharedpreferences.getInt("userID", 0);
+
         getPathsList(userID);
         getRecipesFromBookmarkList(userID);
 
@@ -129,7 +131,7 @@ public class BookmarkListFragmentNew extends Fragment {
                         folderList.add(new BookmarkFolder(emptyRecipeList, folderName));
 
                         Log.d(TAG, "add path to paths list");
-                        addPathToPathsList(userID, folderName); // TODO: update user ID
+                        addPathToPathsList(userID, folderName);
 
                         adapter.notifyItemInserted(folderList.size() - 1);
                         bookmarkListRecyclerView.scrollToPosition(folderList.size() - 1);

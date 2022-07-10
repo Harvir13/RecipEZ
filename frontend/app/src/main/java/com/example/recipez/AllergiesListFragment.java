@@ -1,6 +1,8 @@
 package com.example.recipez;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -52,6 +54,8 @@ public class AllergiesListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private AllergiesListAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    SharedPreferences sharedpreferences;
+    private int userID; // todo: test if works
 
     public final class Ingredient extends MainActivity {
         private int myStaticMember;
@@ -186,7 +190,6 @@ public class AllergiesListFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment AllergiesListFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static AllergiesListFragment newInstance(String param1, String param2) {
         AllergiesListFragment fragment = new AllergiesListFragment();
         Bundle args = new Bundle();
@@ -219,14 +222,14 @@ public class AllergiesListFragment extends Fragment {
 
     public void removeItem(int position) {
         Ingredient ingredient = new Ingredient();
-        ingredient.deleteAllergy("11111", allergiesList.get(position)); // TODO
+        ingredient.deleteAllergy(String.valueOf(userID), allergiesList.get(position));
         allergiesList.remove(position);
         mAdapter.notifyItemRemoved(position);
     }
 
     public void addItem(String restriction) {
         Ingredient ingredient = new Ingredient();
-        ingredient.addAllergy("11111", restriction);
+        ingredient.addAllergy(String.valueOf(userID), restriction);
         allergiesList.add(allergiesList.size(), restriction);
         mAdapter.notifyDataSetChanged();
     }
@@ -242,6 +245,9 @@ public class AllergiesListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        sharedpreferences = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE);
+        userID = sharedpreferences.getInt("userID", 0);
+
         addAllergyButton = view.findViewById(R.id.addAllergyButton);
         addAllergyButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -251,7 +257,7 @@ public class AllergiesListFragment extends Fragment {
         });
 
         Ingredient ingredient = new Ingredient();
-        ingredient.requestAllergiesList("11111", view); // TODO
+        ingredient.requestAllergiesList(String.valueOf(userID), view);
     }
 
     public void openAddAllergyDialog() {

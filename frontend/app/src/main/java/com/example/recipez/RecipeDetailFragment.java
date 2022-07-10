@@ -1,6 +1,8 @@
 package com.example.recipez;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -40,12 +42,10 @@ import java.util.Map;
 public class RecipeDetailFragment extends Fragment {
     final static String TAG = "RecipeDetailFragment";
 
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -63,7 +63,8 @@ public class RecipeDetailFragment extends Fragment {
     private RecyclerView folderListRecyclerView;
     private TextView existingFolderText;
 
-    private int userID = 1; // todo: change user id
+    SharedPreferences sharedpreferences;
+    private int userID; // todo: test if works
 
     public RecipeDetailFragment() {
         // Required empty public constructor
@@ -77,7 +78,6 @@ public class RecipeDetailFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment RecipesFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static RecipeDetailFragment newInstance(String param1, String param2) {
         RecipeDetailFragment fragment = new RecipeDetailFragment();
         Bundle args = new Bundle();
@@ -111,6 +111,9 @@ public class RecipeDetailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        sharedpreferences = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE);
+        userID = sharedpreferences.getInt("userID", 0);
 
         Bundle bundle = this.getArguments();
         recipeID = bundle.getInt("RECIPE_ID", 0);
@@ -470,7 +473,7 @@ public class RecipeDetailFragment extends Fragment {
                             addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    addRecipeToBookmarkList(userID, recipeID, selectedFolderName[0].toString(), recipeName, recipeImageUrl); // TODO: update user ID
+                                    addRecipeToBookmarkList(userID, recipeID, selectedFolderName[0].toString(), recipeName, recipeImageUrl);
                                     Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName[0].toString(), Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 }

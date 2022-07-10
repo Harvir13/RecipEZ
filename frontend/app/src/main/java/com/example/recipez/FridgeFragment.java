@@ -3,6 +3,8 @@ package com.example.recipez;
 import static java.lang.Integer.parseInt;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -58,6 +60,9 @@ public class FridgeFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private FridgeAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    SharedPreferences sharedpreferences;
+    private int userID; // todo: test if works
 
     public final class Ingredient extends MainActivity {
         private int myStaticMember;
@@ -228,7 +233,7 @@ public class FridgeFragment extends Fragment {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-                                storeIngredient("11111", newIngredient);
+                                storeIngredient(String.valueOf(userID), newIngredient);
                             }
                         }
                     }, new Response.ErrorListener() {
@@ -294,7 +299,7 @@ public class FridgeFragment extends Fragment {
     public void removeItem(int position) {
         Ingredient ingredient = new Ingredient();   // TODO: should we make private instance of Ingredient?
         try {
-            ingredient.deleteIngredient("11111", ingredients.get(position).getString("name"));
+            ingredient.deleteIngredient(String.valueOf(userID), ingredients.get(position).getString("name"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -304,7 +309,7 @@ public class FridgeFragment extends Fragment {
 
     public void editItem(int position, JSONObject editedItem) {
         Ingredient ingredient = new Ingredient();
-        ingredient.updateExpiryDate("11111", editedItem);
+        ingredient.updateExpiryDate(String.valueOf(userID), editedItem);
         ingredients.set(position, editedItem);
         mAdapter.notifyItemChanged(position);
     }
@@ -320,6 +325,9 @@ public class FridgeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        sharedpreferences = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE);
+        userID = sharedpreferences.getInt("userID", 0);
+
         addIngredientButton = view.findViewById(R.id.addIngredientButton);
         addIngredientButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -329,7 +337,7 @@ public class FridgeFragment extends Fragment {
         });
 
         Ingredient ingredient = new Ingredient();
-        ingredient.requestIngredients("11111");
+        ingredient.requestIngredients(String.valueOf(userID));
     }
 
     private void openSelectIngredientDialog(ArrayList<String> selectIngredients) {
@@ -381,7 +389,7 @@ public class FridgeFragment extends Fragment {
                         String newExpiryDateUnixString = String.valueOf(format.parse(newExpiryDateString).getTime() / 1000L);
                         addIngredient.put("expiry", newExpiryDateUnixString);
                         Ingredient i = new Ingredient();
-                        i.storeIngredient("11111", addIngredient);
+                        i.storeIngredient(String.valueOf(userID), addIngredient);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
