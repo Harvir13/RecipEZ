@@ -27,7 +27,7 @@ app.get("/checkUserExists", async (req, res) => {
                     res.send(data)
                 })
             }
-            //user already exists in the database, data will contain {"id": xx}
+            //user already exists in the database, data will contain {"userID": xx}
             else {
                 res.send(data)
             }
