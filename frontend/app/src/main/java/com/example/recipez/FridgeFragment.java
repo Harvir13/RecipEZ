@@ -440,8 +440,8 @@ public class FridgeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String newExpiryDateString = newIngredientExpiry.getText().toString();
-                if ("".equals(newExpiryDateString)) {
-                    // TODO: CONFIRM EXPIRY DATE IS VALID AND TOAST IF NOT
+                if ("".equals(newExpiryDateString) || newExpiryDateString.length() != 8) {
+                    Toast.makeText(getActivity(), "Please enter a valid date!", Toast.LENGTH_LONG).show();
                 }
                 else {
                     try {
