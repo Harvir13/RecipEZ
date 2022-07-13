@@ -14,7 +14,7 @@ app.get("/checkUserExists", async (req, res) => {
             response.json()
         ).then(data => {
             // User doesn't exist in db, so we need to store their info
-            if (data["id"] === 0) {
+            if (data["userID"] === 0) {
                 fetch("http://" + ip + ":8081/storeUserInfo", {
                     method: 'POST',
                     headers: {
