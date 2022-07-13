@@ -11,13 +11,6 @@ var app = express();
 app.use(express.json());
 
 
-// const require = createRequire(import.meta.url);
-// var serviceAccount = require("./recipez-92366-firebase-adminsdk-i7kge-e682dcca8c.json");
-
-// admin.initializeApp({
-// 	credential: admin.credential.cert(serviceAccount),
-//   })
-
 async function run() {
   	try {
 		var server = app.listen(8086, (req, res) => {
