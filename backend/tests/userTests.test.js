@@ -9,6 +9,8 @@ const UserDBURL = 'http://20.53.224.7:8081';
 
 jest.mock('axios');
 
+//UserStore.js tests
+
 test('Get user tokens', () => {
     const req = '1, 2, 3';
     const res = [{'userID': 1, 'token': 'a'}, {'userID': 2, 'token': 'b'}, {'userID': 3, 'token': 'c'}];
@@ -40,6 +42,7 @@ test('Check user exists', () => {
     return axios.get(UserStoreURL + '/checkUserExists?email=' + req).then(response => expect(response).toEqual(res))
 });
 
+//UserDB.js tests
 
 test('Scan DB for user email', () => {
     const req = 'test@test.com';
@@ -48,7 +51,6 @@ test('Scan DB for user email', () => {
     axios.get = jest.fn().mockResolvedValue(res);
     return axios.get(UserDBURL + '/scanDB?email=' + req).then(response => expect(response).toEqual(res))
 });
-
 
 test('Store user info', () => {
     const req = {'email': 'test4@test.com'};
