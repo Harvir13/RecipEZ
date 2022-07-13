@@ -28,6 +28,7 @@ setInterval(function() {
 	sendExpiryNotification();
 }, 300000)
 
+//endpoint for TA
 app.get("/getNotification", async(req, res) => {
 	console.log("here")
 	sendExpiryNotification();
