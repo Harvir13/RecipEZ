@@ -41,3 +41,39 @@ test('Testing get restriction', () => {
 	axios.get = jest.fn().mockResolvedValue(res);
 	return axios.get(url + '/getRestrictions?userid=' + req).then(response => expect(response).toEqual(res));
 });
+
+test('Testing add restrictions for DB', () => {
+    const req = {'userID': 1, 'ingredient': 'apple'};
+	const res = {'result': 'Successfully added restriction'};
+
+    axios.put = jest.fn().mockResolvedValue(res);
+    return axios.put(url + '/addToDietaryRestrictions', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(req)
+    }).then(response => expect(response).toEqual(res));
+});
+
+test('Testing delete restrictions for DB', () => {
+    const req = {'userID': 1, 'dietaryRestrictions': ['apple', 'banana']};
+	const res = {'result': 'Successfully added restriction'};
+
+    axios.put = jest.fn().mockResolvedValue(res);
+    return axios.put(url + '/deleteFromDietaryRestrictions', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(req)
+    }).then(response => expect(response).toEqual(res));
+});
+
+test('Testing get restriction for DB', () => {
+	const req = '1';
+	const res = {data: ['banana', 'orange']};
+
+	axios.get = jest.fn().mockResolvedValue(res);
+	return axios.get(url + '/getDietaryRestrictions?userid=' + req).then(response => expect(response).toEqual(res));
+});
