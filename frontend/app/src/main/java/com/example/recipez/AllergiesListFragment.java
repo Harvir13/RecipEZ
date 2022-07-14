@@ -57,11 +57,11 @@ public class AllergiesListFragment extends Fragment {
     SharedPreferences sharedpreferences;
     private int userID; // todo: test if works
 
-    public final class Ingredient extends MainActivity {
+    public final class IngredientFetching extends MainActivity {
         private int myStaticMember;
         private String TAG = "Ingredient Class";
 
-        public Ingredient() {
+        public IngredientFetching() {
             myStaticMember = 1;
         }
 
@@ -221,14 +221,14 @@ public class AllergiesListFragment extends Fragment {
     }
 
     public void removeItem(int position) {
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         ingredient.deleteAllergy(String.valueOf(userID), allergiesList.get(position));
         allergiesList.remove(position);
         mAdapter.notifyItemRemoved(position);
     }
 
     public void addItem(String restriction) {
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         ingredient.addAllergy(String.valueOf(userID), restriction);
         allergiesList.add(allergiesList.size(), restriction);
         mAdapter.notifyDataSetChanged();
@@ -256,7 +256,7 @@ public class AllergiesListFragment extends Fragment {
             }
         });
 
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         ingredient.requestAllergiesList(String.valueOf(userID), view);
     }
 
@@ -271,7 +271,7 @@ public class AllergiesListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String name = editIngredientName.getText().toString();
-                Ingredient ingredient = new Ingredient();
+                IngredientFetching ingredient = new IngredientFetching();
                 ingredient.getIngredientSuggestions(name);
                 dialog.dismiss();
             }

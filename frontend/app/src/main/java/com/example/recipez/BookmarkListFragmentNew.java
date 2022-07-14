@@ -187,11 +187,11 @@ public class BookmarkListFragmentNew extends Fragment {
         return result;
     }
 
-    public final class Recipe extends MainActivity {
+    public final class RecipeFetching extends MainActivity {
         private int myStaticMember;
         private String TAG = "Recipe Class";
 
-        public Recipe() {
+        public RecipeFetching() {
             myStaticMember = 1;
         }
 

@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     public SharedPreferences sharedpreferences;
     private Integer RC_SIGN_IN = 1;
-    UserAccount newUser = new UserAccount();
+    UserAccountFetching newUser = new UserAccountFetching();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -277,11 +277,11 @@ public class LoginActivity extends AppCompatActivity {
 //        }
     }
 
-    public final class UserAccount {
+    public final class UserAccountFetching {
         private int myStaticMember;
         private String TAG = "User Class";
 
-        public UserAccount() {
+        public UserAccountFetching() {
             myStaticMember = 1;
         }
 

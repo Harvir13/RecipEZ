@@ -64,11 +64,11 @@ public class FridgeFragment extends Fragment {
     SharedPreferences sharedpreferences;
     private int userID; // todo: test if works
 
-    public final class Ingredient extends MainActivity {
+    public final class IngredientFetching extends MainActivity {
         private int myStaticMember;
         private String TAG = "Ingredient Class";
 
-        public Ingredient() {
+        public IngredientFetching() {
             myStaticMember = 1;
         }
 
@@ -265,7 +265,7 @@ public class FridgeFragment extends Fragment {
     }
 
     public void addIngredient(String name) {
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         ingredient.checkIngredient(name);
     }
 
@@ -297,7 +297,7 @@ public class FridgeFragment extends Fragment {
     }
 
     public void removeItem(int position) {
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         try {
             ingredient.deleteIngredient(String.valueOf(userID), ingredients.get(position).getString("name"));
         } catch (Exception e) {
@@ -308,7 +308,7 @@ public class FridgeFragment extends Fragment {
     }
 
     public void editItem(int position, JSONObject editedItem) {
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         ingredient.updateExpiryDate(String.valueOf(userID), editedItem);
         ingredients.set(position, editedItem);
         mAdapter.notifyItemChanged(position);
@@ -336,7 +336,7 @@ public class FridgeFragment extends Fragment {
             }
         });
 
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         ingredient.requestIngredients(String.valueOf(userID));
     }
 
@@ -388,7 +388,7 @@ public class FridgeFragment extends Fragment {
                         format.setTimeZone(TimeZone.getTimeZone("GMT-8"));
                         String newExpiryDateUnixString = String.valueOf(format.parse(newExpiryDateString).getTime() / 1000L);
                         addIngredient.put("expiry", newExpiryDateUnixString);
-                        Ingredient i = new Ingredient();
+                        IngredientFetching i = new IngredientFetching();
                         i.storeIngredient(String.valueOf(userID), addIngredient);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -413,7 +413,7 @@ public class FridgeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String name = editIngredientName.getText().toString();
-                Ingredient ingredient = new Ingredient();
+                IngredientFetching ingredient = new IngredientFetching();
                 ingredient.getIngredientSuggestions(name);
                 dialog.dismiss();
             }
