@@ -192,7 +192,10 @@ public class FridgeFragment extends Fragment {
                             try {
                                 ArrayList<String> ingredientSuggestions = new ArrayList<>();
                                 for (int i = 0; i < response.length(); i++) {
-                                    ingredientSuggestions.add(response.getJSONObject(i).getString("name"));
+                                    String ingredient = response.getJSONObject(i).getString("name");
+                                    if (!ingredientInList(ingredient)) {
+                                        ingredientSuggestions.add(ingredient);
+                                    }
                                 }
                                 if (ingredientSuggestions.size() == 0) {
                                     Toast.makeText(getActivity().getApplicationContext(), "No ingredients found, please try a different search", Toast.LENGTH_LONG).show();
@@ -357,6 +360,19 @@ public class FridgeFragment extends Fragment {
         });
 
         dialog.show();
+    }
+
+    private boolean ingredientInList(String ingredient) {
+        try {
+            for (JSONObject ing : ingredients) {
+                if (ing.getString("name").toLowerCase().equals(ingredient)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private void openIngredientExpiryDialog(String ingredient) {
