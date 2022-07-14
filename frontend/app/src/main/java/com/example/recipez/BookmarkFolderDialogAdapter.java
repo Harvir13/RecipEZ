@@ -1,8 +1,10 @@
 package com.example.recipez;
 
+import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 
@@ -42,6 +44,10 @@ public class BookmarkFolderDialogAdapter extends RecyclerView.Adapter<BookmarkFo
                 }
             }
         });
+    }
+
+    public int getSelectedPosition() {
+        return this.selectedPosition;
     }
 
     @Override

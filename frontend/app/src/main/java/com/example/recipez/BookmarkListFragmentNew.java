@@ -123,22 +123,22 @@ public class BookmarkListFragmentNew extends Fragment {
 
                         if (!folderNameInput.getText().toString().equals("")) {
                             folderName = folderNameInput.getText().toString();
+
+                            List<JSONObject> emptyRecipeList = new ArrayList<>();
+                            folderList.add(new BookmarkFolder(emptyRecipeList, folderName));
+
+                            Log.d(TAG, "add path to paths list");
+                            addPathToPathsList(userID, folderName);
+
+                            adapter = new BookmarkFolderAdapter(folderList);
+                            adapter.notifyItemInserted(folderList.size() - 1);
+                            bookmarkListRecyclerView.setAdapter(adapter);
+                            bookmarkListRecyclerView.scrollToPosition(folderList.size() - 1);
+
+                            dialog.dismiss();
                         } else {
                             Toast.makeText(getActivity(), "Please enter a folder name", Toast.LENGTH_SHORT).show();
                         }
-
-                        List<JSONObject> emptyRecipeList = new ArrayList<>();
-                        folderList.add(new BookmarkFolder(emptyRecipeList, folderName));
-
-                        Log.d(TAG, "add path to paths list");
-                        addPathToPathsList(userID, folderName);
-
-                        adapter = new BookmarkFolderAdapter(folderList);
-                        adapter.notifyItemInserted(folderList.size() - 1);
-                        bookmarkListRecyclerView.setAdapter(adapter);
-                        bookmarkListRecyclerView.scrollToPosition(folderList.size() - 1);
-
-                        dialog.dismiss();
                     }
                 });
 

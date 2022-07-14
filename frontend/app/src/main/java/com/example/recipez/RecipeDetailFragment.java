@@ -461,13 +461,19 @@ public class RecipeDetailFragment extends Fragment {
                                         @Override
                                         public void run() {
                                             dialogAdapter.notifyDataSetChanged();
+                                            if (dialogAdapter.getSelectedPosition() >= 0) {
+                                                addToBookmarkConfirmButton.setEnabled(true);
+                                            }
+                                            Log.d(TAG, "selected position after click" + dialogAdapter.getSelectedPosition());
                                         }
                                     });
                                     selectedFolderName[0] = str;
                                 }
                             };
+                            dialogAdapter = new BookmarkFolderDialogAdapter(alreadyBookmarked ? new ArrayList<>() : folderNames, bookmarkFolderClickListener);
 
-                            if (folderNames.size() == 0) {
+                            Log.d(TAG, "selected position " + dialogAdapter.getSelectedPosition());
+                            if (folderNames.size() == 0 || dialogAdapter.getSelectedPosition() == -1) {
                                 addToBookmarkConfirmButton.setEnabled(false);
                             }
                             addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
@@ -480,7 +486,6 @@ public class RecipeDetailFragment extends Fragment {
                             });
 
                             folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                            dialogAdapter = new BookmarkFolderDialogAdapter(alreadyBookmarked ? new ArrayList<>() : folderNames, bookmarkFolderClickListener);
                             folderListRecyclerView.setAdapter(dialogAdapter);
 
                         } catch (JSONException e) {
