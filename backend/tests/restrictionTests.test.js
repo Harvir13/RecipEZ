@@ -1,19 +1,19 @@
 //import axios from 'axios';
-var axios = require('axios')
+var axios = require("axios");
 
 jest.mock('axios');
 
 const UserStoreURL = 'http://20.53.224.7:8082';
 const UserDBURL = 'http://20.53.224.7:8081';
 
-test('Testing add restriction', () => {
+test("Testing add restriction", () => {
 	const req = {'userID': 1, 'dietaryRestrictions': ['apple', 'orange']};
 	const res = {'result': 'Successfully added restriction'};
 
-    axios.put = jest.fn().mockResolvedValue(res);
+  axios.put = jest.fn().mockResolvedValue(res);
     return axios.put(UserStoreURL + '/addRestrictions', {
         method: 'PUT',
-        headers: {
+      headers: {
             'Content-Type': 'application/json'
       },
         body: JSON.stringify(req)
@@ -35,7 +35,7 @@ test('Testing delete restriction', () => {
     }).then(response => expect(response).toEqual(res));
 });
 
-test('Testing get restriction', () => {
+test("Testing get restriction", () => {
   const req = "1";
 	const res = {data: ['banana', 'orange']};
 
@@ -72,7 +72,7 @@ test('Testing delete restrictions for DB', () => {
 });
 
 test('Testing get restriction for DB', () => {
-	const req = '1';
+  const req = "1";
 	const res = {data: ['banana', 'orange']};
 
 	axios.get = jest.fn().mockResolvedValue(res);

@@ -22,20 +22,20 @@ test('Get user tokens', () => {
 
 test('Store user token', () => {
     const req = {'userID': 1, 'token': 'a'};
-    const res = {'result': 'Sucessfully stored user token'};
+  const res = { result: "Sucessfully stored user token" };
 
     axios.post = jest.fn().mockResolvedValue(res);
     return axios.post(UserStoreURL + '/storeUserToken', {
-        method: 'POST',
+      method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+        "Content-Type": "application/json",
         },
         body: JSON.stringify(req)
     }).then(response => expect(response).toEqual(res));
 });
 
 test('Check user exists', () => {
-    const req = 'test@test.com';
+  const req = "test@test.com";
     const res = {'userID': 1};
 
     axios.get = jest.fn().mockResolvedValue(res);
@@ -66,7 +66,7 @@ test("Store user info", () => {
     }).then(response => expect(response).toEqual(res));
 });
 
-test('Store token', () => {
+test("Store token", () => {
     const req = {'userID': 4, 'token': 'd'};
     const res = {'result': "New user's token has been added to DB"};
 
