@@ -34,20 +34,17 @@ app.get("/getNotification", async(req, res) => {
 
 //expects {userid: xxx}
 app.get("/requestIngredients", async (req, res) => {
-	try {
-		console.log(req.query)
-		fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"], {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			}
-		}).then((response) => response.text()).then((data) => {
-			console.log(data)
-			res.send(data);
-		});
-	} catch (err) {
-		res.status(400).send(err);
-	}
+	console.log(req.query)
+	fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"], {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		}
+	}).then((response) => response.text()).then((data, err) => {
+		if (err) res.status(400).send(err);
+		console.log(data);
+		res.send(data);
+	});
 });
 
 // expects {userid: xxx, ingredient: xxx}

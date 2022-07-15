@@ -8,17 +8,12 @@ const uri = "mongodb://localhost:27017";
 const client = new MongoClient(uri);
 
 async function run() {
-    try {
-        await client.connect();
-        var server = app.listen(8085, (req, res) => {
-            var host = server.address().address;
-            var port = server.address().port;
-            console.log("Example server successfully running at http://%s:%s", host, port);
-        });
-    } catch (err) {
-        console.log(err);
-        await client.close();
-    }
+    await client.connect();
+    var server = app.listen(8085, (req, res) => {
+        var host = server.address().address;
+        var port = server.address().port;
+        console.log("Example server successfully running at http://%s:%s", host, port);
+    });
 }
 
 run();
