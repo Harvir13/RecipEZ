@@ -52,7 +52,7 @@ test('Scan DB for user email', () => {
     return axios.get(UserDBURL + '/scanDB?email=' + req).then(response => expect(response).toEqual(res))
 });
 
-test('Store user info', () => {
+test("Store user info", () => {
     const req = {'email': 'test4@test.com'};
     const res = {'userID': 4};
 
