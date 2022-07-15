@@ -1,15 +1,12 @@
 package com.example.recipez;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,19 +38,11 @@ import java.util.ArrayList;
 public class RecipesFragment extends Fragment {
     final static String TAG = "RecipesFragment";
 
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
     private RecyclerView recipeListRecyclerView;
-    private CardView recipeCardButton;
-    private SearchView recipeSearchBar;
     private TextView currentResultsTitle;
+    RecipeCardListRecycleAdapter recycleAdapter;
+    ArrayList<JSONObject> recipes;
 
-    private ImageButton filterButton;
     private CheckBox dairyFreeCheckBox;
     private CheckBox glutenFreeCheckBox;
     private CheckBox vegetarianCheckBox;
@@ -65,10 +54,6 @@ public class RecipesFragment extends Fragment {
     SharedPreferences sharedpreferences;
     private int userID; // todo: test if works
 
-    public RecipesFragment() {
-        // Required empty public constructor
-    }
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -79,20 +64,12 @@ public class RecipesFragment extends Fragment {
      */
     public static RecipesFragment newInstance(String param1, String param2) {
         RecipesFragment fragment = new RecipesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -101,9 +78,6 @@ public class RecipesFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_recipes, container, false);
     }
-
-    RecipeCardListRecycleAdapter recycleAdapter;
-    ArrayList<JSONObject> recipes;
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -117,7 +91,7 @@ public class RecipesFragment extends Fragment {
 
         currentResultsTitle = view.findViewById(R.id.recipe_list_based_on_your_pantry_text);
 
-        filterButton = view.findViewById(R.id.recipe_fragment_filter_button);
+        ImageButton filterButton = view.findViewById(R.id.recipe_fragment_filter_button);
         filterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -142,7 +116,7 @@ public class RecipesFragment extends Fragment {
             }
         });
 
-        recipeSearchBar = view.findViewById(R.id.recipe_list_search_bar);
+        SearchView recipeSearchBar = view.findViewById(R.id.recipe_list_search_bar);
         recipeSearchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

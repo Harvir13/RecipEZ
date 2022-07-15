@@ -128,7 +128,7 @@ app.get("/requestExpiryDate", async (req, res) => {
 				"Content-Type": "application/json",
 			}
 		}).then((response) => response.json()).then((data) => {
-			if (data.length == 0 || data.code == 500) {
+			if (data.length === 0 || data.code === 500) {
 				res.send("-1");
 				return;
 			}
@@ -178,7 +178,7 @@ app.post("/addIngredient", async (req, res) => {
 			},
 		}).then((response) => response.json()).then((spoonacularIng) => {
 			console.log(spoonacularIng);
-			if (spoonacularIng.length == 0) {
+			if (spoonacularIng.length === 0) {
 				res.send({"result": "No ingredient found"});
 				return;
 			}
@@ -238,7 +238,7 @@ app.get("/expiringIngredients", async (req, res) => {
                 let ingDate = new Date(0);
                 let currDate = new Date(0);
                 ingDate.setUTCSeconds(ingredient.expiry - (86400 * 2)); // 86400 = 1 day in seconds
-                currDate.setUTCSeconds(parseInt(req.query["time"]));
+                currDate.setUTCSeconds(parseInt(req.query["time"], 10));
                 if (ingDate <= currDate) {
 					console.log(ingredient)
 					expiringSoon.push(ingredient);
@@ -287,7 +287,6 @@ function levenshtein_distance(inputString, realString) {
 // checks expiry dates and sends a notification to the user, if something is expiring
 function sendExpiryNotification(res) {
 	let currTime = Math.round(Date.now() / 1000).toString();
-	// let currTime = Date.now().toString()
 	console.log("Current time: " + currTime)
 	fetch("http://20.53.224.7:8086/scanExpiryDates?time=" + currTime, {
 		method: "GET",
@@ -320,7 +319,6 @@ function sendExpiryNotification(res) {
 				}).then((response) => response.json()).then((ingredient) => {
 					console.log("Expiring Ingredients:" + ingredient)
 					var currToken = tokens.find((pair) => pair.userID == user).token
-					// var currToken = "evEPuCdDRUiWjsrGpNqMsX:APA91bHB-sNoz-fEfiECbytahF6GoWStdqgVtg6COm3gwzkCkqSrm0Zhlpovs9Wk-8cHr_2SZt9QtuYpb7PQgY3rINkL1a_G0OrJPP2iiZU7jGTtabdftcwaYg4fZI1VKNi8MG58XeEe"
 					var expiring = ""
 					for (let i = 0; i < ingredient.length; i++) {
 						expiring = expiring + ingredient[i]["name"] + ","
@@ -344,38 +342,9 @@ function sendExpiryNotification(res) {
 						console.log(user)
 						console.log(data);
 					});
-					// admin.messaging().sendToDevice(currToken.toString(), {"data": {"ingredients": ingredient.toString()}}, {
-					// 	priority: "high",
-					// 	timeToLive: 60 * 60 * 24
-					//   })
-					// .then( response => {
-					// 	console.log(response)
-					// 	console.log("Send to: " + currToken.toString())
-					// })
-					// .catch( error => {
-					// 	console.log(error);
-					// });
-
 				})
 			})
 		})
-		
-        // let json = {
-        //     "data": {
-        //         "ingredients": data
-        //     },
-        //     "to": token
-        // }
-        // fetch("https://fcm.googleapis.com/fcm/send", {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-type": "application/json",
-        //         Authorization: SERVER_KEY
-        //     },
-        //     body: JSON.stringify(json)
-        // }).then((response) => response.text()).then((data) => {
-        //     console.log(data);
-        // });
 	});
 }
 

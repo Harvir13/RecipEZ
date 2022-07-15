@@ -13,11 +13,7 @@ async function run() {
         var server = app.listen(8085, (req, res) => {
             var host = server.address().address;
             var port = server.address().port;
-            console.log(
-                "Example server successfully running at http://%s:%s",
-                host,
-                port
-            );
+            console.log("Example server successfully running at http://%s:%s", host, port);
         });
     } catch (err) {
         await client.close();
@@ -30,7 +26,7 @@ run();
 app.get("/getIngredients", async (req, res) => {
     try {
         console.log(req.query)
-        client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.query["userid"]) }).then((result) => {
+        client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.query["userid"], 10) }).then((result) => {
             if (result === null) {
                 console.log("result is empty")
                 res.send([])
@@ -55,7 +51,7 @@ app.post("/storeIngredient", async (req, res) => {
             }));
             if (!alreadyHaveIng) result.ingredients.push(req.body.ingredient);
             let newIngredients = {$set: { ingredients: result.ingredients }};
-            client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid) }, newIngredients).then(res.send(req.body));
+            client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid, 10) }, newIngredients).then(res.send(req.body));
         });
     } catch (err) {
         res.status(400).send(err);
@@ -65,12 +61,12 @@ app.post("/storeIngredient", async (req, res) => {
 // expects body of {userid: xxx, ingredient: xxx}
 app.delete("/removeIngredient", async (req, res) => {
     try {
-        client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid) }).then((result) => {
+        client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid, 10) }).then((result) => {
             let newIngredients = result.ingredients.filter(function (value) {
                 return value.name != req.body.ingredient;
             });
         let updateString = {$set: { ingredients: newIngredients }};
-        client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid) }, updateString).then((data) => res.send(data))
+        client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid, 10) }, updateString).then((data) => res.send(data))
         });
     } catch (err) {
         res.status(400).send(err);
@@ -99,14 +95,14 @@ app.get("/usersWithExpiringIngredients", async (req, res) => {
 // expects {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/changeExpiry", async (req, res) => {
     try {
-        client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid) }).then((result) => {
+        client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid, 10) }).then((result) => {
             result.ingredients.forEach(function (value) {
                 if (value.name == req.body.ingredient) {
                     value.expiry = parseInt(req.body.expiry);
                 }
             });
             let updateString = {$set: { ingredients: result.ingredients }};
-            client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid) }, updateString).then(res.send(req.body))
+            client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(req.body.userid, 10) }, updateString).then(res.send(req.body))
         });
     } catch (err) {
         res.status(400).send(err);
