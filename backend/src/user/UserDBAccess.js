@@ -20,7 +20,7 @@ app.get("/scanDB", async (req, res) => {
             }
             else {
                 console.log("False")
-                res.send({"id": 0})
+                res.send({"userID": 0})
             }
         })  
     }

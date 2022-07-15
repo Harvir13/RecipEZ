@@ -64,11 +64,11 @@ public class FridgeFragment extends Fragment {
     SharedPreferences sharedpreferences;
     private int userID; // todo: test if works
 
-    public final class Ingredient extends MainActivity {
+    public final class IngredientFetching extends MainActivity {
         private int myStaticMember;
         private String TAG = "Ingredient Class";
 
-        public Ingredient() {
+        public IngredientFetching() {
             myStaticMember = 1;
         }
 
@@ -192,7 +192,10 @@ public class FridgeFragment extends Fragment {
                             try {
                                 ArrayList<String> ingredientSuggestions = new ArrayList<>();
                                 for (int i = 0; i < response.length(); i++) {
-                                    ingredientSuggestions.add(response.getJSONObject(i).getString("name"));
+                                    String ingredient = response.getJSONObject(i).getString("name");
+                                    if (!ingredientInList(ingredient)) {
+                                        ingredientSuggestions.add(ingredient);
+                                    }
                                 }
                                 if (ingredientSuggestions.size() == 0) {
                                     Toast.makeText(getActivity().getApplicationContext(), "No ingredients found, please try a different search", Toast.LENGTH_LONG).show();
@@ -265,7 +268,7 @@ public class FridgeFragment extends Fragment {
     }
 
     public void addIngredient(String name) {
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         ingredient.checkIngredient(name);
     }
 
@@ -297,7 +300,7 @@ public class FridgeFragment extends Fragment {
     }
 
     public void removeItem(int position) {
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         try {
             ingredient.deleteIngredient(String.valueOf(userID), ingredients.get(position).getString("name"));
         } catch (Exception e) {
@@ -308,7 +311,7 @@ public class FridgeFragment extends Fragment {
     }
 
     public void editItem(int position, JSONObject editedItem) {
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         ingredient.updateExpiryDate(String.valueOf(userID), editedItem);
         ingredients.set(position, editedItem);
         mAdapter.notifyItemChanged(position);
@@ -336,7 +339,7 @@ public class FridgeFragment extends Fragment {
             }
         });
 
-        Ingredient ingredient = new Ingredient();
+        IngredientFetching ingredient = new IngredientFetching();
         ingredient.requestIngredients(String.valueOf(userID));
     }
 
@@ -357,6 +360,19 @@ public class FridgeFragment extends Fragment {
         });
 
         dialog.show();
+    }
+
+    private boolean ingredientInList(String ingredient) {
+        try {
+            for (JSONObject ing : ingredients) {
+                if (ing.getString("name").toLowerCase().equals(ingredient)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private void openIngredientExpiryDialog(String ingredient) {
@@ -388,7 +404,7 @@ public class FridgeFragment extends Fragment {
                         format.setTimeZone(TimeZone.getTimeZone("GMT-8"));
                         String newExpiryDateUnixString = String.valueOf(format.parse(newExpiryDateString).getTime() / 1000L);
                         addIngredient.put("expiry", newExpiryDateUnixString);
-                        Ingredient i = new Ingredient();
+                        IngredientFetching i = new IngredientFetching();
                         i.storeIngredient(String.valueOf(userID), addIngredient);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -413,7 +429,7 @@ public class FridgeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String name = editIngredientName.getText().toString();
-                Ingredient ingredient = new Ingredient();
+                IngredientFetching ingredient = new IngredientFetching();
                 ingredient.getIngredientSuggestions(name);
                 dialog.dismiss();
             }
