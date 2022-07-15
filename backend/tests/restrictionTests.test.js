@@ -10,7 +10,7 @@ test('Testing add restriction', () => {
 	const req = {'userID': 1, 'dietaryRestrictions': ['apple', 'orange']};
 	const res = {'result': 'Successfully added restriction'};
 
-    axios.put = jest.fn().mockResolvedValue(res);
+  axios.put = jest.fn().mockResolvedValue(res);
     return axios.put(UserStoreURL + '/addRestrictions', {
         method: 'PUT',
         headers: {
