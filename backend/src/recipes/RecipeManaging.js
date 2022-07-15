@@ -8,7 +8,6 @@ const apiKey = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
 const ip = "20.53.224.7"
 
 app.post("/addRecipe", async (req, res) => {
-    try {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, recipeID: xxx, path: home/xxx/xxx, title: xxx, image: xxx}
         fetch("http://" + ip + ":8083/addToBookmarkedList", {
@@ -22,12 +21,10 @@ app.post("/addRecipe", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
         })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
 })
 
 app.post("/removeRecipe", async (req, res) => {

@@ -19,7 +19,7 @@ app.post("/addToBookmarkedList", async (req, res) => {
         console.log(req.body)
         var newEntry = req.body
         newEntry["userID"] = parseInt(req.body["userID"])
-        newEntry["recipeID"] = parseInt(req.body["recipeID"])
+        newEntry["recipeID"] = parseInt(req.body["recipeID"], 10)
         client.db("RecipeDB").collection("Paths").findOne({"userID": newEntry["userID"], "path": req.body["path"]}).then(result => {
             console.log(result)
             if(result === null) {
@@ -45,10 +45,10 @@ app.post("/removeFromBookmarkedList", async (req, res) => {
         console.log(req.body)
         var entryToDelete = req.body
         entryToDelete["userID"] = parseInt(req.body["userID"])
-        entryToDelete["recipeID"] = parseInt(req.body["recipeID"])
+        entryToDelete["recipeID"] = parseInt(req.body["recipeID"], 10)
         client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne(entryToDelete).then(result => {
             console.log(result)
-            if (result["deletedCount"] != 1) {
+            if (result["deletedCount"] !== 1) {
                 res.send({"result": "Error occured when deleting"})
             }
             else {
@@ -66,9 +66,9 @@ app.post("/removeFromBookmarkedList", async (req, res) => {
 app.get("/getBookmarkedRecipes", async (req, res) => {
     try {
         console.log(req.query)
-        client.db("RecipeDB").collection("BookmarkedRecipes").find({"userID": parseInt(req.query["userid"])}).toArray().then(result => {
+        client.db("RecipeDB").collection("BookmarkedRecipes").find({"userID": parseInt(req.query["userid"], 10)}).toArray().then(result => {
             console.log("BOOKMARKED RECIPES:" + result)
-            client.db("RecipeDB").collection("Paths").find({"userID": parseInt(req.query["userid"])}).toArray().then(result2 => {
+            client.db("RecipeDB").collection("Paths").find({"userID": parseInt(req.query["userid"], 10)}).toArray().then(result2 => {
                 console.log("PATHS:" + result2)
                 var retObj = {};
                 retObj["paths"] = result2

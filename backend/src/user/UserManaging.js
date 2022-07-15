@@ -7,7 +7,6 @@ app.use(express.json())
 const ip = "20.53.224.7"
 
 app.get("/checkUserExists", async (req, res) => {
-    try {
         console.log(req.query);
         var email = encodeURIComponent(req.query["email"])
         fetch("http://" + ip + ":8081/scanDB?email=" + email).then(response =>
@@ -31,12 +30,10 @@ app.get("/checkUserExists", async (req, res) => {
             else {
                 res.send(data)
             }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
         })
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
     
 })
 
