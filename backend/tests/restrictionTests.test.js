@@ -6,7 +6,7 @@ jest.mock('axios');
 const UserStoreURL = 'http://20.53.224.7:8082';
 const UserDBURL = 'http://20.53.224.7:8081';
 
-test('Testing add restriction', () => {
+test("Testing add restriction", () => {
 	const req = {'userID': 1, 'dietaryRestrictions': ['apple', 'orange']};
 	const res = {'result': 'Successfully added restriction'};
 
