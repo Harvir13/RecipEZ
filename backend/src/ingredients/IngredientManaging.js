@@ -12,14 +12,11 @@ app.use(express.json());
 
 
 async function run() {
-  	try {
-		var server = app.listen(8086, (req, res) => {
-			var host = server.address().address;
-			var port = server.address().port;
-			console.log("Example server successfully running at http://%s:%s", host, port);
-		});
-	} catch (err) {
-	}
+	var server = app.listen(8086, (req, res) => {
+		var host = server.address().address;
+		var port = server.address().port;
+		console.log("Example server successfully running at http://%s:%s", host, port);
+	});
 }
 
 run();
