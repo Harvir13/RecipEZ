@@ -16,6 +16,7 @@ async function run() {
             console.log("Example server successfully running at http://%s:%s", host, port);
         });
     } catch (err) {
+        console.log(err);
         await client.close();
     }
 }
@@ -44,7 +45,7 @@ app.get("/getIngredients", async (req, res) => {
 // expects body of {userid: xxx, ingredient: {name: xxx, expiry: yyy, image: zzz}}
 app.post("/storeIngredient", async (req, res) => {
     try {
-        client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid) }).then((result) => {
+        client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid, 10) }).then((result) => {
             let alreadyHaveIng = false;
             result.ingredients.forEach((ingredient => {
                 if (ingredient.name == req.body.ingredient.name) alreadyHaveIng = true;
@@ -98,7 +99,7 @@ app.post("/changeExpiry", async (req, res) => {
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid, 10) }).then((result) => {
             result.ingredients.forEach(function (value) {
                 if (value.name == req.body.ingredient) {
-                    value.expiry = parseInt(req.body.expiry);
+                    value.expiry = parseInt(req.body.expiry, 10);
                 }
             });
             let updateString = {$set: { ingredients: result.ingredients }};
