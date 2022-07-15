@@ -3,9 +3,6 @@ package com.example.recipez;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -25,13 +22,13 @@ public class NotificationService extends FirebaseMessagingService {
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
 
-            if (/* Check if data needs to be processed by long running job */ true) {
-                // For long-running tasks (10 seconds or more) use WorkManager.
-                //scheduleJob();
-            } else {
-                // Handle message within 10 seconds
-                //handleNow();
-            }
+//            if (/* Check if data needs to be processed by long running job */ true) {
+//                // For long-running tasks (10 seconds or more) use WorkManager.
+//                //scheduleJob();
+//            } else {
+//                // Handle message within 10 seconds
+//                //handleNow();
+//            }
 
         }
 
@@ -62,14 +59,12 @@ public class NotificationService extends FirebaseMessagingService {
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
         // FCM registration token to your app server.
-        sendRegistrationToServer(token);
+        // sendRegistrationToServer(token);
     }
     // [END on_new_token]
 
-    private void sendRegistrationToServer(String token) {
-        // TODO: Implement this method to send token to your app server.
-
-
-    }
+//    private void sendRegistrationToServer(String token) {
+//        // TODO: Implement this method to send token to your app server.
+//    }
 
 }
