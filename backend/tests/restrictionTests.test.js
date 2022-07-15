@@ -72,7 +72,7 @@ test('Testing delete restrictions for DB', () => {
 });
 
 test('Testing get restriction for DB', () => {
-	const req = '1';
+  const req = "1";
 	const res = {data: ['banana', 'orange']};
 
 	axios.get = jest.fn().mockResolvedValue(res);
