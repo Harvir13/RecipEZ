@@ -1,10 +1,7 @@
 import express from "express";
 import fetch from "node-fetch";
-// import admin from "firebase-admin";
-// import { createRequire } from 'module';
 
 const API_KEY = "c3f5daa174074a7994e8e6803d3b2687";
-// var registrationToken = "dQeP0tUfTCmXF_TUVvk615:APA91bFbY6JuIRlxVzPv4EDvzkP1ubgQJm7VEplUpNCm1jedXaNEzrbad9Bs0DnmTKB2TbjLlgKqZj47Hm4lRyK2jZB5aHCa5N7iGiVDk9eJ7xF2QfiVeTEtpYJ0qyHYZ1pi6efATAms";
 const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
 
 var app = express();
@@ -27,10 +24,10 @@ setInterval(function() {
 
 //endpoint for TA to test notifications
 app.get("/getNotification", async(req, res) => {
-	console.log("here")
+	console.log("here");
 	sendExpiryNotification();
-	res.send({"result": "Sent notificaiton"})
-})
+	res.send({"result": "Sent notificaiton"});
+});
 
 //expects {userid: xxx}
 app.get("/requestIngredients", async (req, res) => {
@@ -40,209 +37,194 @@ app.get("/requestIngredients", async (req, res) => {
 		headers: {
 			"Content-Type": "application/json",
 		}
-	}).then((response) => response.text()).then((data, err) => {
-		if (err) res.status(400).send(err);
+	}).then((response) => response.text()).then((data) => {
 		console.log(data);
 		res.send(data);
+	}).catch((err) => {
+		res.status(400).send(err);
 	});
 });
 
 // expects {userid: xxx, ingredient: xxx}
 app.post("/deleteIngredient", async (req, res) => {
-    try {
         fetch("http://20.53.224.7:8085/removeIngredient", {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(req.body)
-        }).then((response) => response.json()).then((data) => res.send(data));
-    } catch (err) {
-        res.status(400).send(err);
-    }
+        }).then((response) => response.json()).then((data) => res.send(data)).catch((err) => {
+			res.status(400).send(err);
+		});
 });
 
 // expects {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/updateExpiryDate", async (req, res) => {
-	try {
-		fetch("http://20.53.224.7:8085/changeExpiry", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(req.body)
-		}).then((response) => response.text()).then((data) => res.send(data));
-	} catch (err) {
+	fetch("http://20.53.224.7:8085/changeExpiry", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(req.body)
+	}).then((response) => response.text()).then((data) => res.send(data)).catch((err) => {
 		res.status(400).send(err);
-	}
+	});
 });
 
 //expects {ingredient: xxx}
 app.get("/searchForIngredient", async (req, res) => {
-	try {
-		fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
-			req.query["ingredient"] + "&number=1&apiKey=" + API_KEY, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-				}
+	fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
+		req.query["ingredient"] + "&number=1&apiKey=" + API_KEY, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
 			}
-		).then((response) => response.json()).then((data) => {
-			res.send(data.results);
-		});
-	} catch (err) {
+		}
+	).then((response) => response.json()).then((data) => {
+		res.send(data.results);
+	}).catch((err) => {
 		res.status(400).send(err);
-	}
+	});
 });
 
 // expects {string: xxx}
 app.get("/getIngredientSuggestions", async (req, res) => {
-	try {
-		fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
-			req.query["string"] + "&apiKey=" + API_KEY, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-				}
+	fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
+		req.query["string"] + "&apiKey=" + API_KEY, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
 			}
-		).then((response) => response.json()).then((data) => {
-			res.send(data.results);
-		});
-	} catch (err) {
+		}
+	).then((response) => response.json()).then((data) => {
+		res.send(data.results);
+	}).catch((err) => {
 		res.status(400).send(err);
-	}
+	});
 });
 
 // expects {ingredient: xxx}
 app.get("/requestExpiryDate", async (req, res) => {
-	try {
-		fetch("https://shelf-life-api.herokuapp.com/search?q=" + req.query["ingredient"], {
+	fetch("https://shelf-life-api.herokuapp.com/search?q=" + req.query["ingredient"], {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		}
+	}).then((response) => response.json()).then((data) => {
+		if (data.length === 0 || data.code === 500) {
+			res.send("-1");
+			return;
+		}
+		let minLevDistance = Number.MAX_VALUE;
+		let desiredIngredient;
+		data.forEach((ingredient) => {
+			let generalName = ingredient.name;
+			//let generalName = ingredient.name.split('-')
+			//console.log(generalName[0].trim().toLowerCase())
+			//console.log(req.query["ingredient"].toLowerCase())
+			//console.log(generalName)
+			let levDistance = levenshtein_distance(generalName, req.query["ingredient"]);
+			console.log("" + generalName + " : " + levDistance);
+			if (levDistance < minLevDistance) {
+				minLevDistance = levDistance;
+				desiredIngredient = ingredient;
+			}
+		});
+		fetch("https://shelf-life-api.herokuapp.com/guides/" + desiredIngredient.id, {
 			method: "GET",
-			headers: {
+			Headers: {
 				"Content-Type": "application/json",
 			}
-		}).then((response) => response.json()).then((data) => {
-			if (data.length === 0 || data.code === 500) {
-				res.send("-1");
-				return;
-			}
-			let minLevDistance = Number.MAX_VALUE;
-			let desiredIngredient;
-			data.forEach((ingredient) => {
-				let generalName = ingredient.name;
-				//let generalName = ingredient.name.split('-')
-				//console.log(generalName[0].trim().toLowerCase())
-				//console.log(req.query["ingredient"].toLowerCase())
-				//console.log(generalName)
-				let levDistance = levenshtein_distance(generalName, req.query["ingredient"]);
-				console.log("" + generalName + " : " + levDistance);
-				if (levDistance < minLevDistance) {
-					minLevDistance = levDistance;
-					desiredIngredient = ingredient;
-				}
+		}).then((response) => response.json()).then((expiryData) => {
+			let wantedMethod = null;
+			expiryData.methods.forEach((method) => {
+				if (method.location == "Refrigerator") wantedMethod = method;
+				else if (method.location == "Pantry" && wantedMethod == null) wantedMethod = method;
+				else wantedMethod = method;
 			});
-			fetch("https://shelf-life-api.herokuapp.com/guides/" + desiredIngredient.id, {
-				method: "GET",
-				Headers: {
-					"Content-Type": "application/json",
-				}
-			}).then((response) => response.json()).then((expiryData) => {
-				let wantedMethod = null;
-				expiryData.methods.forEach((method) => {
-					if (method.location == "Refrigerator") wantedMethod = method;
-					else if (method.location == "Pantry" && wantedMethod == null) wantedMethod = method;
-					else wantedMethod = method;
-				});
-				console.log(expiryData);
-				res.send((wantedMethod.expirationTime + Math.round(Date.now() / 1000)).toString());
-			});
+			console.log(expiryData);
+			res.send((wantedMethod.expirationTime + Math.round(Date.now() / 1000)).toString());
 		});
-	} catch (err) {
+	}).catch((err) => {
 		res.status(400).send(err);
-	}
+	});
 });
 
 // expects body of {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/addIngredient", async (req, res) => {
-	try {
-		fetch("http://20.53.224.7:8086/searchForIngredient?ingredient=" + req.body.ingredient, {
-			method: "GET",
+	fetch("http://20.53.224.7:8086/searchForIngredient?ingredient=" + req.body.ingredient, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	}).then((response) => response.json()).then((spoonacularIng) => {
+		console.log(spoonacularIng);
+		if (spoonacularIng.length === 0) {
+			res.send({"result": "No ingredient found"});
+			return;
+		}
+		let ingredient = {
+			userid: req.body.userid,
+			ingredient: {
+				name: req.body.ingredient,
+				expiry: req.body.expiry,
+				image: spoonacularIng[0].image,
+			}
+		};
+		fetch("http://20.53.224.7:8085/storeIngredient", {
+			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 			},
-		}).then((response) => response.json()).then((spoonacularIng) => {
-			console.log(spoonacularIng);
-			if (spoonacularIng.length === 0) {
-				res.send({"result": "No ingredient found"});
-				return;
-			}
-			let ingredient = {
-				userid: req.body.userid,
-				ingredient: {
-					name: req.body.ingredient,
-					expiry: req.body.expiry,
-					image: spoonacularIng[0].image,
-				}
-			};
-			fetch("http://20.53.224.7:8085/storeIngredient", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(ingredient)
-			}).then((response) => response.json()).then((data) => {
-				console.log(data)
-				res.send(data.ingredient);
-			});
+			body: JSON.stringify(ingredient)
+		}).then((response) => response.json()).then((data) => {
+			console.log(data)
+			res.send(data.ingredient);
 		});
-	} catch (err) {
+	}).catch((err) => {
 		res.status(400).send(err);
-	}
+	});
 });
 
 // expects {userid: xxx, time: xxx}
 app.get("/scanExpiryDates", async (req, res) => {
-	try {
-		fetch("http://20.53.224.7:8085/usersWithExpiringIngredients?time=" + req.query["time"],
-		{
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		}).then((response) => response.json()).then((data) => {
-            res.send(data);
-		});
-	} catch (err) {
+	fetch("http://20.53.224.7:8085/usersWithExpiringIngredients?time=" + req.query["time"],
+	{
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	}).then((response) => response.json()).then((data) => {
+		res.send(data);
+	}).catch((err) => {
 		res.status(400).send(err);
-	}
+	});
 });
 
 // expects {userid: xxx, time: zzz}
 app.get("/expiringIngredients", async (req, res) => {
-    try {
-        fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"],
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((response) => response.json()).then((data) => {
-            let expiringSoon = [];
-            data.forEach((ingredient) => {
-                let ingDate = new Date(0);
-                let currDate = new Date(0);
-                ingDate.setUTCSeconds(ingredient.expiry - (86400 * 2)); // 86400 = 1 day in seconds
-                currDate.setUTCSeconds(parseInt(req.query["time"], 10));
-                if (ingDate <= currDate) {
-					console.log(ingredient)
-					expiringSoon.push(ingredient);
-				}
-            });
-            res.send(expiringSoon);
-        });
-    } catch (err) {
-        res.status(400).send(err);
-    }
+	fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"],
+	{
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	}).then((response) => response.json()).then((data) => {
+		let expiringSoon = [];
+		data.forEach((ingredient) => {
+			let ingDate = new Date(0);
+			let currDate = new Date(0);
+			ingDate.setUTCSeconds(ingredient.expiry - (86400 * 2)); // 86400 = 1 day in seconds
+			currDate.setUTCSeconds(parseInt(req.query["time"], 10));
+			if (ingDate <= currDate) {
+				console.log(ingredient)
+				expiringSoon.push(ingredient);
+			}
+		});
+		res.send(expiringSoon);
+	}).catch((err) => {
+		res.status(400).send(err);
+	});
 });
 
 // expects { {restrictions: xxx, yyy, zzz}, ingredient: xxx}
