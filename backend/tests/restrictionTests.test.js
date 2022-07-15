@@ -35,7 +35,7 @@ test('Testing delete restriction', () => {
     }).then(response => expect(response).toEqual(res));
 });
 
-test('Testing get restriction', () => {
+test("Testing get restriction", () => {
   const req = "1";
 	const res = {data: ['banana', 'orange']};
 
