@@ -59,7 +59,7 @@ app.post("/storeUserInfo", async (req, res) => {
 //expects {userID: xxx, token: xxx}
 app.post("/storeToken", async (req, res) => {
         console.log(req.body)
-        await client.db("UserDB").collection("Tokens").findOne({"userID": parseInt(req.body["userID"])}).then(result => {
+        await client.db("UserDB").collection("Tokens").findOne({"userID": parseInt(req.body["userID"], 10)}).then(result => {
             if (result === null) {
                 var newToken = {"userID": parseInt(req.body["userID"], 10), "token": req.body["token"]}
                 client.db("UserDB").collection("Tokens").insertOne(newToken).then(result =>
@@ -78,7 +78,6 @@ app.post("/storeToken", async (req, res) => {
 
 //expects ?uderids=xxx,xxx,xxx
 app.get("/getTokens", async (req, res) => {
-    try {
         console.log(req.query)
         var userIds = []
         var stringIdsArray = req.query["userids"].split(",")
@@ -87,57 +86,46 @@ app.get("/getTokens", async (req, res) => {
         }
         await client.db("UserDB").collection("Tokens").find({"userID": {$in: userIds}}).toArray().then(result =>
             res.send(result)
-        )
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        ).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
     
 })
 
 //req.body - {userID: xxx, ingredient: xxx}
 app.put("/addToDietaryRestrictions", async(req, res) => {
-    try {
         console.log(req.body)
         var restrictions = req.body["restriction"]
         client.db("UserDB").collection("Users").updateOne({"userID": parseInt(req.body["userID"], 10)}, {$push: {"dietaryRestrictions": restrictions}}).then(result => {
             res.send({"result": "Successfully updated dietary restrictions list"})
-        })   
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx,xxx]}
 app.put("/deleteFromDietaryRestrictions", async (req, res) => {
-    try {
         console.log(req.body)
         var restrictions = req.body["restriction"]
         client.db("UserDB").collection("Users").updateOne({"userID": parseInt(req.body["userID"], 10)}, {$pull: {"dietaryRestrictions": restrictions}}).then(result => {
             res.send({"result": "Successfully updated dietary restrictions list"})
-        })   
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.get("/getDietaryRestrictions", async (req, res) => {
-    try {
         console.log(req.query)
         var userID = parseInt(req.query["userid"], 10)
         client.db("UserDB").collection("Users").findOne({"userID": userID}).then(result => {
             res.send(result)
-        })   
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 async function run () {

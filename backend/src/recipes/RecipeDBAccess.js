@@ -58,7 +58,6 @@ app.post("/removeFromBookmarkedList", async (req, res) => {
 
 //req.query should contain data like ?userid=xxx
 app.get("/getBookmarkedRecipes", async (req, res) => {
-    try {
         console.log(req.query)
         client.db("RecipeDB").collection("BookmarkedRecipes").find({"userID": parseInt(req.query["userid"], 10)}).toArray().then(result => {
             console.log("BOOKMARKED RECIPES:" + result)
@@ -71,34 +70,28 @@ app.get("/getBookmarkedRecipes", async (req, res) => {
                 res.send(retObj)
             })
             
-        })   
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 //req.body should contain data like {userID: xxx, path:/home/xxx}
 app.post("/addToPathList", async (req, res) => {
-    try {
         console.log(req.body)
         var newEntry = req.body
         newEntry["userID"] = parseInt(req.body["userID"], 10)
         client.db("RecipeDB").collection("Paths").insertOne(newEntry).then(result => {
             console.log(result)
             res.send({"result": "Successfully added path to path list"})
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 //req.body should contain data like {userID: xxx, recipeID: xxx}
 app.post("/removeFromPathList", async (req, res) => {
-    try {
         console.log(req.body)
         var entryToDelete = req.body
         entryToDelete["userID"] = parseInt(req.body["userID"], 10)
@@ -110,28 +103,23 @@ app.post("/removeFromPathList", async (req, res) => {
             else {
                 res.send({"result": "Successfully deleted recipe from paths list"})
             }
-        })   
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 //req.query should contain data like ?userid=xxx
 app.get("/getPaths", async (req, res) => {
-    try {
         console.log(req.query)
         client.db("RecipeDB").collection("Paths").find({"userID": parseInt(req.query["userid"], 10)}).toArray().then(result => {
             console.log(result)
             res.send(result)
             
-        })   
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 async function run () {

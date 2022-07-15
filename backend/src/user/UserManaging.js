@@ -79,7 +79,6 @@ app.get("/getUserTokens", async (req, res) => {
 })
 
 app.put("/addRestrictions", async (req, res) => {
-    try {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ]}
         fetch("http://" + ip + ":8081/addToDietaryRestrictions", {
@@ -93,16 +92,13 @@ app.put("/addRestrictions", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.put("/deleteRestrictions", async (req, res) => {
-    try {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ]}
         fetch("http://" + ip + ":8081/deleteFromDietaryRestrictions", {
@@ -116,16 +112,13 @@ app.put("/deleteRestrictions", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.get("/getRestrictions", async (req, res) => {
-    try {
         console.log(req.query)
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ...]}
         fetch("http://" + ip + ":8081/getDietaryRestrictions?userid=" + req.query["userid"]).then(response =>
@@ -143,12 +136,10 @@ app.get("/getRestrictions", async (req, res) => {
             console.log(retObj)
             res.send(retObj)
             
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 async function run () {
