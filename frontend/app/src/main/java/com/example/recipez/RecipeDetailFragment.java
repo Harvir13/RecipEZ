@@ -27,12 +27,15 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,21 +45,14 @@ import java.util.Map;
 public class RecipeDetailFragment extends Fragment {
     final static String TAG = "RecipeDetailFragment";
 
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
-    private TextView recipeIDText;
-    private TextView recipeTitle;
-    private ImageView recipeImage;
     private TextView recipeIngredients;
     private TextView recipeInstructions;
     private TextView recipeNutrition;
 
-    private ImageButton addToBookmarkButton;
+    int recipeID;
+    String recipeName;
+    String recipeImageUrl;
+    private BookmarkFolderDialogAdapter dialogAdapter;
     private BookmarkFolderClickListener bookmarkFolderClickListener;
     private Button addToBookmarkConfirmButton;
     private Button removeFromBookmarkButton;
@@ -65,10 +61,6 @@ public class RecipeDetailFragment extends Fragment {
 
     SharedPreferences sharedpreferences;
     private int userID; // todo: test if works
-
-    public RecipeDetailFragment() {
-        // Required empty public constructor
-    }
 
     /**
      * Use this factory method to create a new instance of
@@ -80,20 +72,12 @@ public class RecipeDetailFragment extends Fragment {
      */
     public static RecipeDetailFragment newInstance(String param1, String param2) {
         RecipeDetailFragment fragment = new RecipeDetailFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -102,11 +86,6 @@ public class RecipeDetailFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_recipe_detail, container, false);
     }
-
-    private BookmarkFolderDialogAdapter dialogAdapter;
-    int recipeID;
-    String recipeName;
-    String recipeImageUrl;
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -120,13 +99,13 @@ public class RecipeDetailFragment extends Fragment {
         recipeName = bundle.getString("RECIPE_TITLE", "");
         recipeImageUrl = bundle.getString("RECIPE_IMAGE", "");
 
-        recipeIDText = view.findViewById(R.id.recipe_id_text);
+        TextView recipeIDText = view.findViewById(R.id.recipe_id_text);
         recipeIDText.setText(String.valueOf(bundle.getInt("RECIPE_ID", 0)));
 
-        recipeTitle = view.findViewById(R.id.recipe_detail_title);
+        TextView recipeTitle = view.findViewById(R.id.recipe_detail_title);
         recipeTitle.setText(recipeName);
 
-        recipeImage = view.findViewById(R.id.recipe_detail_image);
+        ImageView recipeImage = view.findViewById(R.id.recipe_detail_image);
         Picasso.get().load(recipeImageUrl).fit().centerCrop().into(recipeImage);
 
         recipeIngredients = view.findViewById(R.id.recipe_detail_ingredient_list);
@@ -136,7 +115,7 @@ public class RecipeDetailFragment extends Fragment {
         RecipeFetching recipe = new RecipeFetching();
         recipe.getFullRecipeDetails(recipeID);
 
-        addToBookmarkButton = view.findViewById(R.id.add_to_bookmark_button);
+        ImageButton addToBookmarkButton = view.findViewById(R.id.add_to_bookmark_button);
         addToBookmarkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -162,132 +141,12 @@ public class RecipeDetailFragment extends Fragment {
         });
     }
 
-    public String encodeString(String s) {
-        String result;
-        try {
-            result = URLEncoder.encode(s, "UTF-8").replaceAll("\\+", "%20").replaceAll("\\%21", "!")
-                    .replaceAll("\\%27", "'").replaceAll("\\%28", "(").replaceAll("\\%29", ")")
-                    .replaceAll("\\%7E", "~");
-        } // This exception should never occur.
-        catch (Exception e) {
-            result = s;
-        }
-
-        return result;
-    }
-
-    public String convertArrayToString(String[] s) {
-        String result = "";
-
-        for (int i = 0; i < s.length; i++) {
-            if (i == s.length - 1) {
-                result += s[i];
-            } else {
-                result += s[i] + ",";
-            }
-        }
-        return result;
-    }
-
-    public String convertJSONArrayToString(JSONArray s) throws JSONException {
-        String result = "";
-
-        for (int i = 0; i < s.length(); i++) {
-            if (i == s.length() - 1) {
-                result += s.get(i);
-            } else {
-                result += s.get(i) + ",";
-            }
-        }
-        return result;
-    }
-
     public final class RecipeFetching extends MainActivity {
         private int myStaticMember;
         private String TAG = "Recipe Class";
 
         public RecipeFetching() {
             myStaticMember = 1;
-        }
-
-        public void filterRecipes(String[] ingredients, String[] filters, String[] restrictions) {
-            // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String ingredientsList = encodeString(convertArrayToString(ingredients));
-            String filtersList = encodeString(convertArrayToString(filters));
-            String restrictionsList = encodeString(convertArrayToString(restrictions));
-
-            String url = "http://20.53.224.7:8084/requestFilteredRecipes?ingredients=" + ingredientsList + "&restrictions=" + restrictionsList + "&filters=" + filtersList;
-            // 10.0.2.2 is a special alias to localhost for developers
-
-            // Request a string response from the provided URL.
-            JsonArrayRequest jsonRequest = new JsonArrayRequest
-                    (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            Log.d(TAG, response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
-                        }
-                    });
-
-            // Add the request to the RequestQueue.
-            queue.add(jsonRequest);
-        }
-
-        public void getSuggestedRecipes(String[] ingredients, String[] restrictions) {
-            // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String ingredientsList = encodeString(convertArrayToString(ingredients));
-            String restrictionsList = encodeString(convertArrayToString(restrictions));
-
-            String url = "http://20.53.224.7:8084/generateSuggestedRecipesList?ingredientsinpantry=" + ingredientsList + "&restrictions=" + restrictionsList;
-            // 10.0.2.2 is a special alias to localhost for developers
-
-            // Request a string response from the provided URL.
-            JsonArrayRequest jsonRequest = new JsonArrayRequest
-                    (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            Log.d(TAG, response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
-                        }
-                    });
-
-            // Add the request to the RequestQueue.
-            queue.add(jsonRequest);
-
-        }
-
-        public void searchRecipe(String recipeName) {// Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8084/searchRecipe?recipename=" + recipeName;
-            // 10.0.2.2 is a special alias to localhost for developers
-
-            // Request a string response from the provided URL.
-            JsonArrayRequest jsonRequest = new JsonArrayRequest
-                    (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            Log.d(TAG, response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
-                        }
-                    });
-
-            // Add the request to the RequestQueue.
-            queue.add(jsonRequest);
-
         }
 
         public void getFullRecipeDetails(int recipeID) {
@@ -427,13 +286,18 @@ public class RecipeDetailFragment extends Fragment {
                         List<String> folderNames = new ArrayList<>();
 
                         try {
-                            JSONArray pathsArray = response.getJSONArray("paths");
-                            for (int i = 0; i < pathsArray.length(); i++) {
-                                folderNames.add(pathsArray.get(i).toString());
-                            }
+                            Gson gson = new Gson();
+                            Type type = new TypeToken<List<String>>(){}.getType();
+                            folderNames = gson.fromJson(String.valueOf(response.getJSONArray("paths")), type);
+//                            for (int i = 0; i < response.getJSONArray("paths").length(); i++) {
+//                                folderNames.add(response.getJSONArray("paths").get(i).toString());
+//                            }
 
                             JSONArray recipesArray = response.getJSONArray("recipes");
                             boolean alreadyBookmarked = false;
+                            existingFolderText.setText("This recipe is not in any folders");
+                            removeFromBookmarkButton.setEnabled(false);
+
                             outerloop:
                             for (int i = 0; i < folderNames.size(); i++) {
                                 for (int j = 0; j < recipesArray.length(); j++) {
@@ -442,15 +306,12 @@ public class RecipeDetailFragment extends Fragment {
 
                                     if ((recipeObject.getInt("recipeID") == recipeID) && recipeFolderPath.equals(folderNames.get(i))) {
                                         existingFolderText.setText("This recipe is already bookmarked in: " + folderNames.get(i));
+                                        removeFromBookmarkButton.setEnabled(true);
                                         addToBookmarkConfirmButton.setEnabled(false);
                                         alreadyBookmarked = true;
                                         break outerloop;
                                     }
                                 }
-                            }
-                            if (!alreadyBookmarked) {
-                                existingFolderText.setText("This recipe is not in any folders");
-                                removeFromBookmarkButton.setEnabled(false);
                             }
 
                             final String[] selectedFolderName = new String[1];
@@ -464,7 +325,6 @@ public class RecipeDetailFragment extends Fragment {
                                             if (dialogAdapter.getSelectedPosition() >= 0) {
                                                 addToBookmarkConfirmButton.setEnabled(true);
                                             }
-                                            Log.d(TAG, "selected position after click" + dialogAdapter.getSelectedPosition());
                                         }
                                     });
                                     selectedFolderName[0] = str;
@@ -472,15 +332,14 @@ public class RecipeDetailFragment extends Fragment {
                             };
                             dialogAdapter = new BookmarkFolderDialogAdapter(alreadyBookmarked ? new ArrayList<>() : folderNames, bookmarkFolderClickListener);
 
-                            Log.d(TAG, "selected position " + dialogAdapter.getSelectedPosition());
                             if (folderNames.size() == 0 || dialogAdapter.getSelectedPosition() == -1) {
                                 addToBookmarkConfirmButton.setEnabled(false);
                             }
                             addToBookmarkConfirmButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    addRecipeToBookmarkList(userID, recipeID, selectedFolderName[0].toString(), recipeName, recipeImageUrl);
-                                    Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName[0].toString(), Toast.LENGTH_SHORT).show();
+                                    addRecipeToBookmarkList(userID, recipeID, selectedFolderName[0], recipeName, recipeImageUrl);
+                                    Toast.makeText(getActivity(), "Added recipe to " + selectedFolderName[0], Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 }
                             });
@@ -502,91 +361,5 @@ public class RecipeDetailFragment extends Fragment {
 
         // Add the request to the RequestQueue.
         queue.add(jsonRequest);
-
-    }
-
-    public void addPathToPathsList(int userID, String path) {
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8084/addNewPath";
-        // 10.0.2.2 is a special alias to localhost for developers
-
-        Map<String, String> jsonParams = new HashMap();
-        jsonParams.put("userID", String.valueOf(userID));
-        jsonParams.put("path", path);
-
-
-        // Request a string response from the provided URL.
-        JsonObjectRequest jsonRequest = new JsonObjectRequest
-                (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, error.toString());
-                    }
-                }) {
-        };
-
-        // Add the request to the RequestQueue.
-        queue.add(jsonRequest);
-
-    }
-
-    public void removePathFromPathsList(int userID, String path) {
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8084/removeExistingPath";
-        // 10.0.2.2 is a special alias to localhost for developers
-
-        Map<String, String> jsonParams = new HashMap();
-        jsonParams.put("userID", String.valueOf(userID));
-        jsonParams.put("path", path);
-
-        // Request a string response from the provided URL.
-        JsonObjectRequest jsonRequest = new JsonObjectRequest
-                (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, error.toString());
-                    }
-                }) {
-        };
-
-        // Add the request to the RequestQueue.
-        queue.add(jsonRequest);
-    }
-
-    public void getPathsList(int userID) {
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8084/getAllPaths?userid=" + userID;
-        // 10.0.2.2 is a special alias to localhost for developers
-
-        // Request a string response from the provided URL.
-        JsonArrayRequest jsonRequest = new JsonArrayRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        Log.d(TAG, response.toString());
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, error.toString());
-                    }
-                });
-
-        // Add the request to the RequestQueue.
-        queue.add(jsonRequest);
-
     }
 }

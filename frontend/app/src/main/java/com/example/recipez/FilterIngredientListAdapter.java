@@ -9,7 +9,6 @@ import android.widget.CheckBox;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class FilterIngredientListAdapter extends RecyclerView.Adapter<FilterIngredientListAdapter.ViewHolder> {
@@ -55,9 +54,6 @@ public class FilterIngredientListAdapter extends RecyclerView.Adapter<FilterIngr
 
     public ArrayList<String> getSelectedIngredients() {
         return selectedIngredients;
-    }
-    public int getSelectedIngredientsSize() {
-        return selectedIngredients.size();
     }
 
     @Override

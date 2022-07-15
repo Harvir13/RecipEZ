@@ -2,7 +2,6 @@ package com.example.recipez;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +64,6 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
             e.printStackTrace();
         }
     }
-
 
     @Override
     public int getItemCount() {

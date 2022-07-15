@@ -45,7 +45,6 @@ import java.util.Map;
 public class LoginActivity extends AppCompatActivity {
     final static String TAG = "LoginActivity";
     private static final String CHANNEL_ID = "1";
-    private Button signInButton;
     private GoogleSignInClient mGoogleSignInClient;
     public SharedPreferences sharedpreferences;
     private Integer RC_SIGN_IN = 1;
@@ -151,48 +150,6 @@ public class LoginActivity extends AppCompatActivity {
             Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(mainActivityIntent);
         }
-    }
-
-    public String encodeString(String s) {
-        String result;
-        try {
-            result = URLEncoder.encode(s, "UTF-8").replaceAll("\\+", "%20").replaceAll("\\%21", "!")
-                    .replaceAll("\\%27", "'").replaceAll("\\%28", "(").replaceAll("\\%29", ")")
-                    .replaceAll("\\%7E", "~");
-        } // This exception should never occur.
-        catch (Exception e) {
-            result = s;
-        }
-
-        return result;
-    }
-
-    public String convertArrayToString(String[] s) {
-        String result = "";
-
-        for (int i = 0; i < s.length; i++) {
-            if (i == s.length - 1) {
-                result+= s[i];
-            }
-            else {
-                result+= s[i] + ",";
-            }
-        }
-        return result;
-    }
-
-    public String convertJSONArrayToString(JSONArray s) throws JSONException {
-        String result = "";
-
-        for (int i = 0; i < s.length(); i++) {
-            if (i == s.length() - 1) {
-                result+= s.get(i);
-            }
-            else {
-                result+= s.get(i) + ",";
-            }
-        }
-        return result;
     }
 
     private void createNotificationChannel() {
@@ -326,7 +283,6 @@ public class LoginActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
 
-
                             Log.d(TAG, response.toString());
                         }
                     }, new Response.ErrorListener() {
@@ -338,7 +294,6 @@ public class LoginActivity extends AppCompatActivity {
 
             // Add the request to the RequestQueue.
             queue.add(jsonObjectRequest);
-
         }
 
         private void sendRegistrationToServer(String token, int userID) {
@@ -370,7 +325,5 @@ public class LoginActivity extends AppCompatActivity {
             // Add the request to the RequestQueue.
             queue.add(jsonRequest);
         }
-
     }
-
 }
