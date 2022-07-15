@@ -1,5 +1,5 @@
 //import axios from 'axios';
-var axios = require('axios')
+var axios = require("axios");
 
 jest.mock('axios');
 
