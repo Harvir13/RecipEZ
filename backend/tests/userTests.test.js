@@ -35,7 +35,7 @@ test('Store user token', () => {
 });
 
 test('Check user exists', () => {
-    const req = 'test@test.com';
+  const req = "test@test.com";
     const res = {'userID': 1};
 
     axios.get = jest.fn().mockResolvedValue(res);
