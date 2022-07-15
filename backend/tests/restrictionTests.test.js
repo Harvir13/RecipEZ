@@ -13,7 +13,7 @@ test("Testing add restriction", () => {
   axios.put = jest.fn().mockResolvedValue(res);
     return axios.put(UserStoreURL + '/addRestrictions', {
         method: 'PUT',
-        headers: {
+      headers: {
             'Content-Type': 'application/json'
       },
         body: JSON.stringify(req)
