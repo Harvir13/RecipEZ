@@ -7,7 +7,6 @@ app.use(express.json())
 const ip = "20.53.224.7"
 
 app.get("/checkUserExists", async (req, res) => {
-    try {
         console.log(req.query);
         var email = encodeURIComponent(req.query["email"])
         fetch("http://" + ip + ":8081/scanDB?email=" + email).then(response =>
@@ -31,17 +30,14 @@ app.get("/checkUserExists", async (req, res) => {
             else {
                 res.send(data)
             }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
         })
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
     
 })
 
 app.post('/storeUserToken', (req, res) => {
-    try {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, token: xxx}
         fetch("http://" + ip + ":8081/storeToken", {
@@ -55,16 +51,13 @@ app.post('/storeUserToken', (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.get("/getUserTokens", async (req, res) => {
-    try {
         //req.query should contains userids=xxx,xx,xx
         fetch("http://" + ip + ":8081/getTokens?userids=" + req.query["userids"]).then(response =>
             response.json()
@@ -79,16 +72,13 @@ app.get("/getUserTokens", async (req, res) => {
                 retArr.push(currObj)
             }
             res.send(retArr)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    } 
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.put("/addRestrictions", async (req, res) => {
-    try {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ]}
         fetch("http://" + ip + ":8081/addToDietaryRestrictions", {
@@ -102,16 +92,13 @@ app.put("/addRestrictions", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.put("/deleteRestrictions", async (req, res) => {
-    try {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ]}
         fetch("http://" + ip + ":8081/deleteFromDietaryRestrictions", {
@@ -125,16 +112,13 @@ app.put("/deleteRestrictions", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.get("/getRestrictions", async (req, res) => {
-    try {
         console.log(req.query)
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ...]}
         fetch("http://" + ip + ":8081/getDietaryRestrictions?userid=" + req.query["userid"]).then(response =>
@@ -152,12 +136,10 @@ app.get("/getRestrictions", async (req, res) => {
             console.log(retObj)
             res.send(retObj)
             
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 async function run () {
