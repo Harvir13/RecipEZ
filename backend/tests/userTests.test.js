@@ -66,7 +66,7 @@ test("Store user info", () => {
     }).then(response => expect(response).toEqual(res));
 });
 
-test('Store token', () => {
+test("Store token", () => {
     const req = {'userID': 4, 'token': 'd'};
     const res = {'result': "New user's token has been added to DB"};
 
