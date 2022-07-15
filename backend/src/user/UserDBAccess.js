@@ -43,19 +43,16 @@ async function generateUserID () {
 
 //req.body should contain a json of the form {"email": "test@test.com"}
 app.post("/storeUserInfo", async (req, res) => {
-    try {
         const id = await generateUserID()
         var newUser = req.body
         newUser["userID"] = id;
         newUser["dietaryRestrictions"] = [];
         await client.db("UserDB").collection("Users").insertOne(newUser).then(result =>
             res.send({"userID": id})
-        )
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        ).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
     
 })
 
@@ -65,7 +62,7 @@ app.post("/storeToken", async (req, res) => {
         console.log(req.body)
         await client.db("UserDB").collection("Tokens").findOne({"userID": parseInt(req.body["userID"])}).then(result => {
             if (result === null) {
-                var newToken = {"userID": parseInt(req.body["userID"]), "token": req.body["token"]}
+                var newToken = {"userID": parseInt(req.body["userID"], 10), "token": req.body["token"]}
                 client.db("UserDB").collection("Tokens").insertOne(newToken).then(result =>
                     res.send({"result": "New user's token has been added to DB"})
                 )

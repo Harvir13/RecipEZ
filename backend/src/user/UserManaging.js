@@ -38,7 +38,6 @@ app.get("/checkUserExists", async (req, res) => {
 })
 
 app.post('/storeUserToken', (req, res) => {
-    try {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, token: xxx}
         fetch("http://" + ip + ":8081/storeToken", {
@@ -52,12 +51,10 @@ app.post('/storeUserToken', (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.get("/getUserTokens", async (req, res) => {
