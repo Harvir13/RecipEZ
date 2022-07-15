@@ -22,7 +22,7 @@ test('Get user tokens', () => {
 
 test('Store user token', () => {
     const req = {'userID': 1, 'token': 'a'};
-    const res = {'result': 'Sucessfully stored user token'};
+  const res = { result: "Sucessfully stored user token" };
 
     axios.post = jest.fn().mockResolvedValue(res);
     return axios.post(UserStoreURL + '/storeUserToken', {
