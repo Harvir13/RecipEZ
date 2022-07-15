@@ -36,9 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,11 +47,8 @@ import java.util.Map;
 public class AllergiesListFragment extends Fragment {
     final static String TAG = "FridgeFragment";
 
-    private ImageButton addAllergyButton;
     private ArrayList<String> allergiesList;
-    private RecyclerView mRecyclerView;
     private AllergiesListAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     SharedPreferences sharedpreferences;
     private int userID; // todo: test if works
 
@@ -135,6 +130,7 @@ public class AllergiesListFragment extends Fragment {
                     (Request.Method.PUT, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
+                            Log.d(TAG, response.toString());
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -178,10 +174,6 @@ public class AllergiesListFragment extends Fragment {
         }
     }
 
-        public AllergiesListFragment() {
-        // Required empty public constructor
-    }
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -203,9 +195,9 @@ public class AllergiesListFragment extends Fragment {
     }
 
     public void buildRecyclerView(View view) {
-        mRecyclerView = view.findViewById(R.id.allergyRecyclerView);
+        RecyclerView mRecyclerView = view.findViewById(R.id.allergyRecyclerView);
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mAdapter = new AllergiesListAdapter(allergiesList);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -248,7 +240,7 @@ public class AllergiesListFragment extends Fragment {
         sharedpreferences = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE);
         userID = sharedpreferences.getInt("userID", 0);
 
-        addAllergyButton = view.findViewById(R.id.addAllergyButton);
+        ImageButton addAllergyButton = view.findViewById(R.id.addAllergyButton);
         addAllergyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

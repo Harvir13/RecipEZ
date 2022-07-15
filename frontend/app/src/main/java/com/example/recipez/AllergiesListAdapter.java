@@ -10,16 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimeZone;
 
 public class AllergiesListAdapter extends RecyclerView.Adapter<AllergiesListAdapter.AllergiesListHolder> {
     private ArrayList<String> mAllergiesList;

@@ -1,7 +1,5 @@
 package com.example.recipez;
 
-import static java.lang.Integer.parseInt;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -39,10 +37,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -55,11 +51,8 @@ import java.util.TimeZone;
 public class FridgeFragment extends Fragment {
     final static String TAG = "FridgeFragment";
 
-    private ImageButton addIngredientButton;
     private ArrayList<JSONObject> ingredients;
-    private RecyclerView mRecyclerView;
     private FridgeAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     SharedPreferences sharedpreferences;
     private int userID; // todo: test if works
@@ -251,10 +244,6 @@ public class FridgeFragment extends Fragment {
         }
     }
 
-    public FridgeFragment() {
-        // Required empty public constructor
-    }
-
     public static FridgeFragment newInstance(String param1, String param2) {
         FridgeFragment fragment = new FridgeFragment();
         Bundle args = new Bundle();
@@ -273,9 +262,9 @@ public class FridgeFragment extends Fragment {
     }
 
     public void buildFridgeRecyclerView() {
-        mRecyclerView = getView().findViewById(R.id.fridgeRecyclerView);
+        RecyclerView mRecyclerView = getView().findViewById(R.id.fridgeRecyclerView);
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mAdapter = new FridgeAdapter(ingredients);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -331,7 +320,7 @@ public class FridgeFragment extends Fragment {
         sharedpreferences = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE);
         userID = sharedpreferences.getInt("userID", 0);
 
-        addIngredientButton = view.findViewById(R.id.addIngredientButton);
+        ImageButton addIngredientButton = view.findViewById(R.id.addIngredientButton);
         addIngredientButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -365,7 +354,7 @@ public class FridgeFragment extends Fragment {
     private boolean ingredientInList(String ingredient) {
         try {
             for (JSONObject ing : ingredients) {
-                if (ing.getString("name").toLowerCase().equals(ingredient)) {
+                if (ing.getString("name").equalsIgnoreCase(ingredient)) {
                     return true;
                 }
             }
