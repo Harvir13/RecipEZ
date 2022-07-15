@@ -26,7 +26,7 @@ test('Store user token', () => {
 
     axios.post = jest.fn().mockResolvedValue(res);
     return axios.post(UserStoreURL + '/storeUserToken', {
-        method: 'POST',
+      method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
