@@ -38,7 +38,6 @@ app.get("/checkUserExists", async (req, res) => {
 })
 
 app.post('/storeUserToken', (req, res) => {
-    try {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, token: xxx}
         fetch("http://" + ip + ":8081/storeToken", {
@@ -52,16 +51,13 @@ app.post('/storeUserToken', (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.get("/getUserTokens", async (req, res) => {
-    try {
         //req.query should contains userids=xxx,xx,xx
         fetch("http://" + ip + ":8081/getTokens?userids=" + req.query["userids"]).then(response =>
             response.json()
@@ -76,12 +72,10 @@ app.get("/getUserTokens", async (req, res) => {
                 retArr.push(currObj)
             }
             res.send(retArr)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    } 
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.put("/addRestrictions", async (req, res) => {

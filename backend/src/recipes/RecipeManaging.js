@@ -28,7 +28,6 @@ app.post("/addRecipe", async (req, res) => {
 })
 
 app.post("/removeRecipe", async (req, res) => {
-    try {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, recipeID: xxx}
         fetch("http://" + ip + ":8083/removeFromBookmarkedList", {
@@ -42,16 +41,13 @@ app.post("/removeRecipe", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.get("/getRecipes", async (req, res) => {
-    try {
         console.log(req.query)
         //req.query should contain data like ?userid=xxx
         var id = req.query["userid"]
@@ -80,12 +76,10 @@ app.get("/getRecipes", async (req, res) => {
             var retObj = {"recipes": recipeList, "paths": pathList}
             console.log(retObj)
             res.send(retObj)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 //req.query is of the form ?ingredients=xxx,xxx&filters=xxx,xxx&userid=xxx where the filters are taken as true
