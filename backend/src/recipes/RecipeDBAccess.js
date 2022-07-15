@@ -85,7 +85,7 @@ app.get("/getBookmarkedRecipes", async (req, res) => {
     }
 })
 
-//req.body should contain data like {userID: xxx, recipeID: xxx, path:/home/xxx, title: xxx, image: xxx}
+//req.body should contain data like {userID: xxx, path:/home/xxx}
 app.post("/addToPathList", async (req, res) => {
     try {
         console.log(req.body)

@@ -103,6 +103,8 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
                                 if (holder.getAdapterPosition() != getItemCount() - 1) {
                                     notifyItemRangeChanged(holder.getAdapterPosition(), getItemCount() - holder.getAdapterPosition());
                                 }
+                                Toast.makeText(holder.deleteFolderButton.getContext(), "'" + folder.getFolderName() + "'" + " deleted", Toast.LENGTH_SHORT).show();
+
                             }
                         }).setNegativeButton("Cancel", null);
 

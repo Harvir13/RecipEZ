@@ -15,7 +15,7 @@ test('Testing add restriction', () => {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
-        },
+      },
         body: JSON.stringify(req)
     }).then(response => expect(response).toEqual(res));
 });
@@ -36,7 +36,7 @@ test('Testing delete restriction', () => {
 });
 
 test('Testing get restriction', () => {
-	const req = '1';
+  const req = "1";
 	const res = {data: ['banana', 'orange']};
 
 	axios.get = jest.fn().mockResolvedValue(res);

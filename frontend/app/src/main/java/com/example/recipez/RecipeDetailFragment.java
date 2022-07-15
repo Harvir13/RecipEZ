@@ -133,7 +133,7 @@ public class RecipeDetailFragment extends Fragment {
         recipeInstructions = view.findViewById(R.id.recipe_detail_instructions_list);
         recipeNutrition = view.findViewById(R.id.recipe_detail_nutrition_list);
 
-        Recipe recipe = new Recipe();
+        RecipeFetching recipe = new RecipeFetching();
         recipe.getFullRecipeDetails(recipeID);
 
         addToBookmarkButton = view.findViewById(R.id.add_to_bookmark_button);
@@ -202,11 +202,11 @@ public class RecipeDetailFragment extends Fragment {
         return result;
     }
 
-    public final class Recipe extends MainActivity {
+    public final class RecipeFetching extends MainActivity {
         private int myStaticMember;
         private String TAG = "Recipe Class";
 
-        public Recipe() {
+        public RecipeFetching() {
             myStaticMember = 1;
         }
 
