@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.profile:
                         fragment = new ProfileFragment();
                         break;
+                    default:
+                        break;
                 }
 
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
