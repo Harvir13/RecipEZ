@@ -58,7 +58,6 @@ app.post("/storeUserInfo", async (req, res) => {
 
 //expects {userID: xxx, token: xxx}
 app.post("/storeToken", async (req, res) => {
-    try {
         console.log(req.body)
         await client.db("UserDB").collection("Tokens").findOne({"userID": parseInt(req.body["userID"])}).then(result => {
             if (result === null) {
@@ -70,12 +69,10 @@ app.post("/storeToken", async (req, res) => {
             else {
                 res.send({"result": "User already exists, in Token Table. Did not add user to Token table again."})
             }
-        })
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
     
 })
 

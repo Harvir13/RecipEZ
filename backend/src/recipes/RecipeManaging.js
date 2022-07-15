@@ -48,7 +48,6 @@ app.post("/removeRecipe", async (req, res) => {
 })
 
 app.get("/getRecipes", async (req, res) => {
-    try {
         console.log(req.query)
         //req.query should contain data like ?userid=xxx
         var id = req.query["userid"]
@@ -77,12 +76,10 @@ app.get("/getRecipes", async (req, res) => {
             var retObj = {"recipes": recipeList, "paths": pathList}
             console.log(retObj)
             res.send(retObj)
-        })  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        }).catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 //req.query is of the form ?ingredients=xxx,xxx&filters=xxx,xxx&userid=xxx where the filters are taken as true
