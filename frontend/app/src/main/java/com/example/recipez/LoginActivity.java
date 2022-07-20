@@ -243,7 +243,7 @@ public class LoginActivity extends AppCompatActivity {
         public void signIn(String email) {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-            String url = "http://20.53.224.7:8082/checkUserExists?email=" + email + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");;
+            String url = "http://20.53.224.7:8082/checkUserExists?email=" + email + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
