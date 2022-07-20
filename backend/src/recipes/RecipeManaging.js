@@ -1,5 +1,6 @@
 import express from 'express';
 import fetch from 'node-fetch';
+import {OAuth2Client} from 'google-auth-library';
 
 var app = express()
 app.use(express.json())
@@ -7,8 +8,26 @@ app.use(express.json())
 const apiKey = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
 const ip = "20.53.224.7"
 
+const CLIENT_ID = "208965623846-b09n7ql57745t4h9osp24p7lpgnb07mi.apps.googleusercontent.com"
+const client = new OAuth2Client(CLIENT_ID);
+
+async function verify(token) {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+        // Or, if multiple clients access the backend:
+        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+    });
+    const payload = ticket.getPayload();
+    const userid = payload['sub'];
+    // If request specified a G Suite domain:
+    // const domain = payload['hd'];
+  }
+
 app.post("/addRecipe", async (req, res) => {
+    verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
+        
         //req.body should contain data like {userID: xxx, recipeID: xxx, path: home/xxx/xxx, title: xxx, image: xxx}
         fetch("http://" + ip + ":8083/addToBookmarkedList", {
             method: 'POST',
@@ -21,14 +40,16 @@ app.post("/addRecipe", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         })  
 })
 
 app.post("/removeRecipe", async (req, res) => {
+    verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
+        
         //req.body should contain data like {userID: xxx, recipeID: xxx}
         fetch("http://" + ip + ":8083/removeFromBookmarkedList", {
             method: 'POST',
@@ -41,13 +62,14 @@ app.post("/removeRecipe", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
 })
 
 app.get("/getRecipes", async (req, res) => {
+    verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query)
         //req.query should contain data like ?userid=xxx
         var id = req.query["userid"]
@@ -76,7 +98,7 @@ app.get("/getRecipes", async (req, res) => {
             var retObj = {"recipes": recipeList, "paths": pathList}
             console.log(retObj)
             res.send(retObj)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
@@ -84,6 +106,7 @@ app.get("/getRecipes", async (req, res) => {
 
 //req.query is of the form ?ingredients=xxx,xxx&filters=xxx,xxx&userid=xxx where the filters are taken as true
 app.get("/requestFilteredRecipes", async (req, res) => {
+    verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query)
         var ingredients = req.query["ingredients"].split(",")
 
@@ -194,7 +217,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                 })
             })
 
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
@@ -213,6 +236,7 @@ function checkForTitles(recipeList) {
 // expects ?userid=xxx where ingredientsinpantry is non-empty
 // should now expect ?userid=xx !!!
 app.get("/generateSuggestedRecipesList", async (req, res) => {
+    verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query)
 
 
@@ -275,7 +299,7 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
                     res.send(retList)
                 })
             })
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
@@ -283,6 +307,7 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
 
 //expects ?recipename=xxx
 app.get("/searchRecipe", async (req, res) => {
+    verify(req.query["googlesignintoken"]).then(() => {
         var name = encodeURIComponent(req.query["recipename"])
         fetch("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=" + apiKey).then(response =>
             response.json()
@@ -299,7 +324,7 @@ app.get("/searchRecipe", async (req, res) => {
                 returnList.push(currItem)
             }
             res.send(returnList)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
@@ -307,6 +332,7 @@ app.get("/searchRecipe", async (req, res) => {
 
 //expects ?recipeid=xxx
 app.get("/getRecipeDetails", async (req, res) => {
+    verify(req.query["googlesignintoken"]).then(() => {
         fetch("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=" + apiKey).then(response =>
             response.json()
         ).then(data => {
@@ -346,13 +372,14 @@ app.get("/getRecipeDetails", async (req, res) => {
                     res.send(returnObj)
                 })
             })
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
 })
 
 app.post("/addNewPath", async (req, res) => {
+    verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, path: home/xxx/xxx}
         fetch("http://" + ip + ":8083/addToPathList", {
@@ -366,13 +393,14 @@ app.post("/addNewPath", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
 })
 
 app.post("/removeExistingPath", async (req, res) => {
+    verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, path: xxx/xxx}
         fetch("http://" + ip + ":8083/removeFromPathList", {
@@ -386,13 +414,14 @@ app.post("/removeExistingPath", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
 })
 
 app.get("/getAllPaths", async (req, res) => {
+    verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query)
         //req.query should contain data like ?userid=xxx
         var id = req.query["userid"]
@@ -419,7 +448,7 @@ app.get("/getAllPaths", async (req, res) => {
             }
             console.log(retArr)
             res.send(retArr)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 

@@ -1,14 +1,21 @@
 {
+  "name": "src",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
     "express": "^4.18.1",
+    "firebase": "^9.8.4",
+    "firebase-admin": "^11.0.0",
+    "google-auth-library": "^8.1.1",
     "mongodb": "^4.7.0",
-    "node-fetch": "^3.2.8"
+    "node-fetch": "^3.2.4"
   },
-  "devDependencies": {
-    "jest": "^28.1.2"
-  },
-  "scripts": {
-    "test": "jest"
-  }
+  "type": "module"
 }

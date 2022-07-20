@@ -1,12 +1,31 @@
 import express, { json } from 'express';
 import fetch from 'node-fetch';
+import {OAuth2Client} from 'google-auth-library';
 
 var app = express()
 app.use(express.json())
 
+const CLIENT_ID = "208965623846-b09n7ql57745t4h9osp24p7lpgnb07mi.apps.googleusercontent.com"
+const client = new OAuth2Client(CLIENT_ID);
+
 const ip = "20.53.224.7"
 
+async function verify(token) {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+        // Or, if multiple clients access the backend:
+        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+    });
+    const payload = ticket.getPayload();
+    const userid = payload['sub'];
+    // If request specified a G Suite domain:
+    // const domain = payload['hd'];
+  }
+
 app.get("/checkUserExists", async (req, res) => {
+    try {
+        verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query);
         var email = encodeURIComponent(req.query["email"])
         fetch("http://" + ip + ":8081/scanDB?email=" + email).then(response =>
@@ -30,14 +49,18 @@ app.get("/checkUserExists", async (req, res) => {
             else {
                 res.send(data)
             }
-        }).catch(err => {
-            console.log(err)
-            res.status(400).send(err)
-        })
+        })})
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
     
 })
 
 app.post('/storeUserToken', (req, res) => {
+    try {
+        verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, token: xxx}
         fetch("http://" + ip + ":8081/storeToken", {
@@ -51,13 +74,17 @@ app.post('/storeUserToken', (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
-            console.log(err)
-            res.status(400).send(err)
-        }) 
+        })})  
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
 })
 
 app.get("/getUserTokens", async (req, res) => {
+    try {
+        verify(req.query["googlesignintoken"]).then(() => {
         //req.query should contains userids=xxx,xx,xx
         fetch("http://" + ip + ":8081/getTokens?userids=" + req.query["userids"]).then(response =>
             response.json()
@@ -72,15 +99,21 @@ app.get("/getUserTokens", async (req, res) => {
                 retArr.push(currObj)
             }
             res.send(retArr)
-        }).catch(err => {
-            console.log(err)
-            res.status(400).send(err)
-        }) 
+        })})  
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    } 
 })
 
 app.put("/addRestrictions", async (req, res) => {
+    try {
+        console.log("token: " + req.body.googleSignInToken)
+        verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ]}
+
         fetch("http://" + ip + ":8081/addToDietaryRestrictions", {
             method: 'PUT',
             headers: {
@@ -92,14 +125,19 @@ app.put("/addRestrictions", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
-            console.log(err)
-            res.status(400).send(err)
-        }) 
+        })})  
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
 })
 
 app.put("/deleteRestrictions", async (req, res) => {
+    try {
+        verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
+        
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ]}
         fetch("http://" + ip + ":8081/deleteFromDietaryRestrictions", {
             method: 'PUT',
@@ -112,14 +150,20 @@ app.put("/deleteRestrictions", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
-            console.log(err)
-            res.status(400).send(err)
-        }) 
+        })})  
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
 })
 
 app.get("/getRestrictions", async (req, res) => {
+    try {
+        console.log("token: " + req.query["googlesignintokens"])
+        verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query)
+        
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ...]}
         fetch("http://" + ip + ":8081/getDietaryRestrictions?userid=" + req.query["userid"]).then(response =>
             response.json()
@@ -136,10 +180,12 @@ app.get("/getRestrictions", async (req, res) => {
             console.log(retObj)
             res.send(retObj)
             
-        }).catch(err => {
-            console.log(err)
-            res.status(400).send(err)
-        }) 
+        })})  
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
 })
 
 async function run () {
