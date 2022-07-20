@@ -135,7 +135,7 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
         }
     }
 
-    public void removeRecipeFromBookmarkList(int userID, int recipeID, Context context) {
+    private void removeRecipeFromBookmarkList(int userID, int recipeID, Context context) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(context);
         String url = "http://20.53.224.7:8084/removeRecipe";
@@ -144,6 +144,7 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
         Map<String, String> jsonParams = new HashMap();
         jsonParams.put("userID", String.valueOf(userID));
         jsonParams.put("recipeID", String.valueOf(recipeID));
+        jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -164,7 +165,7 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
         queue.add(jsonRequest);
     }
 
-    public void removePathFromPathsList(int userID, String path, Context context) {
+    private void removePathFromPathsList(int userID, String path, Context context) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(context);
         String url = "http://20.53.224.7:8084/removeExistingPath";
@@ -173,6 +174,7 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
         Map<String, String> jsonParams = new HashMap();
         jsonParams.put("userID", String.valueOf(userID));
         jsonParams.put("path", path);
+        jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest

@@ -109,8 +109,7 @@ public class RecipeDetailFragment extends Fragment {
         recipeInstructions = view.findViewById(R.id.recipe_detail_instructions_list);
         recipeNutrition = view.findViewById(R.id.recipe_detail_nutrition_list);
 
-        RecipeFetching recipe = new RecipeFetching();
-        recipe.getFullRecipeDetails(recipeID);
+        getFullRecipeDetails(recipeID);
 
         ImageButton addToBookmarkButton = view.findViewById(R.id.add_to_bookmark_button);
         addToBookmarkButton.setOnClickListener(new View.OnClickListener() {
@@ -138,75 +137,65 @@ public class RecipeDetailFragment extends Fragment {
         });
     }
 
-    public final class RecipeFetching extends MainActivity {
-        private int myStaticMember;
-        private String TAG = "Recipe Class";
+    private void getFullRecipeDetails(int recipeID) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "http://20.53.224.7:8084/getRecipeDetails?recipeid=" + recipeID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
-        public RecipeFetching() {
-            myStaticMember = 1;
-        }
-
-        public void getFullRecipeDetails(int recipeID) {
-            // Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8084/getRecipeDetails?recipeid=" + recipeID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
-            // 10.0.2.2 is a special alias to localhost for developers
-
-            // Request a string response from the provided URL.
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                JSONArray ingredientArray = response.getJSONArray("ingredientsAndAmounts");
-                                StringBuilder ingredientParser = new StringBuilder();
-                                for (int i = 0; i < ingredientArray.length(); i++) {
-                                    ingredientParser.append(ingredientArray.getString(i));
-                                    ingredientParser.append("\n");
-                                }
-                                recipeIngredients.setText(ingredientParser.toString());
-
-                                JSONArray instructionArray = response.getJSONArray("instructions");
-                                StringBuilder instructionParser = new StringBuilder();
-                                for (int i = 0; i < instructionArray.length(); i++) {
-                                    String subName = instructionArray.getJSONObject(i).getString("name");
-                                    if (!subName.equals("")) {
-                                        instructionParser.append(subName);
-                                    }
-                                    JSONArray instructionSubArray = instructionArray.getJSONObject(i).getJSONArray("steps");
-                                    for (int j = 0; j < instructionSubArray.length(); j++) {
-                                        instructionParser.append("- ");
-                                        instructionParser.append(instructionSubArray.getString(j));
-                                        instructionParser.append("\n");
-                                    }
-                                }
-                                recipeInstructions.setText(instructionParser.toString());
-
-                                JSONObject nutritionObject = response.getJSONObject("nutritionDetails");
-                                StringBuilder nutritionParser = new StringBuilder();
-                                nutritionParser.append("Calories: " + nutritionObject.getString("calories") + "\n");
-                                nutritionParser.append("Carbs: " + nutritionObject.getString("carbs") + "\n");
-                                nutritionParser.append("Fat: " + nutritionObject.getString("fat") + "\n");
-                                nutritionParser.append("Protein: " + nutritionObject.getString("protein") + "\n");
-                                recipeNutrition.setText(nutritionParser.toString());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray ingredientArray = response.getJSONArray("ingredientsAndAmounts");
+                            StringBuilder ingredientParser = new StringBuilder();
+                            for (int i = 0; i < ingredientArray.length(); i++) {
+                                ingredientParser.append(ingredientArray.getString(i));
+                                ingredientParser.append("\n");
                             }
-                            Log.d(TAG, response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, error.toString());
-                        }
-                    });
+                            recipeIngredients.setText(ingredientParser.toString());
 
-            // Add the request to the RequestQueue.
-            queue.add(jsonObjectRequest);
-        }
+                            JSONArray instructionArray = response.getJSONArray("instructions");
+                            StringBuilder instructionParser = new StringBuilder();
+                            for (int i = 0; i < instructionArray.length(); i++) {
+                                String subName = instructionArray.getJSONObject(i).getString("name");
+                                if (!subName.equals("")) {
+                                    instructionParser.append(subName);
+                                }
+                                JSONArray instructionSubArray = instructionArray.getJSONObject(i).getJSONArray("steps");
+                                for (int j = 0; j < instructionSubArray.length(); j++) {
+                                    instructionParser.append("- ");
+                                    instructionParser.append(instructionSubArray.getString(j));
+                                    instructionParser.append("\n");
+                                }
+                            }
+                            recipeInstructions.setText(instructionParser.toString());
+
+                            JSONObject nutritionObject = response.getJSONObject("nutritionDetails");
+                            StringBuilder nutritionParser = new StringBuilder();
+                            nutritionParser.append("Calories: " + nutritionObject.getString("calories") + "\n");
+                            nutritionParser.append("Carbs: " + nutritionObject.getString("carbs") + "\n");
+                            nutritionParser.append("Fat: " + nutritionObject.getString("fat") + "\n");
+                            nutritionParser.append("Protein: " + nutritionObject.getString("protein") + "\n");
+                            recipeNutrition.setText(nutritionParser.toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d(TAG, response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonObjectRequest);
     }
 
-    public void addRecipeToBookmarkList(int userID, int recipeID, String path, String title, String image) {
+    private void addRecipeToBookmarkList(int userID, int recipeID, String path, String title, String image) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8084/addRecipe";
@@ -239,7 +228,7 @@ public class RecipeDetailFragment extends Fragment {
         queue.add(jsonRequest);
     }
 
-    public void removeRecipeFromBookmarkList(int userID, int recipeID, Dialog dialog) {
+    private void removeRecipeFromBookmarkList(int userID, int recipeID, Dialog dialog) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8084/removeRecipe";
@@ -248,6 +237,7 @@ public class RecipeDetailFragment extends Fragment {
         Map<String, String> jsonParams = new HashMap();
         jsonParams.put("userID", String.valueOf(userID));
         jsonParams.put("recipeID", String.valueOf(recipeID));
+        jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -270,11 +260,10 @@ public class RecipeDetailFragment extends Fragment {
         queue.add(jsonRequest);
     }
 
-    public void getRecipesFromBookmarkList(int userID, Dialog dialog) {
+    private void getRecipesFromBookmarkList(int userID, Dialog dialog) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID;
-        // 10.0.2.2 is a special alias to localhost for developers
+        String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -285,7 +274,8 @@ public class RecipeDetailFragment extends Fragment {
 
                         try {
                             Gson gson = new Gson();
-                            Type type = new TypeToken<List<String>>(){}.getType();
+                            Type type = new TypeToken<List<String>>() {
+                            }.getType();
                             folderNames = gson.fromJson(String.valueOf(response.getJSONArray("paths")), type);
 
                             JSONArray recipesArray = response.getJSONArray("recipes");

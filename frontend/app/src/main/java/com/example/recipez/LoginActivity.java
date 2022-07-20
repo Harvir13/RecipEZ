@@ -56,7 +56,6 @@ public class LoginActivity extends AppCompatActivity {
 
         createNotificationChannel();
 
-
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -98,8 +97,6 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
-
-
 
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -246,8 +243,7 @@ public class LoginActivity extends AppCompatActivity {
         public void signIn(String email) {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-            String url = "http://20.53.224.7:8082/checkUserExists?email=" + email;
-            // 10.0.2.2 is a special alias to localhost for developers
+            String url = "http://20.53.224.7:8082/checkUserExists?email=" + email + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");;
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -306,7 +302,7 @@ public class LoginActivity extends AppCompatActivity {
             Map<String, String> jsonParams = new HashMap();
             jsonParams.put("token", token);
             jsonParams.put("userID", String.valueOf(userID));
-
+            jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonRequest = new JsonObjectRequest

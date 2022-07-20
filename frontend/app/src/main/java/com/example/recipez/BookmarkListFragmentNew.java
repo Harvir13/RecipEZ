@@ -125,20 +125,10 @@ public class BookmarkListFragmentNew extends Fragment {
         });
     }
 
-    public final class RecipeFetching extends MainActivity {
-        private int myStaticMember;
-        private String TAG = "Recipe Class";
-
-        public RecipeFetching() {
-            myStaticMember = 1;
-        }
-    }
-
-    public void getRecipesFromBookmarkList(int userID) {
+    private void getRecipesFromBookmarkList(int userID) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID;
-        // 10.0.2.2 is a special alias to localhost for developers
+        String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");;
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -195,15 +185,15 @@ public class BookmarkListFragmentNew extends Fragment {
 
     }
 
-    public void addPathToPathsList(int userID, String path) {
+    private void addPathToPathsList(int userID, String path) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8084/addNewPath";
-        // 10.0.2.2 is a special alias to localhost for developers
 
         Map<String, String> jsonParams = new HashMap();
         jsonParams.put("userID", String.valueOf(userID));
         jsonParams.put("path", path);
+        jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -224,11 +214,10 @@ public class BookmarkListFragmentNew extends Fragment {
         queue.add(jsonRequest);
     }
 
-    public void getPathsList(int userID) {
+    private void getPathsList(int userID) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8084/getAllPaths?userid=" + userID;
-        // 10.0.2.2 is a special alias to localhost for developers
+        String url = "http://20.53.224.7:8084/getAllPaths?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");;
 
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest

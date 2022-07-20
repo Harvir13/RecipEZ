@@ -135,7 +135,7 @@ public class RecipesFragment extends Fragment {
         });
     }
 
-    public String encodeString(String s) {
+    private String encodeString(String s) {
         String result;
         try {
             result = URLEncoder.encode(s, "UTF-8").replaceAll("\\+", "%20").replaceAll("\\%21", "!")
@@ -149,7 +149,7 @@ public class RecipesFragment extends Fragment {
         return result;
     }
 
-    public String convertArrayToString(String[] s) {
+    private String convertArrayToString(String[] s) {
         String result = "";
 
         for (int i = 0; i < s.length; i++) {
@@ -162,9 +162,9 @@ public class RecipesFragment extends Fragment {
         return result;
     }
 
-    public void requestIngredients(int userID, Dialog dialog) {
+    private void requestIngredients(int userID, Dialog dialog) {
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8086/requestIngredients?userid=" + userID;
+        String url = "http://20.53.224.7:8086/requestIngredients?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
@@ -218,10 +218,9 @@ public class RecipesFragment extends Fragment {
         queue.add(jsonRequest);
     }
 
-    public void searchRecipe(String recipeName) {// Instantiate the RequestQueue.
+    private void searchRecipe(String recipeName) {// Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8084/searchRecipe?recipename=" + recipeName;
-        // 10.0.2.2 is a special alias to localhost for developers
+        String url = "http://20.53.224.7:8084/searchRecipe?recipename=" + recipeName + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest
@@ -259,12 +258,11 @@ public class RecipesFragment extends Fragment {
 
     }
 
-    public void getSuggestedRecipes(int userId) {
+    private void getSuggestedRecipes(int userId) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
 
-        String url = "http://20.53.224.7:8084/generateSuggestedRecipesList?userid=" + userId;
-        // 10.0.2.2 is a special alias to localhost for developers
+        String url = "http://20.53.224.7:8084/generateSuggestedRecipesList?userid=" + userId + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest
@@ -316,7 +314,7 @@ public class RecipesFragment extends Fragment {
 
     }
 
-    public void filterRecipes(String[] ingredients, String[] filters, int userid) {
+    private void filterRecipes(String[] ingredients, String[] filters, int userid) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String ingredientsList = encodeString(convertArrayToString(ingredients));
@@ -325,8 +323,7 @@ public class RecipesFragment extends Fragment {
         Log.d(TAG, "ingredientsList " + ingredientsList);
         Log.d(TAG, "filtersList " + filtersList);
 
-        String url = "http://20.53.224.7:8084/requestFilteredRecipes?ingredients=" + ingredientsList + "&filters=" + filtersList + "&userid=" + userid;
-        // 10.0.2.2 is a special alias to localhost for developers
+        String url = "http://20.53.224.7:8084/requestFilteredRecipes?ingredients=" + ingredientsList + "&filters=" + filtersList + "&userid=" + userid + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest
