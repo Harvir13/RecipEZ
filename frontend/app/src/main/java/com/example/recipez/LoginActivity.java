@@ -59,6 +59,7 @@ public class LoginActivity extends AppCompatActivity {
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.oath_web_client_id))
                 .requestEmail()
                 .build();
 
@@ -68,6 +69,12 @@ public class LoginActivity extends AppCompatActivity {
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
+            SharedPreferences.Editor myEdit = sharedpreferences.edit();
+            String googleSignInToken = account.getIdToken();
+            myEdit.putString("googleSignInToken", googleSignInToken);
+            myEdit.apply();
+            Log.d(TAG, "Google Sign In Token: " + account.getIdToken());
+
             newUser.signIn(account.getEmail());
             Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(mainActivityIntent);
@@ -93,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
                         String token = task.getResult();
 
                         // Log
-                        Log.d(TAG, "Token: " + token);
+                        Log.d(TAG, "FCM registration token: " + token);
                     }
                 });
     }
@@ -140,6 +147,7 @@ public class LoginActivity extends AppCompatActivity {
             // Log.d(TAG, "Given Name: " + account.getGivenName());
             // Log.d(TAG, "Family Name: " + account.getFamilyName());
             Log.d(TAG, "Display Picture: " + account.getPhotoUrl());
+            Log.d(TAG, "Google Sign In Token: " + account.getIdToken());
             SharedPreferences.Editor myEdit = sharedpreferences.edit();
             String googleSignInToken = account.getIdToken();
             myEdit.putString("googleSignInToken", googleSignInToken);
