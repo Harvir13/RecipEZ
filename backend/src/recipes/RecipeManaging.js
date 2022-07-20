@@ -1,5 +1,6 @@
 import express from 'express';
 import fetch from 'node-fetch';
+import {verify} from '../user/UserManaging.js';
 
 var app = express()
 app.use(express.json())
@@ -8,7 +9,9 @@ const apiKey = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
 const ip = "20.53.224.7"
 
 app.post("/addRecipe", async (req, res) => {
+    verify.then(() => {
         console.log(req.body)
+        
         //req.body should contain data like {userID: xxx, recipeID: xxx, path: home/xxx/xxx, title: xxx, image: xxx}
         fetch("http://" + ip + ":8083/addToBookmarkedList", {
             method: 'POST',
@@ -21,14 +24,16 @@ app.post("/addRecipe", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         })  
 })
 
 app.post("/removeRecipe", async (req, res) => {
+    verify.then(() => {
         console.log(req.body)
+        
         //req.body should contain data like {userID: xxx, recipeID: xxx}
         fetch("http://" + ip + ":8083/removeFromBookmarkedList", {
             method: 'POST',
@@ -41,13 +46,14 @@ app.post("/removeRecipe", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
 })
 
 app.get("/getRecipes", async (req, res) => {
+    verify.then(() => {
         console.log(req.query)
         //req.query should contain data like ?userid=xxx
         var id = req.query["userid"]
@@ -76,7 +82,7 @@ app.get("/getRecipes", async (req, res) => {
             var retObj = {"recipes": recipeList, "paths": pathList}
             console.log(retObj)
             res.send(retObj)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
@@ -84,6 +90,7 @@ app.get("/getRecipes", async (req, res) => {
 
 //req.query is of the form ?ingredients=xxx,xxx&filters=xxx,xxx&userid=xxx where the filters are taken as true
 app.get("/requestFilteredRecipes", async (req, res) => {
+    verify.then(() => {
         console.log(req.query)
         var ingredients = req.query["ingredients"].split(",")
 
@@ -194,7 +201,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                 })
             })
 
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
@@ -213,6 +220,7 @@ function checkForTitles(recipeList) {
 // expects ?userid=xxx where ingredientsinpantry is non-empty
 // should now expect ?userid=xx !!!
 app.get("/generateSuggestedRecipesList", async (req, res) => {
+    verify.then(() => {
         console.log(req.query)
 
 
@@ -275,7 +283,7 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
                     res.send(retList)
                 })
             })
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
@@ -283,6 +291,7 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
 
 //expects ?recipename=xxx
 app.get("/searchRecipe", async (req, res) => {
+    verify.then(() => {
         var name = encodeURIComponent(req.query["recipename"])
         fetch("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=" + apiKey).then(response =>
             response.json()
@@ -299,7 +308,7 @@ app.get("/searchRecipe", async (req, res) => {
                 returnList.push(currItem)
             }
             res.send(returnList)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
@@ -307,6 +316,7 @@ app.get("/searchRecipe", async (req, res) => {
 
 //expects ?recipeid=xxx
 app.get("/getRecipeDetails", async (req, res) => {
+    verify.then(() => {
         fetch("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=" + apiKey).then(response =>
             response.json()
         ).then(data => {
@@ -346,13 +356,14 @@ app.get("/getRecipeDetails", async (req, res) => {
                     res.send(returnObj)
                 })
             })
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
 })
 
 app.post("/addNewPath", async (req, res) => {
+    verify.then(() => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, path: home/xxx/xxx}
         fetch("http://" + ip + ":8083/addToPathList", {
@@ -366,13 +377,14 @@ app.post("/addNewPath", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
 })
 
 app.post("/removeExistingPath", async (req, res) => {
+    verify.then(() => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, path: xxx/xxx}
         fetch("http://" + ip + ":8083/removeFromPathList", {
@@ -386,13 +398,14 @@ app.post("/removeExistingPath", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
 })
 
 app.get("/getAllPaths", async (req, res) => {
+    verify.then(() => {
         console.log(req.query)
         //req.query should contain data like ?userid=xxx
         var id = req.query["userid"]
@@ -419,7 +432,7 @@ app.get("/getAllPaths", async (req, res) => {
             }
             console.log(retArr)
             res.send(retArr)
-        }).catch(err => {
+        })}).catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
