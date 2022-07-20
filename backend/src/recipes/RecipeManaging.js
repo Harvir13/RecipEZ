@@ -8,7 +8,7 @@ app.use(express.json())
 const apiKey = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
 const ip = "20.53.224.7"
 
-const CLIENT_ID = "208965623846-b09n7ql57745t4h9osp24p7lpgnb07mi.apps.googleusercontent.com"
+const CLIENT_ID = "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleusercontent.com"
 const client = new OAuth2Client(CLIENT_ID);
 
 async function verify(token) {

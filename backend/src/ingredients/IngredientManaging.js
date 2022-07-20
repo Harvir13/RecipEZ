@@ -8,7 +8,7 @@ const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9
 var app = express();
 app.use(express.json());
 
-const CLIENT_ID = "208965623846-b09n7ql57745t4h9osp24p7lpgnb07mi.apps.googleusercontent.com"
+const CLIENT_ID = "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleusercontent.com"
 const client = new OAuth2Client(CLIENT_ID);
 
 async function verify(token) {

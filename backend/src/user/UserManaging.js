@@ -5,7 +5,7 @@ import {OAuth2Client} from 'google-auth-library';
 var app = express()
 app.use(express.json())
 
-const CLIENT_ID = "208965623846-b09n7ql57745t4h9osp24p7lpgnb07mi.apps.googleusercontent.com"
+const CLIENT_ID = "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleusercontent.com"
 const client = new OAuth2Client(CLIENT_ID);
 
 const ip = "20.53.224.7"
@@ -25,6 +25,7 @@ async function verify(token) {
 
 app.get("/checkUserExists", async (req, res) => {
     try {
+        console.log("token: " + req.query["googlesignintoken"])
         verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query);
         var email = encodeURIComponent(req.query["email"])
@@ -42,11 +43,13 @@ app.get("/checkUserExists", async (req, res) => {
                 }).then(response => 
                     response.json()
                 ).then(data => {
+                    console.log(data)
                     res.send(data)
                 })
             }
             //user already exists in the database, data will contain {"userID": xx}
             else {
+                console.log(data)
                 res.send(data)
             }
         })})
@@ -160,7 +163,7 @@ app.put("/deleteRestrictions", async (req, res) => {
 
 app.get("/getRestrictions", async (req, res) => {
     try {
-        console.log("token: " + req.query["googlesignintokens"])
+        console.log("token: " + req.query["googlesignintoken"])
         verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query)
         
