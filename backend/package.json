@@ -2,6 +2,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "express": "^4.18.1",
+    "google-auth-library": "^8.1.1",
     "mongodb": "^4.7.0",
     "node-fetch": "^3.2.8"
   },
