@@ -10,7 +10,7 @@ const client = new OAuth2Client(CLIENT_ID);
 
 const ip = "20.53.224.7"
 
-export async function verify() {
+async function verify(token) {
     const ticket = await client.verifyIdToken({
         idToken: token,
         audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
@@ -25,7 +25,7 @@ export async function verify() {
 
 app.get("/checkUserExists", async (req, res) => {
     try {
-        verify.then(() => {
+        verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query);
         var email = encodeURIComponent(req.query["email"])
         fetch("http://" + ip + ":8081/scanDB?email=" + email).then(response =>
@@ -60,7 +60,7 @@ app.get("/checkUserExists", async (req, res) => {
 
 app.post('/storeUserToken', (req, res) => {
     try {
-        verify.then(() => {
+        verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, token: xxx}
         fetch("http://" + ip + ":8081/storeToken", {
@@ -84,7 +84,7 @@ app.post('/storeUserToken', (req, res) => {
 
 app.get("/getUserTokens", async (req, res) => {
     try {
-        verify.then(() => {
+        verify(req.query["googlesignintoken"]).then(() => {
         //req.query should contains userids=xxx,xx,xx
         fetch("http://" + ip + ":8081/getTokens?userids=" + req.query["userids"]).then(response =>
             response.json()
@@ -109,7 +109,8 @@ app.get("/getUserTokens", async (req, res) => {
 
 app.put("/addRestrictions", async (req, res) => {
     try {
-        verify.then(() => {
+        console.log("token: " + req.body.googleSignInToken)
+        verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ]}
 
@@ -134,7 +135,7 @@ app.put("/addRestrictions", async (req, res) => {
 
 app.put("/deleteRestrictions", async (req, res) => {
     try {
-        verify.then(() => {
+        verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
         
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ]}
@@ -159,7 +160,8 @@ app.put("/deleteRestrictions", async (req, res) => {
 
 app.get("/getRestrictions", async (req, res) => {
     try {
-        verify.then(() => {
+        console.log("token: " + req.query["googlesignintokens"])
+        verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query)
         
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ...]}

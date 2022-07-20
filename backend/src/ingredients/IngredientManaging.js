@@ -1,12 +1,28 @@
 import express from "express";
 import fetch from "node-fetch";
-import verify from "../user/UserManaging.js"
+import {OAuth2Client} from 'google-auth-library';
 
 const API_KEY = "c3f5daa174074a7994e8e6803d3b2687";
 const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
 
 var app = express();
 app.use(express.json());
+
+const CLIENT_ID = "208965623846-b09n7ql57745t4h9osp24p7lpgnb07mi.apps.googleusercontent.com"
+const client = new OAuth2Client(CLIENT_ID);
+
+async function verify(token) {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+        // Or, if multiple clients access the backend:
+        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+    });
+    const payload = ticket.getPayload();
+    const userid = payload['sub'];
+    // If request specified a G Suite domain:
+    // const domain = payload['hd'];
+  }
 
 async function run() {
 	var server = app.listen(8086, (req, res) => {
@@ -31,6 +47,7 @@ app.get("/getNotification", async(req, res) => {
 
 //expects {userid: xxx}
 app.get("/requestIngredients", async (req, res) => {
+	console.log(req.query)
 	verify(req.query["googlesignintoken"]).then(() => {
 		fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"], {
 		method: "GET",
