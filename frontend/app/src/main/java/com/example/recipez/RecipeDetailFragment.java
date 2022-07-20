@@ -149,7 +149,7 @@ public class RecipeDetailFragment extends Fragment {
         public void getFullRecipeDetails(int recipeID) {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8084/getRecipeDetails?recipeid=" + recipeID;
+            String url = "http://20.53.224.7:8084/getRecipeDetails?recipeid=" + recipeID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
             // 10.0.2.2 is a special alias to localhost for developers
 
             // Request a string response from the provided URL.
@@ -218,6 +218,7 @@ public class RecipeDetailFragment extends Fragment {
         jsonParams.put("path", path);
         jsonParams.put("title", title);
         jsonParams.put("image", image);
+        jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest

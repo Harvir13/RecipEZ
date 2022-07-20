@@ -143,6 +143,10 @@ public class LoginActivity extends AppCompatActivity {
             // Log.d(TAG, "Given Name: " + account.getGivenName());
             // Log.d(TAG, "Family Name: " + account.getFamilyName());
             Log.d(TAG, "Display Picture: " + account.getPhotoUrl());
+            SharedPreferences.Editor myEdit = sharedpreferences.edit();
+            String googleSignInToken = account.getIdToken();
+            myEdit.putString("googleSignInToken", googleSignInToken);
+            myEdit.apply();
             newUser.signIn(account.getEmail());
             Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(mainActivityIntent);
