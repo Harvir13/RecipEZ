@@ -58,7 +58,6 @@ app.get("/checkUserExists", async (req, res) => {
 })
 
 app.post('/storeUserToken', (req, res) => {
-    try {
         verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, token: xxx}
@@ -73,16 +72,13 @@ app.post('/storeUserToken', (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })})  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        })}).catch ((err) => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.get("/getUserTokens", async (req, res) => {
-    try {
         verify(req.query["googlesignintoken"]).then(() => {
         //req.query should contains userids=xxx,xx,xx
         fetch("http://" + ip + ":8081/getTokens?userids=" + req.query["userids"]).then(response =>
@@ -98,16 +94,13 @@ app.get("/getUserTokens", async (req, res) => {
                 retArr.push(currObj)
             }
             res.send(retArr)
-        })})  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    } 
+        })}).catch ((err) => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.put("/addRestrictions", async (req, res) => {
-    try {
         console.log("token: " + req.body.googleSignInToken)
         verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
@@ -124,16 +117,13 @@ app.put("/addRestrictions", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })})  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        })}).catch ((err) => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.put("/deleteRestrictions", async (req, res) => {
-    try {
         verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
         
@@ -149,16 +139,13 @@ app.put("/deleteRestrictions", async (req, res) => {
         ).then(data => {
             res.send(data)
             console.log(data)
-        })})  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        })}).catch ((err) => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.get("/getRestrictions", async (req, res) => {
-    try {
         console.log("token: " + req.query["googlesignintoken"])
         verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query)
@@ -179,12 +166,10 @@ app.get("/getRestrictions", async (req, res) => {
             console.log(retObj)
             res.send(retObj)
             
-        })})  
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+        })}).catch ((err) => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 async function run () {
