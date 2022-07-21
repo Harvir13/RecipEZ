@@ -256,12 +256,12 @@ public class FridgeFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    public void addIngredient(String name) {
+    private void addIngredient(String name) {
         IngredientFetching ingredient = new IngredientFetching();
         ingredient.checkIngredient(name);
     }
 
-    public void buildFridgeRecyclerView() {
+    private void buildFridgeRecyclerView() {
         RecyclerView mRecyclerView = getView().findViewById(R.id.fridgeRecyclerView);
         mRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
@@ -283,12 +283,12 @@ public class FridgeFragment extends Fragment {
         });
     }
 
-    public void insertItem(JSONObject insert) {
+    private void insertItem(JSONObject insert) {
         ingredients.add(ingredients.size(), insert);
         mAdapter.notifyDataSetChanged();
     }
 
-    public void removeItem(int position) {
+    private void removeItem(int position) {
         IngredientFetching ingredient = new IngredientFetching();
         try {
             ingredient.deleteIngredient(String.valueOf(userID), ingredients.get(position).getString("name"));
@@ -299,7 +299,7 @@ public class FridgeFragment extends Fragment {
         mAdapter.notifyItemRemoved(position);
     }
 
-    public void editItem(int position, JSONObject editedItem) {
+    private void editItem(int position, JSONObject editedItem) {
         IngredientFetching ingredient = new IngredientFetching();
         ingredient.updateExpiryDate(String.valueOf(userID), editedItem);
         ingredients.set(position, editedItem);

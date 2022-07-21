@@ -212,14 +212,14 @@ public class AllergiesListFragment extends Fragment {
         });
     }
 
-    public void removeItem(int position) {
+    private void removeItem(int position) {
         IngredientFetching ingredient = new IngredientFetching();
         ingredient.deleteAllergy(String.valueOf(userID), allergiesList.get(position));
         allergiesList.remove(position);
         mAdapter.notifyItemRemoved(position);
     }
 
-    public void addItem(String restriction) {
+    private void addItem(String restriction) {
         IngredientFetching ingredient = new IngredientFetching();
         ingredient.addAllergy(String.valueOf(userID), restriction);
         allergiesList.add(allergiesList.size(), restriction);
@@ -252,7 +252,7 @@ public class AllergiesListFragment extends Fragment {
         ingredient.requestAllergiesList(String.valueOf(userID), view);
     }
 
-    public void openAddAllergyDialog() {
+    private void openAddAllergyDialog() {
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_add_ingredient);
 
