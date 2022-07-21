@@ -65,9 +65,9 @@ public class FridgeFragment extends Fragment {
             myStaticMember = 1;
         }
 
-        public void requestIngredients(String userID) {
+        private void requestIngredients(String userID) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/requestIngredients?userid=" + userID;
+            String url = "http://20.53.224.7:8086/requestIngredients?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                 @Override
@@ -93,13 +93,14 @@ public class FridgeFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void deleteIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
+        private void deleteIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
             String url = "http://20.53.224.7:8086/deleteIngredient";
 
             Map<String, String> jsonParams = new HashMap();
             jsonParams.put("userid", userID);
             jsonParams.put("ingredient", ingredient);
+            jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest
                     (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
@@ -116,7 +117,7 @@ public class FridgeFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void storeIngredient(String userID, JSONObject ingredient) { // or the actual ingredient, just need the name here
+        private void storeIngredient(String userID, JSONObject ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
             String url = "http://20.53.224.7:8086/addIngredient";
 
@@ -125,6 +126,7 @@ public class FridgeFragment extends Fragment {
                 jsonParams.put("userid", userID);
                 jsonParams.put("ingredient", ingredient.getString("name"));
                 jsonParams.put("expiry", ingredient.getString("expiry"));
+                jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -144,7 +146,7 @@ public class FridgeFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void updateExpiryDate(String userID, JSONObject ingredient) {
+        private void updateExpiryDate(String userID, JSONObject ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
             String url = "http://20.53.224.7:8086/updateExpiryDate";
 
@@ -153,6 +155,7 @@ public class FridgeFragment extends Fragment {
                 jsonParams.put("userid", userID);
                 jsonParams.put("ingredient", ingredient.getString("name"));
                 jsonParams.put("expiry", ingredient.getString("expiry"));
+                jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -175,9 +178,9 @@ public class FridgeFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void getIngredientSuggestions(String string) {
+        private void getIngredientSuggestions(String string) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/getIngredientSuggestions?string=" + string;
+            String url = "http://20.53.224.7:8086/getIngredientSuggestions?string=" + string + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
             JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                         @Override
@@ -210,9 +213,9 @@ public class FridgeFragment extends Fragment {
             queue.add(jsonArrayRequest);
         }
 
-        public void checkIngredient(String name) {
+        private void checkIngredient(String name) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/requestExpiryDate?ingredient=" + name;
+            String url = "http://20.53.224.7:8086/requestExpiryDate?ingredient=" + name + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             StringRequest stringRequest = new StringRequest
                     (Request.Method.GET, url, new Response.Listener<String>() {
@@ -256,12 +259,12 @@ public class FridgeFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    public void addIngredient(String name) {
+    private void addIngredient(String name) {
         IngredientFetching ingredient = new IngredientFetching();
         ingredient.checkIngredient(name);
     }
 
-    public void buildFridgeRecyclerView() {
+    private void buildFridgeRecyclerView() {
         RecyclerView mRecyclerView = getView().findViewById(R.id.fridgeRecyclerView);
         mRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
@@ -283,12 +286,12 @@ public class FridgeFragment extends Fragment {
         });
     }
 
-    public void insertItem(JSONObject insert) {
+    private void insertItem(JSONObject insert) {
         ingredients.add(ingredients.size(), insert);
         mAdapter.notifyDataSetChanged();
     }
 
-    public void removeItem(int position) {
+    private void removeItem(int position) {
         IngredientFetching ingredient = new IngredientFetching();
         try {
             ingredient.deleteIngredient(String.valueOf(userID), ingredients.get(position).getString("name"));
@@ -299,7 +302,7 @@ public class FridgeFragment extends Fragment {
         mAdapter.notifyItemRemoved(position);
     }
 
-    public void editItem(int position, JSONObject editedItem) {
+    private void editItem(int position, JSONObject editedItem) {
         IngredientFetching ingredient = new IngredientFetching();
         ingredient.updateExpiryDate(String.valueOf(userID), editedItem);
         ingredients.set(position, editedItem);

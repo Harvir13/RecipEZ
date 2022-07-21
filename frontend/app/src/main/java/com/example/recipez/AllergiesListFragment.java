@@ -60,9 +60,9 @@ public class AllergiesListFragment extends Fragment {
             myStaticMember = 1;
         }
 
-        public void requestAllergiesList(String userID, View view) {
+        private void requestAllergiesList(String userID, View view) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/getRestrictions?userid=" + userID;
+            String url = "http://20.53.224.7:8082/getRestrictions?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                 @Override
@@ -91,13 +91,14 @@ public class AllergiesListFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void deleteAllergy(String userID, String ingredient) {
+        private void deleteAllergy(String userID, String ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
             String url = "http://20.53.224.7:8082/deleteRestrictions";
 
             Map<String, String> jsonParams = new HashMap();
             jsonParams.put("userID", userID);
             jsonParams.put("restriction", ingredient);
+            jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest
                     (Request.Method.PUT, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
@@ -114,7 +115,7 @@ public class AllergiesListFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void addAllergy(String userID, String ingredient) {
+        private void addAllergy(String userID, String ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
             String url = "http://20.53.224.7:8082/addRestrictions";
 
@@ -122,6 +123,7 @@ public class AllergiesListFragment extends Fragment {
             try {
                 jsonParams.put("userID", userID);
                 jsonParams.put("restriction", ingredient);
+                jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -141,9 +143,9 @@ public class AllergiesListFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void getIngredientSuggestions(String string) {
+        private void getIngredientSuggestions(String string) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/getIngredientSuggestions?string=" + string;
+            String url = "http://20.53.224.7:8086/getIngredientSuggestions?string=" + string + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
             JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                         @Override
@@ -212,14 +214,14 @@ public class AllergiesListFragment extends Fragment {
         });
     }
 
-    public void removeItem(int position) {
+    private void removeItem(int position) {
         IngredientFetching ingredient = new IngredientFetching();
         ingredient.deleteAllergy(String.valueOf(userID), allergiesList.get(position));
         allergiesList.remove(position);
         mAdapter.notifyItemRemoved(position);
     }
 
-    public void addItem(String restriction) {
+    private void addItem(String restriction) {
         IngredientFetching ingredient = new IngredientFetching();
         ingredient.addAllergy(String.valueOf(userID), restriction);
         allergiesList.add(allergiesList.size(), restriction);
@@ -252,7 +254,7 @@ public class AllergiesListFragment extends Fragment {
         ingredient.requestAllergiesList(String.valueOf(userID), view);
     }
 
-    public void openAddAllergyDialog() {
+    private void openAddAllergyDialog() {
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_add_ingredient);
 
