@@ -136,7 +136,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
 
         ingredientList = ingredientList.slice(0,-2)
 
-        fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"]).then(result =>
+        fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"]).then(result =>
             result.json()
         ).then(data => {
             if (data["dietaryRestrictions"] === undefined || data["dietaryRestrictions"].length === 0) {
@@ -236,11 +236,12 @@ function checkForTitles(recipeList) {
 // expects ?userid=xxx where ingredientsinpantry is non-empty
 // should now expect ?userid=xx !!!
 app.get("/generateSuggestedRecipesList", async (req, res) => {
+    console.log("generate suggested recipes")
     verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query)
 
 
-        fetch("http://" + ip + ":8086/requestIngredients?userid=" + req.query["userid"]).then (response =>
+        fetch("http://" + ip + ":8086/requestIngredients?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"]).then (response =>
             response.json()
         ).then(ingredientResponse => {
             console.log(ingredientResponse)
@@ -251,11 +252,12 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
             }
 
             ingredients = ingredients.split(0,-1)
+            console.log(ingredients)
             
             var missingIngredientThreshold = 4 // recipes will be suggested if the user is missing at most 4 ingredients
 
             var skipRestrictions = 0
-            fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"]).then(result =>
+            fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"]).then(result =>
                 result.json()
             ).then(data => {
                 console.log(data)
@@ -272,6 +274,8 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
                     console.log("recipes returned: " + data)
                     var recipesWithTitles = checkForTitles(data)
                     var retList = []
+                    console.log("Recipe with titles:")
+                    console.log(recipesWithTitles)
                     var passesDietaryRestrictionsCheck
                     for (let j = 0; j < recipesWithTitles.length; j++) {
 

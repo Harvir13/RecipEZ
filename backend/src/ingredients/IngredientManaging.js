@@ -95,7 +95,6 @@ app.post("/updateExpiryDate", async (req, res) => {
 
 //expects {ingredient: xxx}
 app.get("/searchForIngredient", async (req, res) => {
-	verify(req.query["googlesignintoken"]).then(() => {
 		fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
 		req.query["ingredient"] + "&number=1&apiKey=" + API_KEY, {
 			method: "GET",
@@ -108,7 +107,6 @@ app.get("/searchForIngredient", async (req, res) => {
 		}).catch((err) => {
 			res.status(400).send(err);
 		});
-	});
 });
 
 // expects {string: xxx}
@@ -180,6 +178,8 @@ app.get("/requestExpiryDate", async (req, res) => {
 
 // expects body of {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/addIngredient", async (req, res) => {
+	console.log("add ingredient: ")
+	console.log(req.body)
 	verify(req.body.googleSignInToken).then(() => {
 		fetch("http://20.53.224.7:8086/searchForIngredient?ingredient=" + req.body.ingredient, {
 		method: "GET",
