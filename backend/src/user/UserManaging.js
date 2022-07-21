@@ -24,7 +24,6 @@ async function verify(token) {
   }
 
 app.get("/checkUserExists", async (req, res) => {
-    try {
         console.log("token: " + req.query["googlesignintoken"])
         verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query);
@@ -52,13 +51,10 @@ app.get("/checkUserExists", async (req, res) => {
                 console.log(data)
                 res.send(data)
             }
-        })})
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
-    
+        })}).catch ((err) => {
+            console.log(err)
+            res.status(400).send(err)
+        }) 
 })
 
 app.post('/storeUserToken', (req, res) => {
