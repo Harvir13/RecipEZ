@@ -95,11 +95,12 @@ public class FridgeFragment extends Fragment {
 
         private void deleteIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/deleteIngredient" + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.53.224.7:8086/deleteIngredient";
 
             Map<String, String> jsonParams = new HashMap();
             jsonParams.put("userid", userID);
             jsonParams.put("ingredient", ingredient);
+            jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest
                     (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
@@ -118,13 +119,14 @@ public class FridgeFragment extends Fragment {
 
         private void storeIngredient(String userID, JSONObject ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/addIngredient" + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.53.224.7:8086/addIngredient";
 
             Map<String, String> jsonParams = new HashMap();
             try {
                 jsonParams.put("userid", userID);
                 jsonParams.put("ingredient", ingredient.getString("name"));
                 jsonParams.put("expiry", ingredient.getString("expiry"));
+                jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -146,13 +148,14 @@ public class FridgeFragment extends Fragment {
 
         private void updateExpiryDate(String userID, JSONObject ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/updateExpiryDate" + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.53.224.7:8086/updateExpiryDate";
 
             Map<String, String> jsonParams = new HashMap();
             try {
                 jsonParams.put("userid", userID);
                 jsonParams.put("ingredient", ingredient.getString("name"));
                 jsonParams.put("expiry", ingredient.getString("expiry"));
+                jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
             } catch (Exception e) {
                 e.printStackTrace();
             }

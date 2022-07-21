@@ -93,11 +93,12 @@ public class AllergiesListFragment extends Fragment {
 
         private void deleteAllergy(String userID, String ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/deleteRestrictions" + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.53.224.7:8082/deleteRestrictions";
 
             Map<String, String> jsonParams = new HashMap();
             jsonParams.put("userID", userID);
             jsonParams.put("restriction", ingredient);
+            jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest
                     (Request.Method.PUT, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
@@ -116,12 +117,13 @@ public class AllergiesListFragment extends Fragment {
 
         private void addAllergy(String userID, String ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/addRestrictions" + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.53.224.7:8082/addRestrictions";
 
             Map<String, String> jsonParams = new HashMap();
             try {
                 jsonParams.put("userID", userID);
                 jsonParams.put("restriction", ingredient);
+                jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
             } catch (Exception e) {
                 e.printStackTrace();
             }
