@@ -65,9 +65,9 @@ public class FridgeFragment extends Fragment {
             myStaticMember = 1;
         }
 
-        public void requestIngredients(String userID) {
+        private void requestIngredients(String userID) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/requestIngredients?userid=" + userID;
+            String url = "http://20.53.224.7:8086/requestIngredients?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                 @Override
@@ -93,9 +93,9 @@ public class FridgeFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void deleteIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
+        private void deleteIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/deleteIngredient";
+            String url = "http://20.53.224.7:8086/deleteIngredient" + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             Map<String, String> jsonParams = new HashMap();
             jsonParams.put("userid", userID);
@@ -116,9 +116,9 @@ public class FridgeFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void storeIngredient(String userID, JSONObject ingredient) { // or the actual ingredient, just need the name here
+        private void storeIngredient(String userID, JSONObject ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/addIngredient";
+            String url = "http://20.53.224.7:8086/addIngredient" + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             Map<String, String> jsonParams = new HashMap();
             try {
@@ -144,9 +144,9 @@ public class FridgeFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void updateExpiryDate(String userID, JSONObject ingredient) {
+        private void updateExpiryDate(String userID, JSONObject ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/updateExpiryDate";
+            String url = "http://20.53.224.7:8086/updateExpiryDate" + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             Map<String, String> jsonParams = new HashMap();
             try {
@@ -175,9 +175,9 @@ public class FridgeFragment extends Fragment {
             queue.add(jsonRequest);
         }
 
-        public void getIngredientSuggestions(String string) {
+        private void getIngredientSuggestions(String string) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/getIngredientSuggestions?string=" + string;
+            String url = "http://20.53.224.7:8086/getIngredientSuggestions?string=" + string + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
             JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                         @Override
@@ -210,9 +210,9 @@ public class FridgeFragment extends Fragment {
             queue.add(jsonArrayRequest);
         }
 
-        public void checkIngredient(String name) {
+        private void checkIngredient(String name) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/requestExpiryDate?ingredient=" + name;
+            String url = "http://20.53.224.7:8086/requestExpiryDate?ingredient=" + name + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             StringRequest stringRequest = new StringRequest
                     (Request.Method.GET, url, new Response.Listener<String>() {
