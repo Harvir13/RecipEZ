@@ -115,7 +115,7 @@ public class BookmarkListFragmentNew extends Fragment {
 
                             dialog.dismiss();
                         } else {
-                            Toast.makeText(getActivity(), "Please enter a folder name", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), R.string.empty_folder_name_toast_msg, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

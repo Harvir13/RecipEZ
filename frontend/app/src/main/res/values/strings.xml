@@ -42,4 +42,5 @@
     <string name="dialog_new_folder_title">Create new folder</string>
     <string name="dialog_new_folder_name_input">Enter folder name</string>
     <string name="dialog_new_folder_confirm_button">Done</string>
+    <string name="empty_folder_name_toast_msg">Please enter a folder name</string>
 </resources>
