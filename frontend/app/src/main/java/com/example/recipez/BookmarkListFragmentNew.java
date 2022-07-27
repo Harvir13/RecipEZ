@@ -100,20 +100,34 @@ public class BookmarkListFragmentNew extends Fragment {
                         String folderName = "";
 
                         if (!folderNameInput.getText().toString().equals("")) {
-                            folderName = folderNameInput.getText().toString();
+                            folderName = folderNameInput.getText().toString().trim();
 
-                            List<JSONObject> emptyRecipeList = new ArrayList<>();
-                            folderList.add(new BookmarkFolder(emptyRecipeList, folderName));
+                            boolean folderAlreadyExists = false;
+                            for (int i = 0; i < folderList.size(); i++) {
+                                Log.d(TAG, folderList.get(i).getFolderName());
+                                if (folderList.get(i).getFolderName().equalsIgnoreCase(folderName)) {
+                                    folderAlreadyExists = true;
+                                    break;
+                                }
+                            }
 
-                            Log.d(TAG, "add path to paths list");
-                            addPathToPathsList(userID, folderName);
+                            if (!folderAlreadyExists) {
+                                List<JSONObject> emptyRecipeList = new ArrayList<>();
+                                folderList.add(new BookmarkFolder(emptyRecipeList, folderName));
 
-                            adapter = new BookmarkFolderAdapter(folderList);
-                            adapter.notifyItemInserted(folderList.size() - 1);
-                            bookmarkListRecyclerView.setAdapter(adapter);
-                            bookmarkListRecyclerView.scrollToPosition(folderList.size() - 1);
+                                Log.d(TAG, "adding " + folderName + " to paths list");
+                                addPathToPathsList(userID, folderName);
 
-                            dialog.dismiss();
+                                adapter = new BookmarkFolderAdapter(folderList);
+                                adapter.notifyItemInserted(folderList.size() - 1);
+                                bookmarkListRecyclerView.setAdapter(adapter);
+                                bookmarkListRecyclerView.scrollToPosition(folderList.size() - 1);
+
+                                dialog.dismiss();
+                            } else {
+                                Toast.makeText(getActivity(), R.string.duplicate_folder_name_toast_msg, Toast.LENGTH_SHORT).show();
+                            }
+
                         } else {
                             Toast.makeText(getActivity(), R.string.empty_folder_name_toast_msg, Toast.LENGTH_SHORT).show();
                         }
