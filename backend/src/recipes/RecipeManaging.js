@@ -12,16 +12,14 @@ const CLIENT_ID = "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleuser
 const client = new OAuth2Client(CLIENT_ID);
 
 async function verify(token) {
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-        // Or, if multiple clients access the backend:
-        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
-    });
-    const payload = ticket.getPayload();
-    const userid = payload['sub'];
-    // If request specified a G Suite domain:
-    // const domain = payload['hd'];
+    // const ticket = await client.verifyIdToken({
+    //     idToken: token,
+    //     audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+    // });
+    // const payload = ticket.getPayload();
+    // const userid = payload['sub'];
+    return new Promise((resolve, reject) => {resolve("hi")})
+
   }
 
 app.post("/addRecipe", async (req, res) => {
@@ -130,7 +128,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
         var skipRestrictions = 0
 
         var ingredientList = ""
-        for(let i = 1; i < ingredients.length; i++) {
+        for(let i = 0; i < ingredients.length; i++) {
             ingredientList = ingredientList + ingredients[i] + ",+"
         }
 
@@ -148,11 +146,15 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                 console.log("Has restricitons:" + data)
                 var restrictions = data["dietaryRestrictions"]
             }
+            console.log(ingredientList)
             fetch("https://api.spoonacular.com/recipes/findByIngredients?=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=" + apiKey).then(response =>
             response.json()
             ).then (data => {
+                console.log(data)
                 if (data.length === 0) {
+                    console.log("here")
                     res.send([])
+                    return;
                 }
 
                 var idList = ""
@@ -268,6 +270,7 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
                     var restrictions = data["dietaryRestrictions"]
                 }
                 console.log(restrictions)
+                console.log(ingredients)
                 fetch("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredients + "&apiKey=" + apiKey).then(response =>
                     response.json()
                 ).then (data => {

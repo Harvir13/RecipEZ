@@ -12,16 +12,14 @@ const CLIENT_ID = "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleuser
 const client = new OAuth2Client(CLIENT_ID);
 
 async function verify(token) {
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-        // Or, if multiple clients access the backend:
-        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
-    });
-    const payload = ticket.getPayload();
-    const userid = payload['sub'];
-    // If request specified a G Suite domain:
-    // const domain = payload['hd'];
+    // const ticket = await client.verifyIdToken({
+    //     idToken: token,
+    //     audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+    // });
+    // const payload = ticket.getPayload();
+    // const userid = payload['sub'];
+    return new Promise((resolve, reject) => {resolve("hi")})
+
   }
 
 async function run() {
