@@ -61,6 +61,24 @@ app.get("/requestIngredients", async (req, res) => {
 	});
 });
 
+
+export function requestIngredients(userid, googlesignintoken) {
+	verify(googlesignintoken).then(() => {
+		fetch("http://20.53.224.7:8085/getIngredients?userid=" + userid, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		}
+		}).then((response) => response.text()).then((data) => {
+			console.log(data);
+			res.send(data);
+		}).catch((err) => {
+			res.status(400).send(err);
+		});
+	});
+
+}
+
 // expects {userid: xxx, ingredient: xxx}
 app.post("/deleteIngredient", async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {

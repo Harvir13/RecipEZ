@@ -1,10 +1,14 @@
 var axios = require("axios");
-const { JWTAccess } = require("google-auth-library");
+var UserManaging = require("../src/user/UserManaging.js");
+var IngredientManaging = require('../src/ingredients/IngredientManaging.js');
 // const fetch = require("node-fetch");
 
 const RecipeManagingURL = "http://20.53.224.7:8084"
 
 // addRecipe tests
+
+jest.mock('../src/user/UserManaging.js')
+jest.mock('../src/ingredients/IngredientManaging.js')
 
 test("Success", () => {
     axios.post(RecipeManagingURL + "/addRecipe", {
@@ -62,6 +66,16 @@ test("Success", () => {
 //requestFilteredRecipes tests
 
 test("Invalid list of filters", () => {
+
+    UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+        if(userid === 21) {
+            return ["bread"]
+        }
+        else {
+            return []
+        }
+    })
+
     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=21&ingredients=apples,sugar&filters=italian,gluten-free"
         ).then(response => {
             expect(response.status).toEqual(454)
@@ -70,6 +84,16 @@ test("Invalid list of filters", () => {
 })
 
 test("Invalid list of ingredients", () => {
+
+    UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+        if(userid === 21) {
+            return ["bread"]
+        }
+        else {
+            return []
+        }
+    })
+
     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=21&ingredients=asdfasdfadsf-asdf&filters=vegetarian"
         ).then(response => {
             expect(response.status).toEqual(200)
@@ -78,6 +102,16 @@ test("Invalid list of ingredients", () => {
 })
 
 test("Success", () => {
+
+    UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+        if(userid === 21) {
+            return ["bread"]
+        }
+        else {
+            return []
+        }
+    })
+
     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=21&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=vegetarian,glutenFree"
         ).then(response => {
             expect(response.status).toEqual(200)
@@ -89,6 +123,30 @@ test("Success", () => {
 
 
 test("No Ingredients", () => {
+
+    UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+        if(userid === 21) {
+            return ["bread"]
+        } else if (userid === 22) {
+            return ["rice"]
+        } else {
+            return []
+        }
+    })
+
+    IngredientManaging.requestIngredients = jest.fn.mockImplementation((userid, googlesignintoken) => {
+        if (userid === 22) {
+            return []
+        } else if (userid === 23) {
+            return ["Breadfruit"]
+        } else if (userid === 21) {
+            return ["lettuce","tomatoes","apple","banana","rice","bread"]
+        }
+        else {
+            return []
+        }
+    })
+
     axios.get(RecipeManagingURL + "/generateSuggestedRecipes?userid=22"
         ).then(response => {
             expect(response.status).toEqual(200)
@@ -97,6 +155,17 @@ test("No Ingredients", () => {
 })
 
 test("Not enough ingredients to make a recipe", () => {
+
+    UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+        if(userid === 21) {
+            return ["bread"]
+        } else if (userid === 22) {
+            return ["rice"]
+        } else {
+            return []
+        }
+    })
+
     axios.get(RecipeManagingURL + "/generateSuggestedRecipes?userid=23"
         ).then(response => {
             expect(response.status).toEqual(200)
@@ -104,7 +173,18 @@ test("Not enough ingredients to make a recipe", () => {
         })
 })
 
-test("Not enough ingredients to make a recipe", () => {
+test("Success", () => {
+
+    UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+        if(userid === 21) {
+            return ["bread"]
+        } else if (userid === 22) {
+            return ["rice"]
+        } else {
+            return []
+        }
+    })
+
     axios.get(RecipeManagingURL + "/generateSuggestedRecipes?userid=21"
         ).then(response => {
             expect(response.status).toEqual(200)
