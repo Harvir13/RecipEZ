@@ -2,7 +2,7 @@ import express from "express";
 import fetch from "node-fetch";
 import {OAuth2Client} from 'google-auth-library';
 
-const API_KEY = "c3f5daa174074a7994e8e6803d3b2687";
+const API_KEY = "3bf3731cdfe2466dbcc93779c1105a60";
 const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
 
 var app = express();
@@ -12,14 +12,14 @@ const CLIENT_ID = "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleuser
 const client = new OAuth2Client(CLIENT_ID);
 
 async function verify(token) {
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-        // Or, if multiple clients access the backend:
-        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
-    });
-    const payload = ticket.getPayload();
-    const userid = payload['sub'];
+    // const ticket = await client.verifyIdToken({
+    //     idToken: token,
+    //     audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+    //     // Or, if multiple clients access the backend:
+    //     //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+    // });
+    // const payload = ticket.getPayload();
+    // const userid = payload['sub'];
     // If request specified a G Suite domain:
     // const domain = payload['hd'];
   }
@@ -34,31 +34,30 @@ async function run() {
 
 run();
 
-setInterval(function() {
-	sendExpiryNotification();
-}, 300000)
+// setInterval(function() {
+// 	sendExpiryNotification();
+// }, 300000)
 
 //endpoint for TA to test notifications
 app.get("/getNotification", async(req, res) => {
-	console.log("here");
 	sendExpiryNotification();
-	res.send({"result": "Sent notificaiton"});
+	res.send({"result": "Sent notification"});
 });
 
 //expects {userid: xxx}
 app.get("/requestIngredients", async (req, res) => {
-	console.log(req.query)
 	verify(req.query["googlesignintoken"]).then(() => {
-		fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"], {
+		fetch("http://localhost:8085/getIngredients?userid=" + req.query["userid"], {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
 		}
-		}).then((response) => response.text()).then((data) => {
-			console.log(data);
-			res.send(data);
-		}).catch((err) => {
-			res.status(400).send(err);
+		}).then((response) => {
+			if (response.status != 200) return response;
+			else return response.text();
+		}).then((data) => {
+			if (data.status == 404) res.status(data.status).send(data);
+			else res.send(data);
 		});
 	});
 });
@@ -66,14 +65,18 @@ app.get("/requestIngredients", async (req, res) => {
 // expects {userid: xxx, ingredient: xxx}
 app.post("/deleteIngredient", async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {
-		fetch("http://20.53.224.7:8085/removeIngredient", {
+		fetch("http://localhost:8085/removeIngredient", {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(req.body)
-        }).then((response) => response.json()).then((data) => res.send(data)).catch((err) => {
-			res.status(400).send(err);
+        }).then((response) => {
+			if (response.status != 200) return response;
+			else return response.json();
+		}).then((data) => {
+			if (data.status == 404) res.status(data.status).send(data);
+			else res.send(data);
 		});
 	}); 
 });
@@ -81,48 +84,36 @@ app.post("/deleteIngredient", async (req, res) => {
 // expects {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/updateExpiryDate", async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {
-		fetch("http://20.53.224.7:8085/changeExpiry", {
+		fetch("http://localhost:8085/changeExpiry", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify(req.body)
-		}).then((response) => response.text()).then((data) => res.send(data)).catch((err) => {
-			res.status(400).send(err);
+		}).then((response) => {
+			if (response.status != 200) return response;
+			else return response.text();
+		}).then((data) => {
+			if (data.status == 404 || data.status == 405) res.status(data.status).send(data);
+			else res.send(data);
 		});
 	});
 });
 
 //expects {ingredient: xxx}
 app.get("/searchForIngredient", async (req, res) => {
-		fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
-		req.query["ingredient"] + "&number=1&apiKey=" + API_KEY, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			}
-		}
-		).then((response) => response.json()).then((data) => {
-			res.send(data.results);
-		}).catch((err) => {
-			res.status(400).send(err);
-		});
+	spoonacularSearch(req.query["ingredient"]).then((data) => {
+		res.send(data.results);
+	});
 });
 
 // expects {string: xxx}
 app.get("/getIngredientSuggestions", async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
-		fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
-		req.query["string"] + "&apiKey=" + API_KEY, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			}
-		}
-		).then((response) => response.json()).then((data) => {
+		spoonacularSuggest(req.query["string"]).then((data) => {
 			res.send(data.results);
 		}).catch((err) => {
-			res.status(400).send(err);
+			res.status(err.status).send(err);
 		});
 	});
 });
@@ -130,12 +121,7 @@ app.get("/getIngredientSuggestions", async (req, res) => {
 // expects {ingredient: xxx}
 app.get("/requestExpiryDate", async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
-		fetch("https://shelf-life-api.herokuapp.com/search?q=" + req.query["ingredient"], {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-		}
-		}).then((response) => response.json()).then((data) => {
+		shelfLifeSearch(req.query["ingredient"]).then((data) => {
 			if (data.length === 0 || data.code === 500) {
 				res.send("-1");
 				return;
@@ -144,52 +130,36 @@ app.get("/requestExpiryDate", async (req, res) => {
 			let desiredIngredient;
 			data.forEach((ingredient) => {
 				let generalName = ingredient.name;
-				//let generalName = ingredient.name.split('-')
-				//console.log(generalName[0].trim().toLowerCase())
-				//console.log(req.query["ingredient"].toLowerCase())
-				//console.log(generalName)
 				let levDistance = levenshtein_distance(generalName, req.query["ingredient"]);
-				console.log("" + generalName + " : " + levDistance);
 				if (levDistance < minLevDistance) {
 					minLevDistance = levDistance;
 					desiredIngredient = ingredient;
 				}
 			});
-			fetch("https://shelf-life-api.herokuapp.com/guides/" + desiredIngredient.id, {
-				method: "GET",
-				Headers: {
-					"Content-Type": "application/json",
-				}
-			}).then((response) => response.json()).then((expiryData) => {
+			shelfLifeGuide(desiredIngredient.id).then((expiryData) => {
 				let wantedMethod = null;
 				expiryData.methods.forEach((method) => {
 					if (method.location == "Refrigerator") wantedMethod = method;
 					else if (method.location == "Pantry" && wantedMethod == null) wantedMethod = method;
 					else wantedMethod = method;
 				});
-				console.log(expiryData);
 				res.send((wantedMethod.expirationTime + Math.round(Date.now() / 1000)).toString());
 			});
-		}).catch((err) => {
-			res.status(400).send(err);
 		});
 	});
 });
 
 // expects body of {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/addIngredient", async (req, res) => {
-	console.log("add ingredient: ")
-	console.log(req.body)
 	verify(req.body.googleSignInToken).then(() => {
-		fetch("http://20.53.224.7:8086/searchForIngredient?ingredient=" + req.body.ingredient, {
+		fetch("http://localhost:8086/searchForIngredient?ingredient=" + req.body.ingredient, {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
 		},
 		}).then((response) => response.json()).then((spoonacularIng) => {
-			console.log(spoonacularIng);
 			if (spoonacularIng.length === 0) {
-				res.send({"result": "No ingredient found"});
+				res.status(410).send(new Error("Error: no ingredient found in Spoonacular API"));
 				return;
 			}
 			let ingredient = {
@@ -200,15 +170,18 @@ app.post("/addIngredient", async (req, res) => {
 					image: spoonacularIng[0].image,
 				}
 			};
-			fetch("http://20.53.224.7:8085/storeIngredient", {
+			fetch("http://localhost:8085/storeIngredient", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(ingredient)
-			}).then((response) => response.json()).then((data) => {
-				console.log(data)
-				res.send(data.ingredient);
+			}).then((response) => {
+				if (response.status != 200) return response;
+				else return response.json();
+			}).then((data) => {
+				if (data.status == 404 || data.status == 405) return res.status(data.status).send(data);
+				else return res.send(data.ingredient);
 			});
 		}).catch((err) => {
 			res.status(400).send(err);
@@ -219,15 +192,17 @@ app.post("/addIngredient", async (req, res) => {
 // expects {userid: xxx, time: xxx}
 app.get("/scanExpiryDates", async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
-		fetch("http://20.53.224.7:8085/usersWithExpiringIngredients?time=" + req.query["time"], {
+		fetch("http://localhost:8085/usersWithExpiringIngredients?time=" + req.query["time"], {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
 			},
-		}).then((response) => response.json()).then((data) => {
-			res.send(data);
-		}).catch((err) => {
-			res.status(400).send(err);
+		}).then((response) => {
+			if (response.status != 200) return response;
+			else return response.json();
+		}).then((data) => {
+			if (data.status == 405) res.status(data.status).send(data);
+			else res.send(data);
 		});
 	});
 });
@@ -235,26 +210,30 @@ app.get("/scanExpiryDates", async (req, res) => {
 // expects {userid: xxx, time: zzz}
 app.get("/expiringIngredients", async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
-		fetch("http://20.53.224.7:8085/getIngredients?userid=" + req.query["userid"], {
+		if (req.query["time"] < 0) return res.status(405).send(new Error("Error: invalid expiry value"));
+		fetch("http://localhost:8085/getIngredients?userid=" + req.query["userid"], {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
 			},
-		}).then((response) => response.json()).then((data) => {
-			let expiringSoon = [];
-			data.forEach((ingredient) => {
-				let ingDate = new Date(0);
-				let currDate = new Date(0);
-				ingDate.setUTCSeconds(ingredient.expiry - (86400 * 2)); // 86400 = 1 day in seconds
-				currDate.setUTCSeconds(parseInt(req.query["time"], 10));
-				if (ingDate <= currDate) {
-					console.log(ingredient)
-					expiringSoon.push(ingredient);
-				}
-			});
-			res.send(expiringSoon);
-		}).catch((err) => {
-			res.status(400).send(err);
+		}).then((response) => {
+			if (response.status != 200) return response;
+			else return response.json();
+		}).then((data) => {
+			if (data.status == 404) res.status(data.status).send(data);
+			else {
+				let expiringSoon = [];
+				data.forEach((ingredient) => {
+					let ingDate = new Date(0);
+					let currDate = new Date(0);
+					ingDate.setUTCSeconds(ingredient.expiry - (86400 * 2)); // 86400 = 1 day in seconds
+					currDate.setUTCSeconds(parseInt(req.query["time"], 10));
+					if (ingDate <= currDate) {
+						expiringSoon.push(ingredient);
+					}
+				});
+				res.send(expiringSoon);
+			}
 		});
 	});
 });
@@ -298,7 +277,7 @@ function levenshtein_distance(inputString, realString) {
 function sendExpiryNotification(res) {
 	let currTime = Math.round(Date.now() / 1000).toString();
 	console.log("Current time: " + currTime)
-	fetch("http://20.53.224.7:8086/scanExpiryDates?time=" + currTime, {
+	fetch("http://localhost:8086/scanExpiryDates?time=" + currTime, {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json"
@@ -358,8 +337,52 @@ function sendExpiryNotification(res) {
 	});
 }
 
-// DO WE STILL NEED THIS
-app.get("/test", async (req, res) => {
-	let dist = levenshtein_distance(req.query["input"], req.query["word"]);
-	res.send(dist.toString());
-});
+async function spoonacularSearch(ingredient) {
+	const res = await fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
+		ingredient + "&number=1&apiKey=" + API_KEY, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			}
+		}).catch((err) => {
+			return err;
+		});
+	return res.json();
+}
+
+async function spoonacularSuggest(string) {
+	const res = await fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
+		string + "&apiKey=" + API_KEY, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			}
+		}).catch((err) => {
+			return err;
+		});
+	return res.json();
+}
+
+async function shelfLifeSearch(ingredient) {
+	const res = await fetch("https://shelf-life-api.herokuapp.com/search?q=" + ingredient, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		}
+	}).catch((err) => {
+		return err;
+	});
+	return res.json();
+}
+
+async function shelfLifeGuide(id) {
+	const res = await fetch("https://shelf-life-api.herokuapp.com/guides/" + id, {
+		method: "GET",
+		Headers: {
+			"Content-Type": "application/json",
+		}
+	}).catch((err) => {
+		return err;
+	});
+	return res.json();
+}
