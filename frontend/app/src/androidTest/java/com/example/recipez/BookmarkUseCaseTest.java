@@ -4,6 +4,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.pressBack;
+import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -49,6 +50,7 @@ public class BookmarkUseCaseTest {
     public void registerIdlingResource() {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
     }
+
     @After
     public void unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
@@ -106,8 +108,10 @@ public class BookmarkUseCaseTest {
         onView(withId(R.id.bookmark_list_recycler_view)).check(matches(hasChildCount(1)));
     }
 
+    // todo: THIS TEST WORKS but currently cannot delete recipe from bookmark, so these recipes
+    //       can't be re-added. so it will fail rn
     @Test
-    public void AddRecipesToFolderTest() {
+    public void AddRecipesToFolderTest() throws InterruptedException {
         // Click on “Recipes” button of bottom nav bar
         // Type “cake balls” in search text input
         // Clicks on card button of recipe “Cake Balls”
@@ -117,18 +121,20 @@ public class BookmarkUseCaseTest {
         // Check for correct toast message
         onView(withId(R.id.recipes)).perform(click());
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("cake balls"), closeSoftKeyboard());
-        onView(allOf(withId(R.id.recipe_card), childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), isDisplayed())).perform(click());
-        onView(allOf(withId(R.id.add_to_bookmark_button), childAtPosition(withId(R.id.recipe_detail_bookmark_button), 3))).perform(scrollTo(), click());
-        onView(allOf(withId(R.id.radio_button_dialog_folder_list), withText("Desserts"), isDisplayed())).perform(click());
+        onView(allOf(withId(androidx.appcompat.R.id.search_src_text), withText("cake balls"), childAtPosition(allOf(withId(androidx.appcompat.R.id.search_plate), childAtPosition(withId(androidx.appcompat.R.id.search_edit_frame), 1)), 0))).perform(pressImeActionButton());
+        onView(allOf(withId(R.id.recipe_card), childAtPosition(childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(withId(R.id.add_to_bookmark_button)).perform(scrollTo(), click());
+        onView(allOf(withId(R.id.radio_button_dialog_folder_list), withText("Desserts"), childAtPosition(childAtPosition(withId(R.id.recycler_view_bookmark_folder_list), 0), 0), isDisplayed())).perform(click());
         onView(withId(R.id.add_to_bookmark_confirm_button)).perform(click());
         onView(withText("Added recipe to Desserts")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 
         // Same procedures for "Apple Pie Bars"
         onView(withId(R.id.recipes)).perform(click());
-        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("apple pie bars"), closeSoftKeyboard());
-        onView(allOf(withId(R.id.recipe_card), childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), isDisplayed())).perform(click());
-        onView(allOf(withId(R.id.add_to_bookmark_button), childAtPosition(withId(R.id.recipe_detail_bookmark_button), 3))).perform(scrollTo(), click());
-        onView(allOf(withId(R.id.radio_button_dialog_folder_list), withText("Desserts"), isDisplayed())).perform(click());
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("APPLE PIE BARS"), closeSoftKeyboard());
+        onView(allOf(withId(androidx.appcompat.R.id.search_src_text), withText("APPLE PIE BARS"), childAtPosition(allOf(withId(androidx.appcompat.R.id.search_plate), childAtPosition(withId(androidx.appcompat.R.id.search_edit_frame), 1)), 0))).perform(pressImeActionButton());
+        onView(allOf(withId(R.id.recipe_card), childAtPosition(childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(withId(R.id.add_to_bookmark_button)).perform(scrollTo(), click());
+        onView(allOf(withId(R.id.radio_button_dialog_folder_list), withText("Desserts"), childAtPosition(childAtPosition(withId(R.id.recycler_view_bookmark_folder_list), 0), 0), isDisplayed())).perform(click());
         onView(withId(R.id.add_to_bookmark_confirm_button)).perform(click());
         onView(withText("Added recipe to Desserts")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 

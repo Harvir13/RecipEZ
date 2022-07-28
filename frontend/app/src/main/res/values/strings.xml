@@ -15,6 +15,7 @@
     <string name="dialog_filter_vegan_checkbox">Vegan</string>
     <string name="dialog_ingredient_list_title">Ingredients</string>
     <string name="filter_ingredient_item_checkbox">Ingredient name</string>
+    <string name="placeholder_no_recipe_text">No recipes found</string>
 
     <!-- Recipe (Details) Fragment -->
     <string name="recipe_detail_title">Recipe Title</string>

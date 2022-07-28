@@ -144,6 +144,8 @@ public class BookmarkListFragmentNew extends Fragment {
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
+        EspressoIdlingResource.increment();
+
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -181,6 +183,9 @@ public class BookmarkListFragmentNew extends Fragment {
 
                             adapter = new BookmarkFolderAdapter(folderList);
                             bookmarkListRecyclerView.setAdapter(adapter);
+
+                            EspressoIdlingResource.decrement();
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

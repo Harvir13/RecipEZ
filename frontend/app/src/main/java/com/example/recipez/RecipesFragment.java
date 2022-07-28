@@ -120,7 +120,6 @@ public class RecipesFragment extends Fragment {
         recipeSearchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                EspressoIdlingResource.increment();
                 currentResultsTitle.setText("Search results for '" + query + "'");
 
                 if (recipeListRecyclerView != null) {
@@ -223,7 +222,8 @@ public class RecipesFragment extends Fragment {
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8084/searchRecipe?recipename=" + recipeName + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
-//        EspressoIdlingResource.increment();
+        EspressoIdlingResource.increment();
+
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
@@ -242,12 +242,12 @@ public class RecipesFragment extends Fragment {
                             recipeListRecyclerView.setLayoutManager(layoutManager);
                             recipeListRecyclerView.setAdapter(recycleAdapter);
 
+                            EspressoIdlingResource.decrement();
                         } catch (JSONException e) {
                             Log.d(TAG, e.toString());
                             e.printStackTrace();
                         }
                         Log.d(TAG, response.toString());
-                        EspressoIdlingResource.decrement();
 
                     }
                 }, new Response.ErrorListener() {
