@@ -43,4 +43,5 @@
     <string name="dialog_new_folder_name_input">Enter folder name</string>
     <string name="dialog_new_folder_confirm_button">Done</string>
     <string name="empty_folder_name_toast_msg">Please enter a folder name</string>
+    <string name="duplicate_folder_name_toast_msg">A folder with the same name already exists</string>
 </resources>

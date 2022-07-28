@@ -43,32 +43,28 @@ public class BookmarkUseCaseTest {
 
     @Test
     public void CreateNewFolderTest() {
-        // 1. Click on “Profile” button of bottom nav bar
+        // Click on “Profile” button of bottom nav bar
+        // Click on “Bookmarked Recipes” card button
+        // Click on “New Folder” button
+        // Click on “Done” button without typing anything in text input field
+        // Check for correct toast message
         onView(withId(R.id.profile)).perform(click());
-
-        // 2. Click on “Bookmarked Recipes” card button
         onView(withId(R.id.bookmarked_list_card)).perform(click());
-
-        // 3. Click on “New Folder” button
         onView(withId(R.id.add_folder_dialog_button)).check(matches(withText("New Folder"))).perform(click());
-
-        // 4. Click on “Done” button without typing anything in text input field
         onView(withId(R.id.dialog_new_folder_confirm_button)).check(matches(withText("Done"))).perform(click());
-        // check for correct toast message
         onView(withText(R.string.empty_folder_name_toast_msg)).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 
-        // 5.1 Type “Desserts” in “Enter folder name” text input field
+        // Type “Desserts” in “Enter folder name” text input field
+        // Click on “Done” button
+        // Check that new folder called "Desserts" is created
         onView(withId(R.id.dialog_new_folder_name_input)).perform(click());
         onView((withId(R.id.dialog_new_folder_name_input))).perform(replaceText("Desserts"), closeSoftKeyboard());
-
-        // 5.2 Click on “Done” button
         onView(withId(R.id.dialog_new_folder_confirm_button)).check(matches(withText("Done"))).perform(click());
-        // check that new folder called "Desserts" is created
         onView(allOf(withId(R.id.folder_name_text), withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0), withText("Desserts")));
 
-        // 6. Click on “Desserts” folder that was just created
+        // Click on “Desserts” folder that was just created
+        // Check that folder is empty
         onView(allOf(withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0), isDisplayed())).perform(click());
-        // check that folder is empty
         onView(withId(R.id.folder_child_recycler_view)).check(matches(hasChildCount(0)));
     }
 
@@ -86,9 +82,21 @@ public class BookmarkUseCaseTest {
 
         // 12. Clicks on the “Confirm” button
 
-        // 13. Repeat Steps 8-12 for “Apple Pie Bars”
+        // 8. Type “Apple Pie Bars” in search text input
 
-        // 14. Repeat Steps 1-2
+        // 9. Clicks on card button of recipe “Apple Pie Bars”
+
+        // 10. Click on button with a bookmark icon underneath recipe image
+
+        // 11. Click on radio button next to “Desserts” in list of bookmark folders
+
+        // 12. Clicks on the “Confirm” button
+
+        // 1. Click on “Profile” button of bottom nav bar
+        onView(withId(R.id.profile)).perform(click());
+
+        // 2. Click on “Bookmarked Recipes” card button
+        onView(withId(R.id.bookmarked_list_card)).perform(click());
 
         // 15. Click on “Desserts” folder
 
@@ -97,7 +105,11 @@ public class BookmarkUseCaseTest {
     // Steps 14 to 19
     @Test
     public void RemoveRecipeFromFolderTest() {
-        // 14. Repeat Steps 1-2
+        // 1. Click on “Profile” button of bottom nav bar
+        onView(withId(R.id.profile)).perform(click());
+
+        // 2. Click on “Bookmarked Recipes” card button
+        onView(withId(R.id.bookmarked_list_card)).perform(click());
 
         // 15. Click on “Desserts” folder
 
@@ -107,13 +119,25 @@ public class BookmarkUseCaseTest {
 
         // 18. Click on “Remove Bookmark” button
 
-        // 19. Repeat Steps 14-15
+        // 1. Click on “Profile” button of bottom nav bar
+        onView(withId(R.id.profile)).perform(click());
+
+        // 2. Click on “Bookmarked Recipes” card button
+        onView(withId(R.id.bookmarked_list_card)).perform(click());
+
+        // 15. Click on “Desserts” folder
     }
 
     // Steps 19 to 21
     @Test
     public void DeleteBookmarkFolderTest() {
-        // 19. Repeat Steps 14-15
+        // 1. Click on “Profile” button of bottom nav bar
+        onView(withId(R.id.profile)).perform(click());
+
+        // 2. Click on “Bookmarked Recipes” card button
+        onView(withId(R.id.bookmarked_list_card)).perform(click());
+
+        // 15. Click on “Desserts” folder
 
         // 20. Click on garbage can icon button next to folder name “Desserts”
 
