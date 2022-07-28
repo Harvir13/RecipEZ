@@ -15,13 +15,11 @@ async function verify(token) {
     // const ticket = await client.verifyIdToken({
     //     idToken: token,
     //     audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-    //     // Or, if multiple clients access the backend:
-    //     //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
     // });
     // const payload = ticket.getPayload();
     // const userid = payload['sub'];
-    // If request specified a G Suite domain:
-    // const domain = payload['hd'];
+    return new Promise((resolve, reject) => {resolve("hi")})
+
   }
 
 async function run() {
@@ -61,6 +59,24 @@ app.get("/requestIngredients", async (req, res) => {
 		});
 	});
 });
+
+
+export function requestIngredients(userid, googlesignintoken) {
+	verify(googlesignintoken).then(() => {
+		fetch("http://20.53.224.7:8085/getIngredients?userid=" + userid, {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		}
+		}).then((response) => response.text()).then((data) => {
+			console.log(data);
+			res.send(data);
+		}).catch((err) => {
+			res.status(400).send(err);
+		});
+	});
+
+}
 
 // expects {userid: xxx, ingredient: xxx}
 app.post("/deleteIngredient", async (req, res) => {

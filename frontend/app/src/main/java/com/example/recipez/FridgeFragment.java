@@ -1,5 +1,7 @@
 package com.example.recipez;
 
+import static java.lang.Long.parseLong;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -161,7 +163,7 @@ public class FridgeFragment extends Fragment {
             }
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest
-                    (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                    (Request.Method.POST, url, new JSONObject(jsonParams), new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.d(TAG, response.toString());
@@ -196,8 +198,7 @@ public class FridgeFragment extends Fragment {
                                 if (ingredientSuggestions.size() == 0) {
                                     Toast.makeText(getActivity().getApplicationContext(), "No ingredients found, please try a different search", Toast.LENGTH_LONG).show();
                                     openAddIngredientDialog();
-                                }
-                                else {
+                                } else {
                                     openSelectIngredientDialog(ingredientSuggestions);
                                 }
                             } catch (JSONException e) {
@@ -223,8 +224,7 @@ public class FridgeFragment extends Fragment {
                         public void onResponse(String response) {
                             if ("-1".equals(response)) {
                                 openIngredientExpiryDialog(name);
-                            }
-                            else {
+                            } else {
                                 JSONObject newIngredient = new JSONObject();
                                 try {
                                     newIngredient.put("name", name);
@@ -395,14 +395,19 @@ public class FridgeFragment extends Fragment {
                         SimpleDateFormat format = new SimpleDateFormat("MMddyyyy");
                         format.setTimeZone(TimeZone.getTimeZone("GMT-8"));
                         String newExpiryDateUnixString = String.valueOf(format.parse(newExpiryDateString).getTime() / 1000L);
-                        addIngredient.put("expiry", newExpiryDateUnixString);
-                        IngredientFetching i = new IngredientFetching();
-                        i.storeIngredient(String.valueOf(userID), addIngredient);
+
+                        if (parseLong(newExpiryDateUnixString) > Integer.MAX_VALUE || parseLong(newExpiryDateUnixString) < Integer.MIN_VALUE) {
+                            Toast.makeText(getActivity(), "Please enter a valid date!", Toast.LENGTH_LONG).show();
+                        } else {
+                            addIngredient.put("expiry", newExpiryDateUnixString);
+                            IngredientFetching i = new IngredientFetching();
+                            i.storeIngredient(String.valueOf(userID), addIngredient);
+
+                            dialog.dismiss();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
-                    dialog.dismiss();
                 }
             }
         });
@@ -456,15 +461,20 @@ public class FridgeFragment extends Fragment {
                         SimpleDateFormat format = new SimpleDateFormat("MMddyyyy");
                         format.setTimeZone(TimeZone.getTimeZone("GMT-8"));
                         String newExpiryDateUnixString = String.valueOf(format.parse(newExpiryDateString).getTime() / 1000L);
-                        JSONObject newIngredientObject = ingredients.get(position);
-                        newIngredientObject.put("expiry", newExpiryDateUnixString);
-                        Log.d(TAG, newExpiryDateUnixString);
-                        editItem(position, newIngredientObject);
+
+                        if (parseLong(newExpiryDateUnixString) > Integer.MAX_VALUE || parseLong(newExpiryDateUnixString) < Integer.MIN_VALUE) {
+                            Toast.makeText(getActivity(), "Please enter a valid date!", Toast.LENGTH_LONG).show();
+                        } else {
+                            JSONObject newIngredientObject = ingredients.get(position);
+                            newIngredientObject.put("expiry", newExpiryDateUnixString);
+                            Log.d(TAG, newExpiryDateUnixString);
+                            editItem(position, newIngredientObject);
+
+                            dialog.dismiss();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
-                    dialog.dismiss();
                 }
             }
         });

@@ -110,7 +110,7 @@ public class RecipesFragment extends Fragment {
                 vegetarianCheckBox = dialog.findViewById(R.id.dialog_filter_vegetarian_checkbox);
                 veganCheckBox = dialog.findViewById(R.id.dialog_filter_vegan_checkbox);
 
-                filterSearchButton = dialog.findViewById(R.id.dialog_filter_search_button);
+                filterSearchButton = dialog.findViewById(R.id.add_to_bookmark_confirm_button);
 
                 dialog.show();
             }
@@ -222,6 +222,8 @@ public class RecipesFragment extends Fragment {
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8084/searchRecipe?recipename=" + recipeName + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
+        EspressoIdlingResource.increment();
+
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
@@ -240,11 +242,13 @@ public class RecipesFragment extends Fragment {
                             recipeListRecyclerView.setLayoutManager(layoutManager);
                             recipeListRecyclerView.setAdapter(recycleAdapter);
 
+                            EspressoIdlingResource.decrement();
                         } catch (JSONException e) {
                             Log.d(TAG, e.toString());
                             e.printStackTrace();
                         }
                         Log.d(TAG, response.toString());
+
                     }
                 }, new Response.ErrorListener() {
                     @Override

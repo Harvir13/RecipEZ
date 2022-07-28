@@ -1,6 +1,8 @@
-import express from 'express';
+import express, { response } from 'express';
 import fetch from 'node-fetch';
 import {OAuth2Client} from 'google-auth-library';
+import * as UserManaging from '../user/UserManaging.js'
+import * as IngredientManaging from '../ingredients/IngredientManaging.js'
 
 var app = express()
 app.use(express.json())
@@ -12,16 +14,14 @@ const CLIENT_ID = "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleuser
 const client = new OAuth2Client(CLIENT_ID);
 
 async function verify(token) {
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-        // Or, if multiple clients access the backend:
-        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
-    });
-    const payload = ticket.getPayload();
-    const userid = payload['sub'];
-    // If request specified a G Suite domain:
-    // const domain = payload['hd'];
+    // const ticket = await client.verifyIdToken({
+    //     idToken: token,
+    //     audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+    // });
+    // const payload = ticket.getPayload();
+    // const userid = payload['sub'];
+    return new Promise((resolve, reject) => {resolve("hi")})
+
   }
 
 app.post("/addRecipe", async (req, res) => {
@@ -121,7 +121,12 @@ app.get("/requestFilteredRecipes", async (req, res) => {
             console.log(filterList)
             var filters = {}
             for (let a = 0; a < filterList.length; a++) {
-                filters[filterList[a]] = true
+                if (filters[filterList[a]] === "vegetarian" || filters[filterList[a]] === "vegan" || filters[filterList[a]] === "glutenFree" || filters[filterList[a]] === "dairyFree") {
+                    filters[filterList[a]] = true
+                }
+                else {
+                    return res.status(454).send({"result": "Invalid filters"})
+                }
             }
 
             console.log(filters)
@@ -130,13 +135,14 @@ app.get("/requestFilteredRecipes", async (req, res) => {
         var skipRestrictions = 0
 
         var ingredientList = ""
-        for(let i = 1; i < ingredients.length; i++) {
+        for(let i = 0; i < ingredients.length; i++) {
             ingredientList = ingredientList + ingredients[i] + ",+"
         }
 
         ingredientList = ingredientList.slice(0,-2)
 
-        fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"]).then(result =>
+        // fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"])
+        UserManaging.getRestrictions(parseInt(req.query["userid"], 10), req.query["googlesignintoken"]).then(result =>
             result.json()
         ).then(data => {
             if (data["dietaryRestrictions"] === undefined || data["dietaryRestrictions"].length === 0) {
@@ -148,11 +154,15 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                 console.log("Has restricitons:" + data)
                 var restrictions = data["dietaryRestrictions"]
             }
-            fetch("https://api.spoonacular.com/recipes/findByIngredients?=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=" + apiKey).then(response =>
+            console.log(ingredientList)
+            fetch("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=" + apiKey).then(response =>
             response.json()
             ).then (data => {
+                console.log(data)
                 if (data.length === 0) {
+                    console.log("here")
                     res.send([])
+                    return;
                 }
 
                 var idList = ""
@@ -241,7 +251,8 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
         console.log(req.query)
 
 
-        fetch("http://" + ip + ":8086/requestIngredients?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"]).then (response =>
+        // fetch("http://" + ip + ":8086/requestIngredients?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"])
+        IngredientManaging.getRestrictions(req.query["userid"], req.query["googlesignintoken"]).then (response =>
             response.json()
         ).then(ingredientResponse => {
             console.log(ingredientResponse)
@@ -257,7 +268,8 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
             var missingIngredientThreshold = 4 // recipes will be suggested if the user is missing at most 4 ingredients
 
             var skipRestrictions = 0
-            fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"]).then(result =>
+            // fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"])
+            UserManaging.getRestrictions(parseInt(req.query["userid"], 10), req.query["googlesignintoken"]).then(result =>
                 result.json()
             ).then(data => {
                 console.log(data)
@@ -268,6 +280,7 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
                     var restrictions = data["dietaryRestrictions"]
                 }
                 console.log(restrictions)
+                console.log(ingredients)
                 fetch("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredients + "&apiKey=" + apiKey).then(response =>
                     response.json()
                 ).then (data => {
@@ -340,6 +353,9 @@ app.get("/getRecipeDetails", async (req, res) => {
         fetch("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=" + apiKey).then(response =>
             response.json()
         ).then(data => {
+            if (!data.hasOwnProperty('ingredients')) {
+                return res.status(455).send({"result": "Recipe does not exist"})
+            }
             var returnObj = {}
             var ingredients = []
             for (let i = 0; i < data["ingredients"].length; i++) {

@@ -11,16 +11,14 @@ const client = new OAuth2Client(CLIENT_ID);
 const ip = "20.53.224.7"
 
 async function verify(token) {
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-        // Or, if multiple clients access the backend:
-        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
-    });
-    const payload = ticket.getPayload();
-    const userid = payload['sub'];
-    // If request specified a G Suite domain:
-    // const domain = payload['hd'];
+    // const ticket = await client.verifyIdToken({
+    //     idToken: token,
+    //     audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+    // });
+    // const payload = ticket.getPayload();
+    // const userid = payload['sub'];
+    return new Promise((resolve, reject) => {resolve("hi")})
+
   }
 
 app.get("/checkUserExists", async (req, res) => {
@@ -171,6 +169,31 @@ app.get("/getRestrictions", async (req, res) => {
             res.status(400).send(err)
         }) 
 })
+
+
+export function getRestrictions(userid, googlesignintoken) {
+    verify(googlesignintoken).then(() => {
+        fetch("http://" + ip + ":8081/getDietaryRestrictions?userid=" + userid).then(response =>
+            response.json()
+        ).then(data => {
+            console.log(data)
+            var retObj = {}
+            retObj["userID"] = data["userID"]
+            if (data["dietaryRestrictions"] === undefined || data["dietaryRestrictions"].length === 0) {
+                retObj["dietaryRestrictions"] = []
+            }
+            else {
+                retObj["dietaryRestrictions"] = data["dietaryRestrictions"]
+            }
+            console.log(retObj)
+            res.send(retObj)
+            
+        })
+    }).catch ((err) => {
+        console.log(err)
+        res.status(400).send(err)
+    }) 
+}
 
 async function run () {
     try {
