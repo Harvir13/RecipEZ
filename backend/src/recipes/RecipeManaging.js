@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { response } from 'express';
 import fetch from 'node-fetch';
 import {OAuth2Client} from 'google-auth-library';
 
@@ -119,7 +119,12 @@ app.get("/requestFilteredRecipes", async (req, res) => {
             console.log(filterList)
             var filters = {}
             for (let a = 0; a < filterList.length; a++) {
-                filters[filterList[a]] = true
+                if (filters[filterList[a]] === "vegetarian" || filters[filterList[a]] === "vegan" || filters[filterList[a]] === "glutenFree" || filters[filterList[a]] === "dairyFree") {
+                    filters[filterList[a]] = true
+                }
+                else {
+                    return res.status(454).send({"result": "Invalid filters"})
+                }
             }
 
             console.log(filters)
@@ -147,7 +152,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                 var restrictions = data["dietaryRestrictions"]
             }
             console.log(ingredientList)
-            fetch("https://api.spoonacular.com/recipes/findByIngredients?=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=" + apiKey).then(response =>
+            fetch("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=" + apiKey).then(response =>
             response.json()
             ).then (data => {
                 console.log(data)
@@ -343,6 +348,9 @@ app.get("/getRecipeDetails", async (req, res) => {
         fetch("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=" + apiKey).then(response =>
             response.json()
         ).then(data => {
+            if (!data.hasOwnProperty('ingredients')) {
+                return res.status(455).send({"result": "Recipe does not exist"})
+            }
             var returnObj = {}
             var ingredients = []
             for (let i = 0; i < data["ingredients"].length; i++) {

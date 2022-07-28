@@ -1,3 +1,4 @@
+import e from 'express';
 import express from 'express';
 import {MongoClient} from 'mongodb';
 
@@ -44,8 +45,8 @@ app.post("/removeFromBookmarkedList", async (req, res) => {
         entryToDelete["recipeID"] = parseInt(req.body["recipeID"], 10)
         client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne(entryToDelete).then(result => {
             console.log(result)
-            if (result["deletedCount"] !== 1) {
-                res.send({"result": "Error occured when deleting"})
+            if (result["deletedCount"] == 0) {
+                res.status(453).send({"result": "Missing recipe from bookmarked list"})
             }
             else {
                 res.send({"result": "Successfully deleted recipe from bookmarked list"})
@@ -79,12 +80,21 @@ app.get("/getBookmarkedRecipes", async (req, res) => {
 //req.body should contain data like {userID: xxx, path:/home/xxx}
 app.post("/addToPathList", async (req, res) => {
         console.log(req.body)
-        var newEntry = req.body
+        var newEntry = {}
         newEntry["userID"] = parseInt(req.body["userID"], 10)
-        client.db("RecipeDB").collection("Paths").insertOne(newEntry).then(result => {
-            console.log(result)
-            res.send({"result": "Successfully added path to path list"})
-        }).catch(err => {
+        newEntry["path"] = req.body["path"]
+        client.db("RecipeDB").collection("Paths").findOne(newEntry).then(result => {
+            if (result != null) {
+                return res.status(456).send({"result": "Path already exists"})
+            }
+            else {
+                client.db("RecipeDB").collection("Paths").insertOne(newEntry).then(result => {
+                    console.log(result)
+                    res.send({"result": "Successfully added path to path list"})
+                })
+            }
+        })
+        .catch(err => {
             console.log(err)
             res.status(400).send(err)
         }) 
@@ -93,12 +103,12 @@ app.post("/addToPathList", async (req, res) => {
 //req.body should contain data like {userID: xxx, recipeID: xxx}
 app.post("/removeFromPathList", async (req, res) => {
         console.log(req.body)
-        var entryToDelete = req.body
+        var entryToDelete = {}
         entryToDelete["userID"] = parseInt(req.body["userID"], 10)
         client.db("RecipeDB").collection("Paths").deleteOne(entryToDelete).then(result => {
             console.log(result)
-            if (result["deletedCount"] !== 1) {
-                res.send({"result": "Error occured when deleting"})
+            if (result["deletedCount"] === 0) {
+                return res.status(457).send({"result": "Path does not exist"})
             }
             else {
                 res.send({"result": "Successfully deleted recipe from paths list"})
