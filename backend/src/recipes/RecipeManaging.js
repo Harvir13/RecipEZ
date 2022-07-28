@@ -2,7 +2,7 @@ import express, { response } from 'express';
 import fetch from 'node-fetch';
 import {OAuth2Client} from 'google-auth-library';
 import * as UserManaging from '../user/UserManaging.js'
-import * as IngredientManaging from '../user/IngredientManaging.js'
+import * as IngredientManaging from '../ingredients/IngredientManaging.js'
 
 var app = express()
 app.use(express.json())
