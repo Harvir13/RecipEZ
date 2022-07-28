@@ -1,6 +1,8 @@
 import express, { response } from 'express';
 import fetch from 'node-fetch';
 import {OAuth2Client} from 'google-auth-library';
+import * as UserManaging from '../user/UserManaging.js'
+import * as IngredientManaging from '../user/IngredientManaging.js'
 
 var app = express()
 app.use(express.json())
@@ -139,7 +141,8 @@ app.get("/requestFilteredRecipes", async (req, res) => {
 
         ingredientList = ingredientList.slice(0,-2)
 
-        fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"]).then(result =>
+        // fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"])
+        UserManaging.getRestrictions(parseInt(req.query["userid"], 10), req.query["googlesignintoken"]).then(result =>
             result.json()
         ).then(data => {
             if (data["dietaryRestrictions"] === undefined || data["dietaryRestrictions"].length === 0) {
@@ -248,7 +251,8 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
         console.log(req.query)
 
 
-        fetch("http://" + ip + ":8086/requestIngredients?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"]).then (response =>
+        // fetch("http://" + ip + ":8086/requestIngredients?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"])
+        IngredientManaging.getRestrictions(req.query["userid"], req.query["googlesignintoken"]).then (response =>
             response.json()
         ).then(ingredientResponse => {
             console.log(ingredientResponse)
@@ -264,7 +268,8 @@ app.get("/generateSuggestedRecipesList", async (req, res) => {
             var missingIngredientThreshold = 4 // recipes will be suggested if the user is missing at most 4 ingredients
 
             var skipRestrictions = 0
-            fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"]).then(result =>
+            // fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"])
+            UserManaging.getRestrictions(parseInt(req.query["userid"], 10), req.query["googlesignintoken"]).then(result =>
                 result.json()
             ).then(data => {
                 console.log(data)

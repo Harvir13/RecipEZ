@@ -170,6 +170,31 @@ app.get("/getRestrictions", async (req, res) => {
         }) 
 })
 
+
+export function getRestrictions(userid, googlesignintoken) {
+    verify(googlesignintoken).then(() => {
+        fetch("http://" + ip + ":8081/getDietaryRestrictions?userid=" + userid).then(response =>
+            response.json()
+        ).then(data => {
+            console.log(data)
+            var retObj = {}
+            retObj["userID"] = data["userID"]
+            if (data["dietaryRestrictions"] === undefined || data["dietaryRestrictions"].length === 0) {
+                retObj["dietaryRestrictions"] = []
+            }
+            else {
+                retObj["dietaryRestrictions"] = data["dietaryRestrictions"]
+            }
+            console.log(retObj)
+            res.send(retObj)
+            
+        })
+    }).catch ((err) => {
+        console.log(err)
+        res.status(400).send(err)
+    }) 
+}
+
 async function run () {
     try {
         console.log("Successfully connected to database")
