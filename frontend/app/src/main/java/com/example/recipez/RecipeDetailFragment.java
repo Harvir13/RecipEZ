@@ -121,7 +121,7 @@ public class RecipeDetailFragment extends Fragment {
                 getRecipesFromBookmarkList(userID, dialog);
 
                 folderListRecyclerView = dialog.findViewById(R.id.recycler_view_bookmark_folder_list);
-                addToBookmarkConfirmButton = dialog.findViewById(R.id.dialog_filter_search_button);
+                addToBookmarkConfirmButton = dialog.findViewById(R.id.add_to_bookmark_confirm_button);
                 existingFolderText = dialog.findViewById(R.id.dialog_filter_list_title);
 
                 removeFromBookmarkButton = dialog.findViewById(R.id.dialog_add_to_bookmark_remove_button);
