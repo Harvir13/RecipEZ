@@ -59,9 +59,7 @@ public class BookmarkUseCaseTest {
     @Test
     public void CreateNewFolderTest() {
         // (Assumes that the user has no pre-existing folders)
-        // Click on “Profile” button of bottom nav bar
-        // Click on “Bookmarked Recipes” card button
-        // Click on “New Folder” button
+        // Click on “Profile” -> “Bookmarked Recipes” -> “New Folder”
         // Click on “Done” button without typing anything in text input field
         // Check for correct toast message and that folder is not created
         onView(withId(R.id.profile)).perform(click());
@@ -73,8 +71,7 @@ public class BookmarkUseCaseTest {
         onView(withId(R.id.bookmark_list_recycler_view)).check(matches(hasChildCount(0)));
 
         // Click on “New Folder” button
-        // Type “Desserts” in “Enter folder name” text input field
-        // Click on “Done” button
+        // Type “Desserts” in “Enter folder name” text input field -> Click on “Done”
         // Check that new folder called "Desserts" is created
         onView(withId(R.id.add_folder_dialog_button)).check(matches(withText("New Folder"))).perform(click());
         onView(withId(R.id.dialog_new_folder_name_input)).perform(click());
@@ -91,11 +88,8 @@ public class BookmarkUseCaseTest {
     @Test
     public void AddDuplicateFolderTest() {
         // (Assumes that a folder named "Desserts" already exists)
-        // Click on “Profile” button of bottom nav bar
-        // Click on “Bookmarked Recipes” card button
-        // Click on “New Folder” button
-        // Type “Desserts” in “Enter folder name” text input field
-        // Click on “Done” button
+        // Click on “Profile” -> “Bookmarked Recipes” -> “New Folder” button
+        // Type “Desserts” in “Enter folder name” text input field -> Click on “Done”
         // Check for correct toast message and that folder is not created
         onView(withId(R.id.profile)).perform(click());
         onView(withId(R.id.bookmarked_list_card)).perform(click());
@@ -108,16 +102,19 @@ public class BookmarkUseCaseTest {
         onView(withId(R.id.bookmark_list_recycler_view)).check(matches(hasChildCount(1)));
     }
 
-    // todo: THIS TEST WORKS but currently cannot delete recipe from bookmark, so these recipes
-    //       can't be re-added. so it will fail rn
+    // todo: need field testing, wrote raw
+    @Test
+    public void InvalidRecipeSearchTest() {
+        // Click on “Recipes” -> Type “asdfasdf” in search text input
+        // Check for correct toast message
+        // Check that no recipes appear
+
+    }
+
     @Test
     public void AddRecipesToFolderTest() throws InterruptedException {
-        // Click on “Recipes” button of bottom nav bar
-        // Type “cake balls” in search text input
-        // Clicks on card button of recipe “Cake Balls”
-        // Click on button with a bookmark icon underneath recipe image
-        // Click on radio button next to “Desserts” in list of bookmark folders
-        // Clicks on the “Confirm” button
+        // Clicks on card button of recipe “Cake Balls” -> Click on bookmark icon button
+        // Click on radio button next to “Desserts” folder -> Clicks on “Confirm”
         // Check for correct toast message
         onView(withId(R.id.recipes)).perform(click());
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("cake balls"), closeSoftKeyboard());
@@ -138,9 +135,7 @@ public class BookmarkUseCaseTest {
         onView(withId(R.id.add_to_bookmark_confirm_button)).perform(click());
         onView(withText("Added recipe to Desserts")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 
-        // Click on “Profile” button of bottom nav bar
-        // Click on “Bookmarked Recipes” card button
-        // Click on “Desserts” folder
+        // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder
         // Check that the folder contains the two recipes
         onView(withId(R.id.profile)).perform(click());
         onView(withId(R.id.bookmarked_list_card)).perform(click());
@@ -150,46 +145,33 @@ public class BookmarkUseCaseTest {
         onView(allOf(withId(R.id.folder_child_recycler_view), childAtPosition(withId(R.id.expandable_folder_layout), 1), withText("Apple Pie Bars")));
     }
 
-    // Steps 14 to 19
+    // todo: need field testing, wrote raw
     @Test
     public void RemoveRecipeFromFolderTest() {
-        // 1. Click on “Profile” button of bottom nav bar
+        // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder -> “Cake Balls” recipe
+        // Click on bookmark icon button -> “Remove Bookmark”
+        // Check for correct toast message
         onView(withId(R.id.profile)).perform(click());
-
-        // 2. Click on “Bookmarked Recipes” card button
         onView(withId(R.id.bookmarked_list_card)).perform(click());
 
-        // 15. Click on “Desserts” folder
+        // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder
+        // Check that the folder no longer contains the "Cake Balls" recipe
 
-        // 16. Clicks on “Cake Balls” recipe
-
-        // 17. Click on button with a bookmark icon underneath recipe image
-
-        // 18. Click on “Remove Bookmark” button
-
-        // 1. Click on “Profile” button of bottom nav bar
-        onView(withId(R.id.profile)).perform(click());
-
-        // 2. Click on “Bookmarked Recipes” card button
-        onView(withId(R.id.bookmarked_list_card)).perform(click());
-
-        // 15. Click on “Desserts” folder
     }
 
-    // Steps 19 to 21
+    // todo: need field testing, wrote raw
     @Test
     public void DeleteBookmarkFolderTest() {
-        // 1. Click on “Profile” button of bottom nav bar
-        onView(withId(R.id.profile)).perform(click());
+        // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder
+        // Check that the folder contains the recipe "Apple Pie Bars"
 
-        // 2. Click on “Bookmarked Recipes” card button
-        onView(withId(R.id.bookmarked_list_card)).perform(click());
+        // Click on garbage can icon button next to folder name “Desserts” -> “Confirm”
+        // Check for correct toast message
+        // Check that the folder is no longer in the list of folders
 
-        // 15. Click on “Desserts” folder
-
-        // 20. Click on garbage can icon button next to folder name “Desserts”
-
-        // 21. Click on “Confirm” button
+        // Click on “Recipes” -> Type “cake balls” in search text input
+        // Clicks on card button of recipe “Cake Balls” -> Click on bookmark icon button
+        // Check that dialog says "This recipe is not in any folders"
     }
 
     private static Matcher<View> childAtPosition(final Matcher<View> parentMatcher, final int position) {
@@ -210,7 +192,7 @@ public class BookmarkUseCaseTest {
         };
     }
 
-    public class ToastMatcher extends TypeSafeMatcher<Root> {
+    public static class ToastMatcher extends TypeSafeMatcher<Root> {
         @Override
         public void describeTo(Description description) {
             description.appendText("is toast");

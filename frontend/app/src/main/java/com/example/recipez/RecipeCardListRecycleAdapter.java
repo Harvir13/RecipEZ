@@ -34,9 +34,9 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d(TAG, "item count " + this.getItemCount());
         View view;
         if (this.getItemCount() == 0) {
+            // todo: come back to this later
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.placeholder_no_recipe, parent, false);
         } else {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_card_cell, parent, false);
@@ -47,8 +47,9 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (this.getItemCount() == 0) {
-
+            Log.d(TAG, "item count " + this.getItemCount());
         } else {
+            Log.d(TAG, "item count " + this.getItemCount());
             try {
                 Picasso.get().load(recipeArrayList.get(position).getString("image")).fit().centerCrop().into(holder.recipeImage);
                 holder.recipeTitle.setText(recipeArrayList.get(position).getString("title"));
