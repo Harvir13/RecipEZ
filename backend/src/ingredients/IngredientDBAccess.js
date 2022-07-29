@@ -22,8 +22,7 @@ run();
 app.get("/getIngredients", async (req, res) => {
     client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.query["userid"], 10) }).then((result) => {
         if (result === null) {
-            console.log("result is empty")
-            res.send([])
+            res.status(404).send(new Error("Error: invalid userID"));
         }
         else {
             console.log(result.ingredients)
@@ -36,7 +35,9 @@ app.get("/getIngredients", async (req, res) => {
 
 // expects body of {userid: xxx, ingredient: {name: xxx, expiry: yyy, image: zzz}}
 app.post("/storeIngredient", async (req, res) => {
+    if (req.body.ingredient.expiry < 0) return res.status(405).send(new Error("Error: invalid expiry value"));
     client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid, 10) }).then((result) => {
+        if (result == null) return res.status(404).send(new Error("Error: invalid userID"));
         let alreadyHaveIng = false;
         result.ingredients.forEach((ingredient => {
             if (ingredient.name == req.body.ingredient.name) alreadyHaveIng = true;
@@ -52,6 +53,7 @@ app.post("/storeIngredient", async (req, res) => {
 // expects body of {userid: xxx, ingredient: xxx}
 app.delete("/removeIngredient", async (req, res) => {
     client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid, 10) }).then((result) => {
+        if (result == null) return res.status(404).send(new Error("Error: invalid userID"));
         let newIngredients = result.ingredients.filter(function (value) {
             return value.name != req.body.ingredient;
         });
@@ -64,6 +66,7 @@ app.delete("/removeIngredient", async (req, res) => {
 
 // expects {time: xxx}
 app.get("/usersWithExpiringIngredients", async (req, res) => {
+    if (req.query["time"] < 0) return res.status(405).send(new Error("Error: invalid expiry value"));
     let expiringUsers = []
     client.db("IngredientDB").collection("Users").find().toArray().then((result) => {
         result.forEach((user) => {
@@ -81,7 +84,9 @@ app.get("/usersWithExpiringIngredients", async (req, res) => {
 
 // expects {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/changeExpiry", async (req, res) => {
+    if (req.body.expiry < 0) return res.status(405).send(new Error("Error: invalid expiry value"));
     client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(req.body.userid, 10) }).then((result) => {
+        if (result == null) return res.status(404).send(new Error("Error: invalid userID"));
         result.ingredients.forEach(function (value) {
             if (value.name == req.body.ingredient) {
                 value.expiry = parseInt(req.body.expiry, 10);
