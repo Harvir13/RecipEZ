@@ -92,7 +92,7 @@ public class BookmarkListFragmentNew extends Fragment {
         sharedpreferences = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE);
         userID = sharedpreferences.getInt("userID", 0);
 
-        getPathsList(userID);
+//        getPathsList(userID);
         getRecipesFromBookmarkList(userID);
 
         bookmarkListRecyclerView = view.findViewById(R.id.bookmark_list_recycler_view);
@@ -166,6 +166,8 @@ public class BookmarkListFragmentNew extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, String.valueOf(response));
+                        folderNames.clear();
+                        folderList.clear();
                         try {
                             JSONArray pathsArray = response.getJSONArray("paths");
                             for (int j = 0; j < pathsArray.length(); j++) {
@@ -203,8 +205,6 @@ public class BookmarkListFragmentNew extends Fragment {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-                        Log.d(TAG, response.toString());
                     }
                 }, new Response.ErrorListener() {
                     @Override
