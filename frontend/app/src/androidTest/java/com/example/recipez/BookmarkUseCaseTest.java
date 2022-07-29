@@ -7,7 +7,9 @@ import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
@@ -36,11 +38,14 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 
 @RunWith(AndroidJUnit4.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BookmarkUseCaseTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule =
@@ -57,7 +62,7 @@ public class BookmarkUseCaseTest {
     }
 
     @Test
-    public void CreateNewFolderTest() {
+    public void Test1_CreateNewFolderTest() {
         // (Assumes that the user has no pre-existing folders)
         // Click on “Profile” -> “Bookmarked Recipes” -> “New Folder”
         // Click on “Done” button without typing anything in text input field
@@ -82,11 +87,11 @@ public class BookmarkUseCaseTest {
         // Click on “Desserts” folder that was just created
         // Check that folder is empty
         onView(allOf(withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0), isDisplayed())).perform(click());
-        onView(withId(R.id.folder_child_recycler_view)).check(matches(hasChildCount(0)));
+        onView(allOf(withId(R.id.folder_child_recycler_view), withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0))).check(doesNotExist());
     }
 
     @Test
-    public void AddDuplicateFolderTest() {
+    public void Test2_AddDuplicateFolderTest() {
         // (Assumes that a folder named "Desserts" already exists)
         // Click on “Profile” -> “Bookmarked Recipes” -> “New Folder” button
         // Type “Desserts” in “Enter folder name” text input field -> Click on “Done”
@@ -102,17 +107,20 @@ public class BookmarkUseCaseTest {
         onView(withId(R.id.bookmark_list_recycler_view)).check(matches(hasChildCount(1)));
     }
 
-    // todo: need field testing, wrote raw
     @Test
-    public void InvalidRecipeSearchTest() {
+    public void Test3_InvalidRecipeSearchTest() {
         // Click on “Recipes” -> Type “asdfasdf” in search text input
         // Check for correct toast message
         // Check that no recipes appear
-
+        onView(withId(R.id.recipes)).perform(click());
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("asdfasdf"), closeSoftKeyboard());
+        onView(allOf(withId(androidx.appcompat.R.id.search_src_text), withText("asdfasdf"), childAtPosition(allOf(withId(androidx.appcompat.R.id.search_plate), childAtPosition(withId(androidx.appcompat.R.id.search_edit_frame), 1)), 0))).perform(pressImeActionButton());
+        onView(allOf(withId(R.id.recipe_card), childAtPosition(childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), 0))).check(doesNotExist());
+        onView(withText("No recipes found!")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
     }
 
     @Test
-    public void AddRecipesToFolderTest() throws InterruptedException {
+    public void Test4_AddRecipesToFolderTest() {
         // Clicks on card button of recipe “Cake Balls” -> Click on bookmark icon button
         // Click on radio button next to “Desserts” folder -> Clicks on “Confirm”
         // Check for correct toast message
@@ -145,37 +153,56 @@ public class BookmarkUseCaseTest {
         onView(allOf(withId(R.id.folder_child_recycler_view), childAtPosition(withId(R.id.expandable_folder_layout), 1), withText("Apple Pie Bars")));
     }
 
-    // todo: need field testing, wrote raw
     @Test
-    public void RemoveRecipeFromFolderTest() {
+    public void Test5_RemoveRecipeFromFolderTest() {
         // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder -> “Cake Balls” recipe
         // Click on bookmark icon button -> “Remove Bookmark”
         // Check for correct toast message
         onView(withId(R.id.profile)).perform(click());
         onView(withId(R.id.bookmarked_list_card)).perform(click());
+        onView(allOf(withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(allOf(withId(R.id.folder_child_recycler_view), childAtPosition(withId(R.id.expandable_folder_layout), 0))).perform(actionOnItemAtPosition(0, click()));
+        onView(withId(R.id.add_to_bookmark_button)).perform(scrollTo(), click());
+        onView(withId(R.id.dialog_add_to_bookmark_remove_button)).perform(click());
+        onView(withText("Removed recipe from bookmark")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 
         // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder
         // Check that the folder no longer contains the "Cake Balls" recipe
-
+        onView(withId(R.id.profile)).perform(click());
+        onView(withId(R.id.bookmarked_list_card)).perform(click());
+        onView(allOf(withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(allOf(withId(R.id.folder_child_recycler_view), childAtPosition(withId(R.id.expandable_folder_layout), 0), withText("Cake Balls"))).check(doesNotExist());
     }
 
-    // todo: need field testing, wrote raw
     @Test
-    public void DeleteBookmarkFolderTest() {
+    public void Test6_DeleteBookmarkFolderTest() {
         // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder
         // Check that the folder contains the recipe "Apple Pie Bars"
+        onView(withId(R.id.profile)).perform(click());
+        onView(withId(R.id.bookmarked_list_card)).perform(click());
+        onView(allOf(withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(allOf(withId(R.id.folder_child_recycler_view), childAtPosition(withId(R.id.expandable_folder_layout), 0), withText("Apple Pie Bars")));
 
         // Click on garbage can icon button next to folder name “Desserts” -> “Confirm”
         // Check for correct toast message
         // Check that the folder is no longer in the list of folders
+        onView(allOf(withId(R.id.folder_delete_button), childAtPosition(childAtPosition(withId(R.id.linear_folder_layout), 0), 1), isDisplayed())).perform(click());
+        onView(allOf(withId(android.R.id.button1), withText("Confirm"), childAtPosition(childAtPosition(withClassName(is("android.widget.ScrollView")), 0), 3))).perform(scrollTo(), click());
+        onView(withText("'Desserts' deleted")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+        onView(allOf(withId(R.id.bookmark_list_recycler_view), hasChildCount(0)));
 
-        // Click on “Recipes” -> Type “cake balls” in search text input
-        // Clicks on card button of recipe “Cake Balls” -> Click on bookmark icon button
+        // Click on “Recipes” -> Type “apple pie bars” in search text input
+        // Clicks on card button of recipe “apple pie bars” -> Click on bookmark icon button
         // Check that dialog says "This recipe is not in any folders"
+        onView(withId(R.id.recipes)).perform(click());
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("APPLE PIE BARS"), closeSoftKeyboard());
+        onView(allOf(withId(androidx.appcompat.R.id.search_src_text), withText("APPLE PIE BARS"), childAtPosition(allOf(withId(androidx.appcompat.R.id.search_plate), childAtPosition(withId(androidx.appcompat.R.id.search_edit_frame), 1)), 0))).perform(pressImeActionButton());
+        onView(allOf(withId(R.id.recipe_card), childAtPosition(childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(withId(R.id.add_to_bookmark_button)).perform(scrollTo(), click());
+        onView(allOf(withId(R.id.dialog_filter_list_title), withText("This recipe is not in any folders")));
     }
 
     private static Matcher<View> childAtPosition(final Matcher<View> parentMatcher, final int position) {
-
         return new TypeSafeMatcher<View>() {
             @Override
             public void describeTo(Description description) {
@@ -210,5 +237,23 @@ public class BookmarkUseCaseTest {
             }
             return false;
         }
+    }
+
+    public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
+        return new TypeSafeMatcher<View>() {
+            int currentIndex = 0;
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("with index: ");
+                description.appendValue(index);
+                matcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                return matcher.matches(view) && currentIndex++ == index;
+            }
+        };
     }
 }
