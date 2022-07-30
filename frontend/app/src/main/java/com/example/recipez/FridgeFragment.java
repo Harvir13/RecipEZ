@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.IdlingResource;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -138,6 +139,7 @@ public class FridgeFragment extends Fragment {
                         @Override
                         public void onResponse(JSONObject response) {
                             insertItem(response);
+                            EspressoIdlingResource.decrement();
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -145,6 +147,7 @@ public class FridgeFragment extends Fragment {
                             Log.d(TAG, error.toString() + "STORE");
                         }
                     });
+            EspressoIdlingResource.increment();
             queue.add(jsonRequest);
         }
 
@@ -204,6 +207,7 @@ public class FridgeFragment extends Fragment {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                            EspressoIdlingResource.decrement();
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -211,6 +215,7 @@ public class FridgeFragment extends Fragment {
                             Log.d(TAG, error.toString());
                         }
                     });
+            EspressoIdlingResource.increment();
             queue.add(jsonArrayRequest);
         }
 
