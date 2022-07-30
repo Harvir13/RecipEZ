@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -62,6 +63,19 @@ public class BookmarkListFragmentNew extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button event
+                Fragment fragment = new ProfileFragment();
+                getParentFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override
@@ -78,7 +92,7 @@ public class BookmarkListFragmentNew extends Fragment {
         sharedpreferences = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE);
         userID = sharedpreferences.getInt("userID", 0);
 
-        getPathsList(userID);
+//        getPathsList(userID);
         getRecipesFromBookmarkList(userID);
 
         bookmarkListRecyclerView = view.findViewById(R.id.bookmark_list_recycler_view);
@@ -144,12 +158,16 @@ public class BookmarkListFragmentNew extends Fragment {
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8084/getRecipes?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
+        EspressoIdlingResource.increment();
+
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, String.valueOf(response));
+                        folderNames.clear();
+                        folderList.clear();
                         try {
                             JSONArray pathsArray = response.getJSONArray("paths");
                             for (int j = 0; j < pathsArray.length(); j++) {
@@ -181,11 +199,12 @@ public class BookmarkListFragmentNew extends Fragment {
 
                             adapter = new BookmarkFolderAdapter(folderList);
                             bookmarkListRecyclerView.setAdapter(adapter);
+
+                            EspressoIdlingResource.decrement();
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-                        Log.d(TAG, response.toString());
                     }
                 }, new Response.ErrorListener() {
                     @Override

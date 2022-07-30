@@ -4,9 +4,12 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.pressBack;
+import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
@@ -35,11 +38,14 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 
 @RunWith(AndroidJUnit4.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BookmarkUseCaseTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule =
@@ -49,17 +55,16 @@ public class BookmarkUseCaseTest {
     public void registerIdlingResource() {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
     }
+
     @After
     public void unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
     }
 
     @Test
-    public void CreateNewFolderTest() {
+    public void Test1_CreateNewFolderTest() {
         // (Assumes that the user has no pre-existing folders)
-        // Click on “Profile” button of bottom nav bar
-        // Click on “Bookmarked Recipes” card button
-        // Click on “New Folder” button
+        // Click on “Profile” -> “Bookmarked Recipes” -> “New Folder”
         // Click on “Done” button without typing anything in text input field
         // Check for correct toast message and that folder is not created
         onView(withId(R.id.profile)).perform(click());
@@ -71,8 +76,7 @@ public class BookmarkUseCaseTest {
         onView(withId(R.id.bookmark_list_recycler_view)).check(matches(hasChildCount(0)));
 
         // Click on “New Folder” button
-        // Type “Desserts” in “Enter folder name” text input field
-        // Click on “Done” button
+        // Type “Desserts” in “Enter folder name” text input field -> Click on “Done”
         // Check that new folder called "Desserts" is created
         onView(withId(R.id.add_folder_dialog_button)).check(matches(withText("New Folder"))).perform(click());
         onView(withId(R.id.dialog_new_folder_name_input)).perform(click());
@@ -83,17 +87,14 @@ public class BookmarkUseCaseTest {
         // Click on “Desserts” folder that was just created
         // Check that folder is empty
         onView(allOf(withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0), isDisplayed())).perform(click());
-        onView(withId(R.id.folder_child_recycler_view)).check(matches(hasChildCount(0)));
+        onView(allOf(withId(R.id.folder_child_recycler_view), withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0))).check(doesNotExist());
     }
 
     @Test
-    public void AddDuplicateFolderTest() {
+    public void Test2_AddDuplicateFolderTest() {
         // (Assumes that a folder named "Desserts" already exists)
-        // Click on “Profile” button of bottom nav bar
-        // Click on “Bookmarked Recipes” card button
-        // Click on “New Folder” button
-        // Type “Desserts” in “Enter folder name” text input field
-        // Click on “Done” button
+        // Click on “Profile” -> “Bookmarked Recipes” -> “New Folder” button
+        // Type “Desserts” in “Enter folder name” text input field -> Click on “Done”
         // Check for correct toast message and that folder is not created
         onView(withId(R.id.profile)).perform(click());
         onView(withId(R.id.bookmarked_list_card)).perform(click());
@@ -107,34 +108,42 @@ public class BookmarkUseCaseTest {
     }
 
     @Test
-    public void AddRecipesToFolderTest() {
-        // Click on “Recipes” button of bottom nav bar
-        // Type “cake balls” in search text input
-        // Clicks on card button of recipe “Cake Balls”
-        // Click on button with a bookmark icon underneath recipe image
-        // Click on radio button next to “Desserts” in list of bookmark folders
-        // Clicks on the “Confirm” button
+    public void Test3_InvalidRecipeSearchTest() {
+        // Click on “Recipes” -> Type “asdfasdf” in search text input
+        // Check for correct toast message
+        // Check that no recipes appear
+        onView(withId(R.id.recipes)).perform(click());
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("asdfasdf"), closeSoftKeyboard());
+        onView(allOf(withId(androidx.appcompat.R.id.search_src_text), withText("asdfasdf"), childAtPosition(allOf(withId(androidx.appcompat.R.id.search_plate), childAtPosition(withId(androidx.appcompat.R.id.search_edit_frame), 1)), 0))).perform(pressImeActionButton());
+        onView(allOf(withId(R.id.recipe_card), childAtPosition(childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), 0))).check(doesNotExist());
+        onView(withText("No recipes found!")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void Test4_AddRecipesToFolderTest() {
+        // Clicks on card button of recipe “Cake Balls” -> Click on bookmark icon button
+        // Click on radio button next to “Desserts” folder -> Clicks on “Confirm”
         // Check for correct toast message
         onView(withId(R.id.recipes)).perform(click());
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("cake balls"), closeSoftKeyboard());
-        onView(allOf(withId(R.id.recipe_card), childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), isDisplayed())).perform(click());
-        onView(allOf(withId(R.id.add_to_bookmark_button), childAtPosition(withId(R.id.recipe_detail_bookmark_button), 3))).perform(scrollTo(), click());
-        onView(allOf(withId(R.id.radio_button_dialog_folder_list), withText("Desserts"), isDisplayed())).perform(click());
+        onView(allOf(withId(androidx.appcompat.R.id.search_src_text), withText("cake balls"), childAtPosition(allOf(withId(androidx.appcompat.R.id.search_plate), childAtPosition(withId(androidx.appcompat.R.id.search_edit_frame), 1)), 0))).perform(pressImeActionButton());
+        onView(allOf(withId(R.id.recipe_card), childAtPosition(childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(withId(R.id.add_to_bookmark_button)).perform(scrollTo(), click());
+        onView(allOf(withId(R.id.radio_button_dialog_folder_list), withText("Desserts"), childAtPosition(childAtPosition(withId(R.id.recycler_view_bookmark_folder_list), 0), 0), isDisplayed())).perform(click());
         onView(withId(R.id.add_to_bookmark_confirm_button)).perform(click());
         onView(withText("Added recipe to Desserts")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 
         // Same procedures for "Apple Pie Bars"
         onView(withId(R.id.recipes)).perform(click());
-        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("apple pie bars"), closeSoftKeyboard());
-        onView(allOf(withId(R.id.recipe_card), childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), isDisplayed())).perform(click());
-        onView(allOf(withId(R.id.add_to_bookmark_button), childAtPosition(withId(R.id.recipe_detail_bookmark_button), 3))).perform(scrollTo(), click());
-        onView(allOf(withId(R.id.radio_button_dialog_folder_list), withText("Desserts"), isDisplayed())).perform(click());
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("APPLE PIE BARS"), closeSoftKeyboard());
+        onView(allOf(withId(androidx.appcompat.R.id.search_src_text), withText("APPLE PIE BARS"), childAtPosition(allOf(withId(androidx.appcompat.R.id.search_plate), childAtPosition(withId(androidx.appcompat.R.id.search_edit_frame), 1)), 0))).perform(pressImeActionButton());
+        onView(allOf(withId(R.id.recipe_card), childAtPosition(childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(withId(R.id.add_to_bookmark_button)).perform(scrollTo(), click());
+        onView(allOf(withId(R.id.radio_button_dialog_folder_list), withText("Desserts"), childAtPosition(childAtPosition(withId(R.id.recycler_view_bookmark_folder_list), 0), 0), isDisplayed())).perform(click());
         onView(withId(R.id.add_to_bookmark_confirm_button)).perform(click());
         onView(withText("Added recipe to Desserts")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 
-        // Click on “Profile” button of bottom nav bar
-        // Click on “Bookmarked Recipes” card button
-        // Click on “Desserts” folder
+        // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder
         // Check that the folder contains the two recipes
         onView(withId(R.id.profile)).perform(click());
         onView(withId(R.id.bookmarked_list_card)).perform(click());
@@ -144,50 +153,56 @@ public class BookmarkUseCaseTest {
         onView(allOf(withId(R.id.folder_child_recycler_view), childAtPosition(withId(R.id.expandable_folder_layout), 1), withText("Apple Pie Bars")));
     }
 
-    // Steps 14 to 19
     @Test
-    public void RemoveRecipeFromFolderTest() {
-        // 1. Click on “Profile” button of bottom nav bar
+    public void Test5_RemoveRecipeFromFolderTest() {
+        // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder -> “Cake Balls” recipe
+        // Click on bookmark icon button -> “Remove Bookmark”
+        // Check for correct toast message
         onView(withId(R.id.profile)).perform(click());
-
-        // 2. Click on “Bookmarked Recipes” card button
         onView(withId(R.id.bookmarked_list_card)).perform(click());
+        onView(allOf(withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(allOf(withId(R.id.folder_child_recycler_view), childAtPosition(withId(R.id.expandable_folder_layout), 0))).perform(actionOnItemAtPosition(0, click()));
+        onView(withId(R.id.add_to_bookmark_button)).perform(scrollTo(), click());
+        onView(withId(R.id.dialog_add_to_bookmark_remove_button)).perform(click());
+        onView(withText("Removed recipe from bookmark")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 
-        // 15. Click on “Desserts” folder
-
-        // 16. Clicks on “Cake Balls” recipe
-
-        // 17. Click on button with a bookmark icon underneath recipe image
-
-        // 18. Click on “Remove Bookmark” button
-
-        // 1. Click on “Profile” button of bottom nav bar
+        // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder
+        // Check that the folder no longer contains the "Cake Balls" recipe
         onView(withId(R.id.profile)).perform(click());
-
-        // 2. Click on “Bookmarked Recipes” card button
         onView(withId(R.id.bookmarked_list_card)).perform(click());
-
-        // 15. Click on “Desserts” folder
+        onView(allOf(withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(allOf(withId(R.id.folder_child_recycler_view), childAtPosition(withId(R.id.expandable_folder_layout), 0), withText("Cake Balls"))).check(doesNotExist());
     }
 
-    // Steps 19 to 21
     @Test
-    public void DeleteBookmarkFolderTest() {
-        // 1. Click on “Profile” button of bottom nav bar
+    public void Test6_DeleteBookmarkFolderTest() {
+        // Click on “Profile” -> “Bookmarked Recipes” -> “Desserts” folder
+        // Check that the folder contains the recipe "Apple Pie Bars"
         onView(withId(R.id.profile)).perform(click());
-
-        // 2. Click on “Bookmarked Recipes” card button
         onView(withId(R.id.bookmarked_list_card)).perform(click());
+        onView(allOf(withId(R.id.linear_folder_layout), childAtPosition(childAtPosition(withId(R.id.bookmark_list_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(allOf(withId(R.id.folder_child_recycler_view), childAtPosition(withId(R.id.expandable_folder_layout), 0), withText("Apple Pie Bars")));
 
-        // 15. Click on “Desserts” folder
+        // Click on garbage can icon button next to folder name “Desserts” -> “Confirm”
+        // Check for correct toast message
+        // Check that the folder is no longer in the list of folders
+        onView(allOf(withId(R.id.folder_delete_button), childAtPosition(childAtPosition(withId(R.id.linear_folder_layout), 0), 1), isDisplayed())).perform(click());
+        onView(allOf(withId(android.R.id.button1), withText("Confirm"), childAtPosition(childAtPosition(withClassName(is("android.widget.ScrollView")), 0), 3))).perform(scrollTo(), click());
+        onView(withText("'Desserts' deleted")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+        onView(allOf(withId(R.id.bookmark_list_recycler_view), hasChildCount(0)));
 
-        // 20. Click on garbage can icon button next to folder name “Desserts”
-
-        // 21. Click on “Confirm” button
+        // Click on “Recipes” -> Type “apple pie bars” in search text input
+        // Clicks on card button of recipe “apple pie bars” -> Click on bookmark icon button
+        // Check that dialog says "This recipe is not in any folders"
+        onView(withId(R.id.recipes)).perform(click());
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(replaceText("APPLE PIE BARS"), closeSoftKeyboard());
+        onView(allOf(withId(androidx.appcompat.R.id.search_src_text), withText("APPLE PIE BARS"), childAtPosition(allOf(withId(androidx.appcompat.R.id.search_plate), childAtPosition(withId(androidx.appcompat.R.id.search_edit_frame), 1)), 0))).perform(pressImeActionButton());
+        onView(allOf(withId(R.id.recipe_card), childAtPosition(childAtPosition(withId(R.id.recipe_fragment_recycler_view), 0), 0), isDisplayed())).perform(click());
+        onView(withId(R.id.add_to_bookmark_button)).perform(scrollTo(), click());
+        onView(allOf(withId(R.id.dialog_filter_list_title), withText("This recipe is not in any folders")));
     }
 
     private static Matcher<View> childAtPosition(final Matcher<View> parentMatcher, final int position) {
-
         return new TypeSafeMatcher<View>() {
             @Override
             public void describeTo(Description description) {
@@ -204,7 +219,7 @@ public class BookmarkUseCaseTest {
         };
     }
 
-    public class ToastMatcher extends TypeSafeMatcher<Root> {
+    public static class ToastMatcher extends TypeSafeMatcher<Root> {
         @Override
         public void describeTo(Description description) {
             description.appendText("is toast");
@@ -222,5 +237,23 @@ public class BookmarkUseCaseTest {
             }
             return false;
         }
+    }
+
+    public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
+        return new TypeSafeMatcher<View>() {
+            int currentIndex = 0;
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("with index: ");
+                description.appendValue(index);
+                matcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                return matcher.matches(view) && currentIndex++ == index;
+            }
+        };
     }
 }

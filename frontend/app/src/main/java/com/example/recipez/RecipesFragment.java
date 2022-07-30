@@ -2,9 +2,11 @@ package com.example.recipez;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
@@ -20,6 +22,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -70,6 +73,20 @@ public class RecipesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button event
+                Intent a = new Intent(Intent.ACTION_MAIN);
+                a.addCategory(Intent.CATEGORY_HOME);
+                a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(a);}
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override
@@ -120,7 +137,6 @@ public class RecipesFragment extends Fragment {
         recipeSearchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                EspressoIdlingResource.increment();
                 currentResultsTitle.setText("Search results for '" + query + "'");
 
                 if (recipeListRecyclerView != null) {
@@ -223,7 +239,8 @@ public class RecipesFragment extends Fragment {
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8084/searchRecipe?recipename=" + recipeName + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
-//        EspressoIdlingResource.increment();
+        EspressoIdlingResource.increment();
+
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
@@ -236,18 +253,21 @@ public class RecipesFragment extends Fragment {
                                 JSONObject recipeObject = recipesArray.getJSONObject(i);
                                 recipes.add(recipeObject);
                             }
+                            if (recipes.size() == 0) {
+                                Toast.makeText(getActivity(), "No recipes found!", Toast.LENGTH_SHORT).show();
+                            }
 
                             recycleAdapter = new RecipeCardListRecycleAdapter(recipes);
                             RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
                             recipeListRecyclerView.setLayoutManager(layoutManager);
                             recipeListRecyclerView.setAdapter(recycleAdapter);
 
+                            EspressoIdlingResource.decrement();
                         } catch (JSONException e) {
                             Log.d(TAG, e.toString());
                             e.printStackTrace();
                         }
                         Log.d(TAG, response.toString());
-                        EspressoIdlingResource.decrement();
 
                     }
                 }, new Response.ErrorListener() {
@@ -304,7 +324,7 @@ public class RecipesFragment extends Fragment {
                             Log.d(TAG, e.toString());
                             e.printStackTrace();
                         }
-                        Log.d(TAG, response.toString());
+                        Log.d(TAG, "suggested recipes " + response.toString());
                     }
                 }, new Response.ErrorListener() {
                     @Override
