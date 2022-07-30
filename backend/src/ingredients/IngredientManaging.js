@@ -1,8 +1,9 @@
 import express from "express";
-import fetch from "node-fetch";
+//var axios = require("axios");
+import axios from "axios";
 import {OAuth2Client} from 'google-auth-library';
 
-const API_KEY = "3bf3731cdfe2466dbcc93779c1105a60";
+const API_KEY = "d1e4859a4c854f3a9f5f8cdbbf2bf18f";
 const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
 
 var app = express();
@@ -45,17 +46,10 @@ app.get("/getNotification", async(req, res) => {
 //expects {userid: xxx}
 app.get("/requestIngredients", async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
-		fetch("http://localhost:8085/getIngredients?userid=" + req.query["userid"], {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-		}
-		}).then((response) => {
-			if (response.status != 200) return response;
-			else return response.text();
-		}).then((data) => {
-			if (data.status == 404) res.status(data.status).send(data);
-			else res.send(data);
+		axios.get("http://localhost:8085/getIngredients?userid=" + req.query["userid"]).then((response) => {
+			res.send(response.data);
+		}).catch((err) => {
+			res.status(err.response.status).send(err);
 		});
 	});
 });
@@ -63,16 +57,10 @@ app.get("/requestIngredients", async (req, res) => {
 
 export function requestIngredients(userid, googlesignintoken) {
 	verify(googlesignintoken).then(() => {
-		fetch("http://20.53.224.7:8085/getIngredients?userid=" + userid, {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-		}
-		}).then((response) => response.text()).then((data) => {
-			console.log(data);
-			res.send(data);
+		axios.get("http://20.53.224.7:8085/getIngredients?userid=" + userid).then((response) => {
+			res.send(response.data);
 		}).catch((err) => {
-			res.status(400).send(err);
+			res.status(err.response.status).send(err);
 		});
 	});
 
@@ -81,18 +69,12 @@ export function requestIngredients(userid, googlesignintoken) {
 // expects {userid: xxx, ingredient: xxx}
 app.post("/deleteIngredient", async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {
-		fetch("http://localhost:8085/removeIngredient", {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(req.body)
-        }).then((response) => {
-			if (response.status != 200) return response;
-			else return response.json();
-		}).then((data) => {
-			if (data.status == 404) res.status(data.status).send(data);
-			else res.send(data);
+		axios.delete("http://localhost:8085/removeIngredient", {
+			data: req.body
+		}).then((response) => {
+			res.send(response.data);
+		}).catch((err) => {
+			res.status(err.response.status).send(err);
 		});
 	}); 
 });
@@ -100,18 +82,10 @@ app.post("/deleteIngredient", async (req, res) => {
 // expects {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/updateExpiryDate", async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {
-		fetch("http://localhost:8085/changeExpiry", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(req.body)
-		}).then((response) => {
-			if (response.status != 200) return response;
-			else return response.text();
-		}).then((data) => {
-			if (data.status == 404 || data.status == 405) res.status(data.status).send(data);
-			else res.send(data);
+		axios.post("http://localhost:8085/changeExpiry", req.body).then((response) => {
+			res.send(response.data);
+		}).catch((err) => {
+			res.status(err.response.status).send(err);
 		});
 	});
 });
@@ -168,13 +142,8 @@ app.get("/requestExpiryDate", async (req, res) => {
 // expects body of {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/addIngredient", async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {
-		fetch("http://localhost:8086/searchForIngredient?ingredient=" + req.body.ingredient, {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		}).then((response) => response.json()).then((spoonacularIng) => {
-			if (spoonacularIng.length === 0) {
+		axios.get("http://localhost:8086/searchForIngredient?ingredient=" + req.body.ingredient).then((spoonacularIng) => {
+			if (spoonacularIng.data.length === 0) {
 				res.status(410).send(new Error("Error: no ingredient found in Spoonacular API"));
 				return;
 			}
@@ -183,24 +152,14 @@ app.post("/addIngredient", async (req, res) => {
 				ingredient: {
 					name: req.body.ingredient,
 					expiry: req.body.expiry,
-					image: spoonacularIng[0].image,
+					image: spoonacularIng.data[0].image,
 				}
 			};
-			fetch("http://localhost:8085/storeIngredient", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(ingredient)
-			}).then((response) => {
-				if (response.status != 200) return response;
-				else return response.json();
-			}).then((data) => {
-				if (data.status == 404 || data.status == 405) return res.status(data.status).send(data);
-				else return res.send(data.ingredient);
+			axios.post("http://localhost:8085/storeIngredient", ingredient).then((response) => {
+				res.send(response.data.ingredient);
+			}).catch((err) => {
+				res.status(err.response.status).send(err);
 			});
-		}).catch((err) => {
-			res.status(400).send(err);
 		});
 	});
 });
@@ -208,17 +167,10 @@ app.post("/addIngredient", async (req, res) => {
 // expects {userid: xxx, time: xxx}
 app.get("/scanExpiryDates", async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
-		fetch("http://localhost:8085/usersWithExpiringIngredients?time=" + req.query["time"], {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		}).then((response) => {
-			if (response.status != 200) return response;
-			else return response.json();
-		}).then((data) => {
-			if (data.status == 405) res.status(data.status).send(data);
-			else res.send(data);
+		axios.get("http://localhost:8085/usersWithExpiringIngredients?time=" + req.query["time"]).then((response) => {
+			res.send(response.data);
+		}).catch((err) => {
+			res.status(err.response.status).send(err);
 		});
 	});
 });
@@ -227,29 +179,21 @@ app.get("/scanExpiryDates", async (req, res) => {
 app.get("/expiringIngredients", async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
 		if (req.query["time"] < 0) return res.status(405).send(new Error("Error: invalid expiry value"));
-		fetch("http://localhost:8085/getIngredients?userid=" + req.query["userid"], {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		}).then((response) => {
-			if (response.status != 200) return response;
-			else return response.json();
-		}).then((data) => {
-			if (data.status == 404) res.status(data.status).send(data);
-			else {
-				let expiringSoon = [];
-				data.forEach((ingredient) => {
-					let ingDate = new Date(0);
-					let currDate = new Date(0);
-					ingDate.setUTCSeconds(ingredient.expiry - (86400 * 2)); // 86400 = 1 day in seconds
-					currDate.setUTCSeconds(parseInt(req.query["time"], 10));
-					if (ingDate <= currDate) {
-						expiringSoon.push(ingredient);
-					}
-				});
-				res.send(expiringSoon);
-			}
+		axios.get("http://localhost:8085/getIngredients?userid=" + req.query["userid"]).then((response) => {
+			let data = response.data;
+			let expiringSoon = [];
+			data.forEach((ingredient) => {
+				let ingDate = new Date(0);
+				let currDate = new Date(0);
+				ingDate.setUTCSeconds(ingredient.expiry - (86400 * 2)); // 86400 = 1 day in seconds
+				currDate.setUTCSeconds(parseInt(req.query["time"], 10));
+				if (ingDate <= currDate) {
+					expiringSoon.push(ingredient);
+				}
+			});
+			res.send(expiringSoon);
+		}).catch((err) => {
+			res.status(err.response.status).send(err);
 		});
 	});
 });
@@ -293,12 +237,9 @@ function levenshtein_distance(inputString, realString) {
 function sendExpiryNotification(res) {
 	let currTime = Math.round(Date.now() / 1000).toString();
 	console.log("Current time: " + currTime)
-	fetch("http://localhost:8086/scanExpiryDates?time=" + currTime, {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json"
-		}
-	}).then((response) => response.json()).then((data) => {
+	axios.get("http://localhost:8086/scanExpiryDates?time=" + currTime).then((response) => {
+		return response.json();
+	}).then((data) => {
         console.log(data);
 		let userids = "";
 		for (let i = 0; i < data.length; i++) {
@@ -307,21 +248,15 @@ function sendExpiryNotification(res) {
 		}
 		userids = userids.slice(0,-1)
 		console.log(userids);
-		fetch("http://20.53.224.7:8082/getUserTokens?userids=" + userids, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json"
-			}
-		}).then((response) => response.json()).then((tokens) => {
+		axios.get("http://20.53.224.7:8082/getUserTokens?userids=" + userids).then((response) => {
+			return response.json();
+		}).then((tokens) => {
 			console.log(tokens)
 			data.forEach((user) => {
 				console.log(user)
-				fetch("http://20.53.224.7:8086/expiringIngredients?userid=" + user.toString() + "&time=" + currTime, {
-					method: "GET",
-					headers: {
-						"Content-Type": "application/json"
-					}
-				}).then((response) => response.json()).then((ingredient) => {
+				axios.get("http://20.53.224.7:8086/expiringIngredients?userid=" + user.toString() + "&time=" + currTime).then((response) => {
+					return response.json();
+				}).then((ingredient) => {
 					console.log("Expiring Ingredients:" + ingredient)
 					var currToken = tokens.find((pair) => pair.userID == user).token
 					var expiring = ""
@@ -336,13 +271,9 @@ function sendExpiryNotification(res) {
 						},
 						"to": currToken.toString()
 					}
-					fetch("https://fcm.googleapis.com/fcm/send", {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: SERVER_KEY
-						},
-						body: JSON.stringify(json)
+					axios.post("https://fcm.googleapis.com/fcm/send", JSON.stringify(json), {
+						"Content-Type": "application/json",
+						Authorization: SERVER_KEY
 					}).then((response) => response.text()).then((data) => {
 						console.log(user)
 						console.log(data);
@@ -354,51 +285,23 @@ function sendExpiryNotification(res) {
 }
 
 async function spoonacularSearch(ingredient) {
-	const res = await fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
-		ingredient + "&number=1&apiKey=" + API_KEY, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			}
-		}).catch((err) => {
-			return err;
-		});
-	return res.json();
+	const res = await axios.get("https://api.spoonacular.com/food/ingredients/search?query=" +
+		ingredient + "&number=1&apiKey=" + API_KEY);
+	return res.data;
 }
 
 async function spoonacularSuggest(string) {
-	const res = await fetch("https://api.spoonacular.com/food/ingredients/search?query=" +
-		string + "&apiKey=" + API_KEY, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			}
-		}).catch((err) => {
-			return err;
-		});
-	return res.json();
+	const res = await axios.get("https://api.spoonacular.com/food/ingredients/search?query=" +
+		string + "&apiKey=" + API_KEY);
+	return res.data;
 }
 
 async function shelfLifeSearch(ingredient) {
-	const res = await fetch("https://shelf-life-api.herokuapp.com/search?q=" + ingredient, {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-		}
-	}).catch((err) => {
-		return err;
-	});
-	return res.json();
+	const res = await axios.get("https://shelf-life-api.herokuapp.com/search?q=" + ingredient);
+	return res.data;
 }
 
 async function shelfLifeGuide(id) {
-	const res = await fetch("https://shelf-life-api.herokuapp.com/guides/" + id, {
-		method: "GET",
-		Headers: {
-			"Content-Type": "application/json",
-		}
-	}).catch((err) => {
-		return err;
-	});
-	return res.json();
+	const res = await axios.get("https://shelf-life-api.herokuapp.com/guides/" + id);
+	return res.data;
 }

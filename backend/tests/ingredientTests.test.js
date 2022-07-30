@@ -6,19 +6,19 @@ const IP = "localhost";//const IP = "20.53.224.7";
 
 
 //tests for getIngredients
-test("requestIngredients: user with unregistered userID", () => {
+test("getIngredients: user with unregistered userID", () => {
     return axios.get("http://" + IP + ":8085/getIngredients?userid=-1").catch((err) => {
         expect(err.response.status).toBe(404);
     });
 });
 
-test("requestIngredients: user with no ingredients", () => {
+test("getIngredients: user with no ingredients", () => {
     return axios.get("http://" + IP + ":8085/getIngredients?userid=11111").then((response) => {
         expect(response.data).toEqual([]);
     });
 });
 
-test("requestIngredients: user with ingredients", () => {
+test("getIngredients: user with ingredients", () => {
     return axios.get("http://" + IP + ":8085/getIngredients?userid=22222").then((response) => {
         console.log(response.data);
         expect(response.data).toEqual([
@@ -212,6 +212,7 @@ test("changeExpiry: correct input", async () => {
 //tests for requestIngredients
 test("requestIngredients: user with unregistered userID", () => {
     return axios.get("http://" + IP + ":8086/requestIngredients?userid=-1").catch((err) => {
+        console.log(err);
         expect(err.response.status).toBe(404);
     });
 });
