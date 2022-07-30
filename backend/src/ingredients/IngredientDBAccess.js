@@ -1,7 +1,7 @@
-import express from "express";
-import { MongoClient } from "mongodb";
-// const express = require('express')
-// const {MongoClient} = require('mongodb')
+// import express from "express";
+// import { MongoClient } from "mongodb";
+const express = require('express')
+const {MongoClient} = require('mongodb')
 
 var app = express();
 app.use(express.json());
@@ -35,7 +35,7 @@ app.get("/getIngredients", async (req, res) => {
     });
 });
 
-export function getIngredients(userid) {
+function getIngredients(userid) {
     return new Promise((resolve, reject) => {
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
             if (result === null) {
@@ -71,7 +71,7 @@ app.post("/storeIngredient", async (req, res) => {
     });
 });
 
-export function storeIngredient(userid, inputIngredient) {
+function storeIngredient(userid, inputIngredient) {
     return new Promise((resolve, reject) => {
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
             let alreadyHaveIng = false;
@@ -104,7 +104,7 @@ app.delete("/removeIngredient", async (req, res) => {
     });
 });
 
-export function removeIngredient(userid, ingredient) {
+function removeIngredient(userid, ingredient) {
     return new Promise((resolve, reject) => {
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
             let newIngredients = result.ingredients.filter(function (value) {
@@ -139,7 +139,7 @@ app.get("/usersWithExpiringIngredients", async (req, res) => {
     });
 })
 
-export function usersWithExpiringIngredients(time) {
+function usersWithExpiringIngredients(time) {
     return new Promise((resolve, reject) => {
         let expiringUsers = []
         client.db("IngredientDB").collection("Users").find().toArray().then((result) => {
@@ -175,7 +175,7 @@ app.post("/changeExpiry", async (req, res) => {
     });
 });
 
-export function changeExpiry(userid, ingredient, expiry) {
+function changeExpiry(userid, ingredient, expiry) {
     return new Promise((resolve, reject) => {
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
             result.ingredients.forEach(function (value) {
@@ -193,3 +193,5 @@ export function changeExpiry(userid, ingredient, expiry) {
         }) 
     })
 }
+
+module.exports = {changeExpiry, usersWithExpiringIngredients, removeIngredient, storeIngredient, getIngredients}

@@ -1,7 +1,7 @@
-import express from 'express';
-import {MongoClient} from 'mongodb';
-// const express = require('express')
-// const {MongoClient} = require('mongodb')
+// import express from 'express';
+// import {MongoClient} from 'mongodb';
+const express = require('express')
+const {MongoClient} = require('mongodb')
 
 var app = express()
 app.use(express.json())
@@ -30,7 +30,7 @@ app.get("/scanDB", async (req, res) => {
     
 })
 
-export function scanDB(email) {
+function scanDB(email) {
     return new Promise((resolve, reject) => {
         client.db("UserDB").collection("Users").countDocuments({"email": email}).then(result => {
             console.log(result)
@@ -79,7 +79,7 @@ app.post("/storeUserInfo", async (req, res) => {
     
 })
 
-export function storeUserInfo(email) {
+function storeUserInfo(email) {
     return new Promise((resolve, reject) => {
         const id = generateUserID()
         var newUser = {"email": email}
@@ -114,7 +114,7 @@ app.post("/storeToken", async (req, res) => {
     
 })
 
-export function storeToken(userID, token) {
+function storeToken(userID, token) {
     return new Promise((resolve, reject) => {
         client.db("UserDB").collection("Tokens").findOne({"userID": parseInt(userID, 10)}).then(result => {
             if (result === null) {
@@ -150,7 +150,7 @@ app.get("/getTokens", async (req, res) => {
     
 })
 
-export function getTokens(userids) {
+function getTokens(userids) {
     return new Promise((resolve, reject) => {
         var userIds = []
         var stringIdsArray = userids.split(",")
@@ -180,7 +180,7 @@ app.put("/addToDietaryRestrictions", async(req, res) => {
         }) 
 })
 
-export function addToDietaryRestrictions(userID, restriction) {
+function addToDietaryRestrictions(userID, restriction) {
     return new Promise((resolve, reject) => {
         var restrictions = restriction
         client.db("UserDB").collection("Users").updateOne({"userID": parseInt(userID, 10)}, {$push: {"dietaryRestrictions": restrictions}}).then(result => {
@@ -204,7 +204,7 @@ app.put("/deleteFromDietaryRestrictions", async (req, res) => {
         }) 
 })
 
-export function deleteDietaryRestrictions(userID, restriction) {
+function deleteDietaryRestrictions(userID, restriction) {
     return new Promise((resolve, reject) => {
         var restrictions = restriction
         client.db("UserDB").collection("Users").updateOne({"userID": parseInt(userID, 10)}, {$pull: {"dietaryRestrictions": restrictions}}).then(result => {
@@ -227,7 +227,7 @@ app.get("/getDietaryRestrictions", async (req, res) => {
         }) 
 })
 
-export function getDietaryRestrictions(userid) {
+function getDietaryRestrictions(userid) {
     return new Promise((resolve, reject) => {
         var userID = parseInt(userid, 10)
         client.db("UserDB").collection("Users").findOne({"userID": userID}).then(result => {
@@ -257,3 +257,5 @@ async function run () {
 }
 
 run()
+
+module.exports = {getDietaryRestrictions, deleteDietaryRestrictions, addToDietaryRestrictions, getTokens, storeToken, storeUserInfo, scanDB}

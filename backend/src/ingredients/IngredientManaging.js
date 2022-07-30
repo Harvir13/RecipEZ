@@ -1,13 +1,13 @@
-import express from "express";
-import axios from "axios";
-import {OAuth2Client} from 'google-auth-library';
-import * as IngredientDBAccess from "./IngredientDBAccess.js"
-import * as UserManaging from "../user/UserManaging.js";
-// const UserManaging = require('../user/UserManaging.js');
-// const IngredientDBAccess = require('./IngredientDBAccess.js');
-// const {OAuth2Client} = require('google-auth-library');
-// const axios = require('axios');
-// const express = require('express')
+// import express from "express";
+// import axios from "axios";
+// import {OAuth2Client} from 'google-auth-library';
+// import * as IngredientDBAccess from "./IngredientDBAccess.js"
+// import * as UserManaging from "../user/UserManaging.js";
+const {getUserTokens} = require('../user/UserManaging.js');
+const {changeExpiry, usersWithExpiringIngredients, removeIngredient, storeIngredient, getIngredients} = require('./IngredientDBAccess.js');
+const {OAuth2Client} = require('google-auth-library');
+const axios = require('axios');
+const express = require('express')
  
 const API_KEY = "d1e4859a4c854f3a9f5f8cdbbf2bf18f";
 const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
@@ -403,7 +403,7 @@ app.get("/getNotification", async(req, res) => {
 //expects {userid: xxx}
 app.get("/requestIngredients", async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
-		IngredientDBAccess.getIngredients(req.query["userid"]).then((response) => {
+		getIngredients(req.query["userid"]).then((response) => {
 			res.status(response.status).send(response.result);
 		}).catch((err) => {
 			var status = err.status
@@ -413,11 +413,10 @@ app.get("/requestIngredients", async (req, res) => {
 	});
 });
 
-
-export function requestIngredients(userid, googlesignintoken) {
+function requestIngredients(userid, googlesignintoken) {
 	return new Promise((resolve, reject) => {
         verify(googlesignintoken).then(() => {
-            	IngredientDBAccess.getIngredients(userid).then((response) => {
+            	getIngredients(userid).then((response) => {
 				return resolve({"status": 200, data: response.result})
         	}).catch ((err) => {
             	console.log(err)
@@ -430,7 +429,7 @@ export function requestIngredients(userid, googlesignintoken) {
 // expects {userid: xxx, ingredient: xxx}
 app.post("/deleteIngredient", async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {
-		IngredientDBAccess.removeIngredient(req.body["userid"], req.body["ingredient"]).then((response) => {
+		removeIngredient(req.body["userid"], req.body["ingredient"]).then((response) => {
 			res.status(response.status).send(response.result);
 		}).catch((err) => {
 			var status = err.status
@@ -443,7 +442,7 @@ app.post("/deleteIngredient", async (req, res) => {
 // expects {userid: xxx, ingredient: xxx, expiry: xxx}
 app.post("/updateExpiryDate", async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {
-		IngredientDBAccess.changeExpiry(req.body["userid"], req.body["ingredient"], req.body["expiry"]).then((response) => {
+		changeExpiry(req.body["userid"], req.body["ingredient"], req.body["expiry"]).then((response) => {
 			res.status(response.status).send(response.result);
 		}).catch((err) => {
 			var status = err.status
@@ -527,7 +526,7 @@ app.post("/addIngredient", async (req, res) => {
 					image: spoonacularIng[0].image,
 				}
 			};
-			IngredientDBAccess.storeIngredient(ingredientObj.userid, ingredientObj.ingredient).then((response) => {
+			storeIngredient(ingredientObj.userid, ingredientObj.ingredient).then((response) => {
 				res.status(response.status).send(response.result);
 			}).catch((err) => {
 				var status = err.status
@@ -541,7 +540,7 @@ app.post("/addIngredient", async (req, res) => {
 // expects {userid: xxx, time: xxx}
 function scanExpiryDates(time) {
 	return new Promise((resolve, reject) => {
-		IngredientDBAccess.usersWithExpiringIngredients(time).then(response => {
+		usersWithExpiringIngredients(time).then(response => {
 			return resolve(response.result)
 		}).catch(err => {
 			return reject(err)
@@ -564,7 +563,7 @@ function scanExpiryDates(time) {
 function expiringIngredients(userid, time) {
 	return new Promise((resolve, reject) => {
 		if (time < 0) return res.status(405).send(new Error("Error: invalid expiry value"));
-		IngredientDBAccess.getIngredients(userid).then((response) => {
+		getIngredients(userid).then((response) => {
 			let data = response.result;
 			let expiringSoon = [];
 			data.forEach((ingredient) => {
@@ -656,7 +655,7 @@ function sendExpiryNotification() {
 		}
 		userids = userids.slice(0,-1)
 		console.log(userids);
-		UserManaging,getUserTokens(userids).then((response) => {
+		getUserTokens(userids).then((response) => {
 			return response.result;
 		}).then((tokens) => {
 			console.log(tokens)
@@ -713,3 +712,5 @@ async function shelfLifeGuide(id) {
 	const res = await axios.get("https://shelf-life-api.herokuapp.com/guides/" + id);
 	return res.data;
 }
+
+module.exports = {requestIngredients}
