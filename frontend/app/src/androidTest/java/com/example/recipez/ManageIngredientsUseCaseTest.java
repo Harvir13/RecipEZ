@@ -7,6 +7,7 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -22,7 +23,10 @@ import android.view.ViewParent;
 
 import androidx.test.espresso.DataInteraction;
 import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -100,7 +104,10 @@ public class ManageIngredientsUseCaseTest {
                         isDisplayed()));
         materialButton.perform(click());
 
-        // 4.
+        // The dialog gets dismissed, reappears, and a toast is shown at the bottom stating that no ingredients were found and to try another string.
+        onView(withText("No ingredients found, please try a different search")).inRoot(new BookmarkUseCaseTest.ToastMatcher()).check(matches(isDisplayed()));
+
+        // 4.The user enters “apple” and presses the “SEARCH” button
         ViewInteraction appCompatEditText1 = onView(
                 allOf(withId(R.id.editIngredientName),
                         childAtPosition(
@@ -121,6 +128,7 @@ public class ManageIngredientsUseCaseTest {
                         isDisplayed()));
         materialButton.perform(click());
 
+        // 5. The user selects “apple” on the ListView
         DataInteraction textView = onData(anything())
                 .inAdapterView(allOf(withId(R.id.selectIngredientList),
                         childAtPosition(
@@ -136,12 +144,14 @@ public class ManageIngredientsUseCaseTest {
             e.printStackTrace();
         }
 
+        // A new item should show on the main fragment showing an image of an apple, the title “Apple”, an expiry date returned from the external service, and a red garbage icon on the right.
         ViewInteraction textView2 = onView(
                 allOf(withId(R.id.ingredientName), withText("Apple"),
                         withParent(withParent(IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class))),
                         isDisplayed()));
         textView2.check(matches(withText("Apple")));
 
+        // 6. Repeat steps 4 and 5, but this time search and select “breadfruit”
         ViewInteraction appCompatImageButton2 = onView(
                 allOf(withId(R.id.addIngredientButton),
                         childAtPosition(
@@ -187,6 +197,7 @@ public class ManageIngredientsUseCaseTest {
             e.printStackTrace();
         }
 
+        // 7. Enter an invalid date (more or less than 8 characters for MMDDYYYY, such as 1 or 1010101010) and press the button
         ViewInteraction appCompatEditText3 = onView(
                 allOf(withId(R.id.newIngredientExpiry),
                         childAtPosition(
@@ -207,13 +218,10 @@ public class ManageIngredientsUseCaseTest {
                         isDisplayed()));
         materialButton3.perform(click());
 
-        // delay for expiry editing dialog to render
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // The dialog should not dismiss and a toast should inform the user to enter a valid date.
+        onView(withText("Please enter a valid date!")).inRoot(new BookmarkUseCaseTest.ToastMatcher()).check(matches(isDisplayed()));
 
+        // Enter a valid date (01012023) and press the button
         ViewInteraction appCompatEditText4 = onView(
                 allOf(withId(R.id.newIngredientExpiry), withText("1"),
                         childAtPosition(
@@ -251,18 +259,66 @@ public class ManageIngredientsUseCaseTest {
             e.printStackTrace();
         }
 
-//        ViewInteraction appCompatImageView = onView(allOf(withId(R.id.feeding_name), withParent(withId(R.id.fragment_show_feeding)))).check(matches(isDisplayed()));
-//        appCompatImageView.perform(click());
+        onView(allOf(withId(R.id.fridgeRecyclerView), hasChildCount(2)));
 
-//        ViewInteraction appCompatImageView2 = onView(
-//                allOf(withId(R.id.ingredientDelete),
-//                        childAtPosition(
-//                                childAtPosition(
-//                                        withClassName(is("androidx.cardview.widget.CardView")),
-//                                        0),
-//                                3),
-//                        isDisplayed()));
-//        appCompatImageView2.perform(click());
+        // 9. Press the trash icon on the “Apple” entry
+        onView(withId(R.id.fridgeRecyclerView))
+                .perform(
+                        RecyclerViewActions.actionOnItemAtPosition(
+                                0,
+                                new ViewAction() {
+                                    @Override
+                                    public Matcher<View> getConstraints() {
+                                        return null;
+                                    }
+
+                                    @Override
+                                    public String getDescription() {
+                                        return "Click on specific button";
+                                    }
+
+                                    @Override
+                                    public void perform(UiController uiController, View view) {
+                                        View button = view.findViewById(R.id.ingredientDelete);
+                                        button.performClick();
+                                    }
+                                })
+                );
+
+        onView(allOf(withId(R.id.fridgeRecyclerView), hasChildCount(1)));
+
+        // 10. Repeat step 9 for “Breadfruit”
+        onView(withId(R.id.fridgeRecyclerView))
+                .perform(
+                        RecyclerViewActions.actionOnItemAtPosition(
+                                0,
+                                new ViewAction() {
+                                    @Override
+                                    public Matcher<View> getConstraints() {
+                                        return null;
+                                    }
+
+                                    @Override
+                                    public String getDescription() {
+                                        return "Click on specific button";
+                                    }
+
+                                    @Override
+                                    public void perform(UiController uiController, View view) {
+                                        View button = view.findViewById(R.id.ingredientDelete);
+                                        button.performClick();
+                                    }
+                                })
+                );
+
+        onView(allOf(withId(R.id.fridgeRecyclerView), hasChildCount(0)));
+
+        // delay to allow Volley request to go through for deleting the item on the backend
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private static Matcher<View> childAtPosition(
