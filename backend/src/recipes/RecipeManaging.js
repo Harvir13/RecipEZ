@@ -157,10 +157,15 @@ const requestFilteredRecipes = async (req, res) => {
 
         ingredientList = ingredientList.slice(0,-2)
 
+
+        console.log("About to get gestrictions")
+
         // fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"])
-        UserManaging.getRestrictions(parseInt(req.query["userid"], 10), req.query["googlesignintoken"]).then(result =>
-            result.data
-        ).then(data => {
+        UserManaging.getRestrictions(parseInt(req.query["userid"], 10), req.query["googlesignintoken"]).then(result => {
+            console.log(result)
+            return result.data
+        }).then(data => {
+            console.log(data["dietaryRestrictions"])
             if (data["dietaryRestrictions"] === undefined || data["dietaryRestrictions"].length === 0) {
                 skipRestrictions = 1
                 // console.log("here")
@@ -255,15 +260,16 @@ const requestFilteredRecipes = async (req, res) => {
 const generateSuggestedRecipesList = async (req, res) => {
     // console.log("generate suggested recipes")
     verify(req.query["googlesignintoken"]).then(() => {
-        // console.log(req.query)
+        console.log(req.query)
 
 
         // fetch("http://" + ip + ":8086/requestIngredients?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"])
-        IngredientManaging.requestIngredients(req.query["userid"], req.query["googlesignintoken"]).then(response =>
-            response.data
-        ).then(ingredientResponse => {
-            // console.log("got ingredients")
-            // console.log(ingredientResponse)
+        IngredientManaging.requestIngredients(req.query["userid"], req.query["googlesignintoken"]).then(response => {
+            console.log(response)
+            return response.data
+        }).then(ingredientResponse => {
+            console.log("got ingredients")
+            console.log(ingredientResponse)
             if (ingredientResponse.length === 0) {
                 // console.log("no ingredients")
                 return res.send(ingredientResponse)
@@ -277,7 +283,7 @@ const generateSuggestedRecipesList = async (req, res) => {
             }
             // console.log(ingredients)
             ingredients = ingredients.slice(0,-1)
-            // console.log(ingredients)
+            console.log(ingredients)
             
             var missingIngredientThreshold = 4 // recipes will be suggested if the user is missing at most 4 ingredients
 
@@ -286,7 +292,7 @@ const generateSuggestedRecipesList = async (req, res) => {
             UserManaging.getRestrictions(parseInt(req.query["userid"], 10), req.query["googlesignintoken"]).then(result =>
                 result.data
             ).then(data => {
-                // console.log(data)
+                console.log(data)
                 if (data["dietaryRestrictions"] === undefined || data["dietaryRestrictions"].length === 0) {
                     skipRestrictions = 1
                 }
@@ -328,6 +334,7 @@ const generateSuggestedRecipesList = async (req, res) => {
                             retList.push(currItem)
                         }
                     }
+                    console.log(retList)
                     res.send(retList)
                 })
             })
@@ -341,10 +348,12 @@ const generateSuggestedRecipesList = async (req, res) => {
 const searchRecipe = async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
         var name = encodeURIComponent(req.query["recipename"])
-        axios.get("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=" + apiKey).then(response =>
-            response.data
-        ).then (data => {
-            // console.log(data)
+        console.log(name)
+        axios.get("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=" + apiKey).then(response => {
+            console.log(response)
+            return response.data
+    }).then (data => {
+            console.log(data)
             var recipes = data["results"]
             var hasTitles = checkForTitles(recipes)
             var returnList = []
@@ -355,6 +364,7 @@ const searchRecipe = async (req, res) => {
                 currItem["image"] = hasTitles[i]["image"]
                 returnList.push(currItem)
             }
+            console.log(returnList)
             res.send(returnList)
         })}).catch(err => {
             // console.log(err)
@@ -365,9 +375,11 @@ const searchRecipe = async (req, res) => {
 //expects ?recipeid=xxx
 const getRecipeDetails = async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
+        console.log(req.query["recipeid"])
         axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=" + apiKey).then(response =>
             response.data
         ).then(data => {
+            console.log(data)
             if (!data.hasOwnProperty('ingredients')) {
                 return res.status(455).send({"result": "Recipe does not exist"})
             }
@@ -384,6 +396,7 @@ const getRecipeDetails = async (req, res) => {
             ).then(data => {
                 // console.log("Recipe Details")
                 // console.log(data)
+                console.log(data)
                 var nutrition = {}
                 nutrition["calories"] = data["calories"]
                 nutrition["carbs"] = data["carbs"]
@@ -394,7 +407,7 @@ const getRecipeDetails = async (req, res) => {
                     response.data
                 ).then(data => {
                     var instructions = []
-                    // console.log(data)
+                    console.log(data)
                     var currStep = {}
                     for (let j = 0; j < data.length; j++) {
                         currStep["name"] = data[j]["name"]
@@ -406,12 +419,16 @@ const getRecipeDetails = async (req, res) => {
                         instructions.push(currStep)
                     }
                     returnObj["instructions"] = instructions
-                    res.send(returnObj)
+                    console.log(returnObj)
+                    return res.send(returnObj)
                 })
             })
-        })}).catch(err => {
+        }).catch(err => {
             // console.log(err)
-            res.status(400).send(err)
+            return res.status(455).send({"result": "Recipe does not exist"})
+        }) }).catch(err => {
+            // console.log(err)
+            return res.status(400).send(err)
         }) 
 }
 

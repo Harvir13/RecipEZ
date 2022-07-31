@@ -9,7 +9,7 @@ app.use(express.json())
 
 
 app.post("/addRecipe", RecipeManaging.addRecipe)
-app.post("removeRecipe", RecipeManaging.removeRecipe)
+app.post("/removeRecipe", RecipeManaging.removeRecipe)
 app.get("/getRecipes", RecipeManaging.getRecipes)
 app.get("/requestFilteredRecipes", RecipeManaging.requestFilteredRecipes)
 app.get("/generateSuggestedRecipesList", RecipeManaging.generateSuggestedRecipesList)

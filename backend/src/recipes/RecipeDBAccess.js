@@ -43,6 +43,7 @@ function addToBookmarkedList (userID, recipeID, path, title, image) {
 function removeFromBookmarkedList(userID, recipeID) {
     return new Promise((resolve, reject) => {
         var entryToDelete = {}
+        console.log("removing recipe")
         entryToDelete["userID"] = parseInt(userID, 10)
         entryToDelete["recipeID"] = parseInt(recipeID, 10)
         client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne(entryToDelete).then(result => {
