@@ -239,7 +239,7 @@ public class RecipesFragment extends Fragment {
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8082/searchRecipe?recipename=" + recipeName + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
-        EspressoIdlingResource.increment();
+        EspressoIdlingResourceUtil.increment();
 
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest
@@ -262,7 +262,7 @@ public class RecipesFragment extends Fragment {
                             recipeListRecyclerView.setLayoutManager(layoutManager);
                             recipeListRecyclerView.setAdapter(recycleAdapter);
 
-                            EspressoIdlingResource.decrement();
+                            EspressoIdlingResourceUtil.decrement();
                         } catch (JSONException e) {
                             Log.d(TAG, e.toString());
                             e.printStackTrace();
@@ -349,7 +349,7 @@ public class RecipesFragment extends Fragment {
 
         String url = "http://20.53.224.7:8082/requestFilteredRecipes?ingredients=" + ingredientsList + "&filters=" + filtersList + "&userid=" + userid + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
-        EspressoIdlingResource.increment();
+        EspressoIdlingResourceUtil.increment();
 
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest
@@ -372,7 +372,7 @@ public class RecipesFragment extends Fragment {
                             recipeListRecyclerView.setLayoutManager(layoutManager);
                             recipeListRecyclerView.setAdapter(recycleAdapter);
 
-                            EspressoIdlingResource.decrement();
+                            EspressoIdlingResourceUtil.decrement();
                         } catch (JSONException e) {
                             Log.d(TAG, e.toString());
                             e.printStackTrace();

@@ -23,7 +23,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -158,7 +157,7 @@ public class BookmarkListFragmentNew extends Fragment {
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8082/getRecipes?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
-        EspressoIdlingResource.increment();
+        EspressoIdlingResourceUtil.increment();
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -200,7 +199,7 @@ public class BookmarkListFragmentNew extends Fragment {
                             adapter = new BookmarkFolderAdapter(folderList);
                             bookmarkListRecyclerView.setAdapter(adapter);
 
-                            EspressoIdlingResource.decrement();
+                            EspressoIdlingResourceUtil.decrement();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -247,27 +246,27 @@ public class BookmarkListFragmentNew extends Fragment {
         queue.add(jsonRequest);
     }
 
-    private void getPathsList(int userID) {
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8082/getAllPaths?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
-
-        // Request a string response from the provided URL.
-        JsonArrayRequest jsonRequest = new JsonArrayRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        Log.d(TAG, response.toString());
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, error.toString());
-                    }
-                });
-
-        // Add the request to the RequestQueue.
-        queue.add(jsonRequest);
-    }
+//    private void getPathsList(int userID) {
+//        // Instantiate the RequestQueue.
+//        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+//        String url = "http://20.53.224.7:8082/getAllPaths?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+//
+//        // Request a string response from the provided URL.
+//        JsonArrayRequest jsonRequest = new JsonArrayRequest
+//                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+//                    @Override
+//                    public void onResponse(JSONArray response) {
+//                        Log.d(TAG, response.toString());
+//                    }
+//                }, new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Log.d(TAG, error.toString());
+//                    }
+//                });
+//
+//        // Add the request to the RequestQueue.
+//        queue.add(jsonRequest);
+//    }
 }
 

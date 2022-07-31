@@ -61,11 +61,9 @@ public final class SimpleCountingIdlingResource implements IdlingResource {
      */
     public void decrement() {
         int counterVal = counter.decrementAndGet();
-        if (counterVal == 0) {
+        if (counterVal == 0 && null != resourceCallback) {
             // we've gone from non-zero to zero. That means we're idle now! Tell espresso.
-            if (null != resourceCallback) {
-                resourceCallback.onTransitionToIdle();
-            }
+            resourceCallback.onTransitionToIdle();
         }
 
         if (counterVal < 0) {

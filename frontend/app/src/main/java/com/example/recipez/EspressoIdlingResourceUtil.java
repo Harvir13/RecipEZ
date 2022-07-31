@@ -2,7 +2,7 @@ package com.example.recipez;
 
 import androidx.test.espresso.IdlingResource;
 
-public class EspressoIdlingResource {
+public class EspressoIdlingResourceUtil {
 
     private static final String RESOURCE = "GLOBAL";
 
