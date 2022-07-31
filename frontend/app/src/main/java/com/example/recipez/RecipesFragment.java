@@ -349,6 +349,8 @@ public class RecipesFragment extends Fragment {
 
         String url = "http://20.53.224.7:8082/requestFilteredRecipes?ingredients=" + ingredientsList + "&filters=" + filtersList + "&userid=" + userid + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
+        EspressoIdlingResource.increment();
+
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
@@ -361,12 +363,16 @@ public class RecipesFragment extends Fragment {
                                 JSONObject recipeObject = recipesArray.getJSONObject(i);
                                 recipes.add(recipeObject);
                             }
+                            if (recipes.size() == 0) {
+                                Toast.makeText(getActivity(), "No recipes found!", Toast.LENGTH_SHORT).show();
+                            }
 
                             recycleAdapter = new RecipeCardListRecycleAdapter(recipes);
                             RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
                             recipeListRecyclerView.setLayoutManager(layoutManager);
                             recipeListRecyclerView.setAdapter(recycleAdapter);
 
+                            EspressoIdlingResource.decrement();
                         } catch (JSONException e) {
                             Log.d(TAG, e.toString());
                             e.printStackTrace();
