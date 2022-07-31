@@ -3,7 +3,7 @@
 // import {OAuth2Client} from 'google-auth-library';
 // import * as IngredientDBAccess from "./IngredientDBAccess.js"
 // import * as UserManaging from "../user/UserManaging.js";
-const {getUserTokens} = require('../user/UserManaging.js');
+const UserManaging = require('../user/UserManaging.js');
 const {changeExpiry, usersWithExpiringIngredients, removeIngredient, storeIngredient, getIngredients} = require('./IngredientDBAccess.js');
 const {OAuth2Client} = require('google-auth-library');
 const axios = require('axios');
@@ -292,7 +292,7 @@ function sendExpiryNotification() {
 		}
 		userids = userids.slice(0,-1)
 		console.log(userids);
-		getUserTokens(userids).then((response) => {
+		UserManaging.getUserTokens(userids).then((response) => {
 			return response.result;
 		}).then((tokens) => {
 			console.log(tokens)
