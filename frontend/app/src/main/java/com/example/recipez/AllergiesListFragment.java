@@ -146,7 +146,7 @@ public class AllergiesListFragment extends Fragment {
 
         private void getIngredientSuggestions(String string) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8086/getIngredientSuggestions?string=" + string + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.53.224.7:8082/getIngredientSuggestions?string=" + string + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
             JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                         @Override
