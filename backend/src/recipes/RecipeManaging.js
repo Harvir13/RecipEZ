@@ -13,8 +13,8 @@ const {getRestrictions} = require('../user/UserManaging.js')
 const {requestIngredients} = require('../ingredients/IngredientManaging.js')
 // const RecipeDBAccess = require("./RecipeDBAccess.js")
 
-var app = express()
-app.use(express.json())
+// var app = express()
+// app.use(express.json())
 
 const apiKey = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
 const ip = "20.53.224.7"
@@ -523,7 +523,7 @@ async function run () {
 run()
 
 
-app.post("/addRecipe", async (req, res) => {
+const addRecipe =  async (req, res) => {
     verify(req.body.googleSignInToken).then(() => {
         // console.log(req.body)
         
@@ -542,9 +542,9 @@ app.post("/addRecipe", async (req, res) => {
             delete err["status"]
             res.status(status).send(err)
         })  
-})
+}
 
-app.post("/removeRecipe", async (req, res) => {
+const removeRecipe = async (req, res) => {
     verify(req.body.googleSignInToken).then(() => {
         // console.log(req.body)
         
@@ -566,7 +566,7 @@ app.post("/removeRecipe", async (req, res) => {
             delete err["status"]
             res.status(status).send(err)
         }) 
-})
+}
 
 app.get("/getRecipes", async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
