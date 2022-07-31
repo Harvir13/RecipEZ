@@ -2,7 +2,6 @@ package com.example.recipez;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -280,7 +279,7 @@ public class RecipeDetailFragment extends Fragment {
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "http://20.53.224.7:8082/getRecipes?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
-        EspressoIdlingResource.increment();
+        EspressoIdlingResourceUtil.increment();
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -349,7 +348,7 @@ public class RecipeDetailFragment extends Fragment {
                             folderListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                             folderListRecyclerView.setAdapter(dialogAdapter);
 
-                            EspressoIdlingResource.decrement();
+                            EspressoIdlingResourceUtil.decrement();
 
                         } catch (JSONException e) {
                             e.printStackTrace();

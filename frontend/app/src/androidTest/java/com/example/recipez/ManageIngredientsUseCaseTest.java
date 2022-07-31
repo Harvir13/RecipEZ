@@ -51,12 +51,12 @@ public class ManageIngredientsUseCaseTest {
 
     @Before
     public void registerIdlingResource() {
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().register(EspressoIdlingResourceUtil.getIdlingResource());
     }
 
     @After
     public void unregisterIdlingResource() {
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResourceUtil.getIdlingResource());
     }
 
     @Test
@@ -116,7 +116,7 @@ public class ManageIngredientsUseCaseTest {
                                         0),
                                 1),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("apple"), closeSoftKeyboard());
+        appCompatEditText1.perform(replaceText("apple"), closeSoftKeyboard());
 
         ViewInteraction materialButton1 = onView(
                 allOf(withId(R.id.addIngredientConfirm), withText("Search"),
@@ -126,7 +126,7 @@ public class ManageIngredientsUseCaseTest {
                                         0),
                                 2),
                         isDisplayed()));
-        materialButton.perform(click());
+        materialButton1.perform(click());
 
         // 5. The user selects “apple” on the ListView
         DataInteraction textView = onData(anything())
