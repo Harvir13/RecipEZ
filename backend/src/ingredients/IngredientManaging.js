@@ -192,7 +192,6 @@ app.post("/addIngredient", async (req, res) => {
 function scanExpiryDates(time) {
 	return new Promise((resolve, reject) => {
 		usersWithExpiringIngredients(time).then(response => {
-			console.log(response);
 			return resolve(response.result)
 		}).catch(err => {
 			console.log(err);
@@ -350,3 +349,5 @@ async function shelfLifeGuide(id) {
 	const res = await axios.get("https://shelf-life-api.herokuapp.com/guides/" + id);
 	return res.data;
 }
+
+module.exports = {requestIngredients}

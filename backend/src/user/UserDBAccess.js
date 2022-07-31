@@ -229,6 +229,7 @@ app.get("/getDietaryRestrictions", async (req, res) => {
 
 function getDietaryRestrictions(userid) {
     return new Promise((resolve, reject) => {
+        console.log("restrictions for: " + userid)
         var userID = parseInt(userid, 10)
         client.db("UserDB").collection("Users").findOne({"userID": userID}).then(result => {
             return resolve({"status": 200, "result": result})

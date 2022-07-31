@@ -25,6 +25,9 @@ function storeIngredient(userid, inputIngredient) {
     return new Promise((resolve, reject) => {
         if (inputIngredient.expiry < 0) return reject({"status": 405, "result": "Error: invalid expiry value"});
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
+            if (result == null) {
+                return resolve({"status": 404, "result": "invalid userID"});
+            }
             let alreadyHaveIng = false;
             if (result == null) return reject ({"status": 404, "result": "Error: invalid userID"});
             result.ingredients.forEach((ingredient => {
