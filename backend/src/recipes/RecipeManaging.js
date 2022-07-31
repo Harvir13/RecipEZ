@@ -55,11 +55,11 @@ const addRecipe =  async (req, res) => {
 
 const removeRecipe = async (req, res) => {
     verify(req.body.googleSignInToken).then(() => {
-        // console.log(req.body)
+        console.log(req.body)
         
         //req.body should contain data like {userID: xxx, recipeID: xxx}
         removeFromBookmarkedList(req.body["userID"], req.body["recipeID"]).then(response => {
-            // console.log("remove recipe")
+            console.log("remove recipe success")
             var status = response.status
             delete response["status"]
             return res.status(status).send(response)

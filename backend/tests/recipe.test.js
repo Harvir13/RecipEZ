@@ -5,6 +5,18 @@ var axios = require("axios");
 // import * as UserManaging from "../src/user/UserManaging.js"
 const UserManaging = require('../src/user/UserManaging.js')
 const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
+const RecipeManaging = require('../src/recipes/RecipeManaging.js')
+const {app} = require('../src/router.js')
+// const {app} = require('../src/start.js')
+const supertest = require('supertest')
+
+// jest.useFakeTimers()
+
+app.listen(8083, () => {})
+
+
+
+const request = supertest(app)
 
 const RecipeManagingURL = "http://20.53.224.7:8082"
 
@@ -13,22 +25,23 @@ const RecipeManagingURL = "http://20.53.224.7:8082"
 jest.mock('../src/user/UserManaging.js')
 jest.mock('../src/ingredients/IngredientManaging.js')
 
+// jest.setTimeout(15000)
 
-test("Success", () => {
-    
 
-    axios.post(RecipeManagingURL + "/addRecipe", {
-                userID: 11111, 
-                recipeID: 632660, 
-                path: "dessert",
-                title: "Apricot Glazed Apple Tart",
-                image: "https://spoonacular.com/recipeImages/632660-312x231.jpg"
-        }).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.result).toEqual("Successfully added recipe to bookmarked list")
-        }).catch(err => {
-            console.log(err)
-        })
+test("Success", async () => {
+
+    const response = await request.post("/addRecipe").send({
+        userID: 11111, 
+        recipeID: 632660, 
+        path: "dessert",
+        title: "Apricot Glazed Apple Tart",
+        image: "https://spoonacular.com/recipeImages/632660-312x231.jpg"
+    })
+
+    console.log(response.status)
+    console.log(response.body)
+    expect(response.status).toEqual(200)
+    expect(response.body.result).toEqual("Successfully added recipe to bookmarked list")
 })
 
 
@@ -58,186 +71,186 @@ test("Success", () => {
 
 // getRecipes tests
 
-test("No Bookmarked Recipes", () => {
-    axios.get(RecipeManagingURL + "/getRecipes?userid=22222"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data).toEqual({"recipes": [], "paths": []})
-        }).catch(err => {
-            console.log(err)
-        })
-})
+// test("No Bookmarked Recipes", () => {
+//     axios.get(RecipeManagingURL + "/getRecipes?userid=22222"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data).toEqual({"recipes": [], "paths": []})
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-test("Success", () => {
-    axios.get(RecipeManagingURL + "/getRecipes?userid=11111"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data["recipes"].length).toBeGreaterThan(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+// test("Success", () => {
+//     axios.get(RecipeManagingURL + "/getRecipes?userid=11111"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data["recipes"].length).toBeGreaterThan(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-// //requestFilteredRecipes tests
+//requestFilteredRecipes tests
 
-test("Invalid list of filters", () => {
+// test("Invalid list of filters", () => {
 
-    UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
-        if(userid === 21) {
-            return ["bread"]
-        }
-        else {
-            return []
-        }
-    })
+//     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
+//         if(userid === 21) {
+//             return ["bread"]
+//         }
+//         else {
+//             return []
+//         }
+//     })
 
-    axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=11111&ingredients=apples,sugar&filters=italian,gluten-free"
-        ).then(response => {
+//     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=11111&ingredients=apples,sugar&filters=italian,gluten-free"
+//         ).then(response => {
 
-        }).catch(err => {
-            expect(err.response.status).toEqual(454)
-        })
-})
+//         }).catch(err => {
+//             expect(err.response.status).toEqual(454)
+//         })
+// })
 
-test("Invalid list of ingredients", () => {
+// test("Invalid list of ingredients", () => {
 
-    UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
-        if(userid === 21) {
-            return ["bread"]
-        }
-        else {
-            return []
-        }
-    })
+//     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
+//         if(userid === 21) {
+//             return ["bread"]
+//         }
+//         else {
+//             return []
+//         }
+//     })
 
-    axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=11111&ingredients=asdfasdfadsf-asdf&filters=vegetarian"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toEqual(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+//     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=11111&ingredients=asdfasdfadsf-asdf&filters=vegetarian"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toEqual(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-test("Success", () => {
+// test("Success", () => {
 
-    UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
-        if(userid === 21) {
-            return ["bread"]
-        }
-        else {
-            return []
-        }
-    })
+//     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
+//         if(userid === 21) {
+//             return ["bread"]
+//         }
+//         else {
+//             return []
+//         }
+//     })
 
-    axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=dairyFree"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toBeGreaterThan(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+//     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=dairyFree"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toBeGreaterThan(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
  //generatedSuggestedRecipes tests
 
 
-test("No Ingredients", () => {
+// test("No Ingredients", () => {
 
-    UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
-        if(userid === 11111) {
-            return ["bread"]
-        } else if (userid === 33333) {
-            return ["Apple"]
-        } else {
-            return []
-        }
-    })
+//     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
+//         if(userid === 11111) {
+//             return ["bread"]
+//         } else if (userid === 33333) {
+//             return ["Apple"]
+//         } else {
+//             return []
+//         }
+//     })
 
-    IngredientManaging.requestIngredients = jest.fn().mockImplementation((userid, googlesignintoken) => {
-        if(userid === 11111) {
-            return ["Apple", "Blue berries", "Orange"]
-        } else if (userid === 33333) {
-            return ["Breadfruit"]
-        } else {
-            return []
-        }
-    })
+//     IngredientManaging.requestIngredients = jest.fn().mockImplementation((userid, googlesignintoken) => {
+//         if(userid === 11111) {
+//             return ["Apple", "Blue berries", "Orange"]
+//         } else if (userid === 33333) {
+//             return ["Breadfruit"]
+//         } else {
+//             return []
+//         }
+//     })
 
-    axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=22222"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toEqual(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+//     axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=22222"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toEqual(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-test("Not enough ingredients to make a recipe", () => {
+// test("Not enough ingredients to make a recipe", () => {
 
-    UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
-        if(userid === 11111) {
-            return ["bread"]
-        } else if (userid === 33333) {
-            return ["Apple"]
-        } else {
-            return []
-        }
-    })
+//     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
+//         if(userid === 11111) {
+//             return ["bread"]
+//         } else if (userid === 33333) {
+//             return ["Apple"]
+//         } else {
+//             return []
+//         }
+//     })
 
-    IngredientManaging.requestIngredients = jest.fn().mockImplementation((userid, googlesignintoken) => {
-        if(userid === 11111) {
-            return ["Apple", "Blue berries", "Orange"]
-        } else if (userid === 33333) {
-            return ["Breadfruit"]
-        } else {
-            return []
-        }
-    })
+//     IngredientManaging.requestIngredients = jest.fn().mockImplementation((userid, googlesignintoken) => {
+//         if(userid === 11111) {
+//             return ["Apple", "Blue berries", "Orange"]
+//         } else if (userid === 33333) {
+//             return ["Breadfruit"]
+//         } else {
+//             return []
+//         }
+//     })
 
-    axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=33333"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toEqual(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+//     axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=33333"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toEqual(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-test("Success", () => {
+// test("Success", () => {
 
-    UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
-        if(userid === 11111) {
-            return ["bread"]
-        } else if (userid === 33333) {
-            return ["Apple"]
-        } else {
-            return []
-        }
-    })
+//     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
+//         if(userid === 11111) {
+//             return ["bread"]
+//         } else if (userid === 33333) {
+//             return ["Apple"]
+//         } else {
+//             return []
+//         }
+//     })
 
-    IngredientManaging.requestIngredients = jest.fn().mockImplementation((userid, googlesignintoken) => {
-        if(userid === 11111) {
-            return ["Apple", "Blue berries", "Orange"]
-        } else if (userid === 33333) {
-            return ["Breadfruit"]
-        } else {
-            return []
-        }
-    })
+//     IngredientManaging.requestIngredients = jest.fn().mockImplementation((userid, googlesignintoken) => {
+//         if(userid === 11111) {
+//             return ["Apple", "Blue berries", "Orange"]
+//         } else if (userid === 33333) {
+//             return ["Breadfruit"]
+//         } else {
+//             return []
+//         }
+//     })
 
-    axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=11111"
-        ).then(response => {
-            console.log(response)
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toBeGreaterThan(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+//     axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=11111"
+//         ).then(response => {
+//             console.log(response)
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toBeGreaterThan(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
 
-// // searchRecipe tests
+// searchRecipe tests
 
 // test("Not enough ingredients to make a recipe", () => {
 //     axios.get(RecipeManagingURL + "/searchRecipe?query=card"
