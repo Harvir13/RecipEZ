@@ -10,9 +10,11 @@ const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9
 var app = express();
 app.use(express.json());
 
+module.exports = {getNotification, requestIngredientsAPI, requestIngredients, searchForIngredient, scanExpiryDates, sendExpiryNotification,
+	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient, client};
 
 // setInterval(function() {
-// 	sendExpiryNotification();
+// 	sendExpiryNotification(Math.round(Date.now() / 1000).toString());
 // }, 300000)
 
 const getNotification = async(req, res) => {
@@ -39,7 +41,6 @@ function requestIngredients(userid, googlesignintoken) {
             	getIngredients(userid).then((response) => {
 				return resolve({"status": 200, data: response.result})
         	}).catch((err) => {
-            	console.log(err)
 				return reject({"status": err.status, "data": err})
         	}) 
     	})
@@ -76,8 +77,6 @@ const updateExpiryDate = async (req, res) => {
 function searchForIngredient(ingredient) {
 	return new Promise((resolve, reject) => {
 		spoonacularSearch(ingredient).then((data) => {
-			console.log("search for ingredient")
-			console.log(data)
 			return resolve(data.results);
 		});
 	})	
@@ -85,15 +84,12 @@ function searchForIngredient(ingredient) {
 
 // expects {string: xxx}
 const getIngredientSuggestions = async (req, res) => {
-	console.log("suggesting ingredients")
-	console.log(req.query)
 	verify(req.query["googlesignintoken"]).then(() => {
 		spoonacularSuggest(req.query["string"]).then((data) => {
-			console.log(data);
 			res.send(data.results);
 		}).catch((err) => {
-			var status = err.status
-			delete err["status"]
+			var status = err.status;
+			delete err["status"];
 			res.status(status).send(err);
 		});
 	});
@@ -134,7 +130,6 @@ const requestExpiryDate = async (req, res) => {
 const addIngredient = async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {
 		searchForIngredient(req.body.ingredient).then((spoonacularIng) => {
-			console.log(spoonacularIng)
 			if (spoonacularIng.length === 0) {
 				res.status(410).send(new Error("Error: no ingredient found in Spoonacular API"));
 				return;
@@ -164,8 +159,7 @@ function scanExpiryDates(time) {
 		usersWithExpiringIngredients(time).then(response => {
 			return resolve(response.result)
 		}).catch(err => {
-			console.log(err);
-			return reject(err)
+			return reject(err);
 		})
 	})
 	
@@ -184,7 +178,7 @@ function scanExpiryDates(time) {
 // expects {userid: xxx, time: zzz}
 function expiringIngredients(userid, time) {
 	return new Promise((resolve, reject) => {
-		if (time < 0) return res.status(405).send(new Error("Error: invalid expiry value"));
+		if (time < 0) return reject({"status": 405, "result": "Error: invalid expiry value"});
 		getIngredients(userid).then((response) => {
 			let data = response.result;
 			let expiringSoon = [];
@@ -197,11 +191,9 @@ function expiringIngredients(userid, time) {
 					expiringSoon.push(ingredient);
 				}
 			});
-			return resolve({"status": response.status, "result": expiringSoon})
+			return resolve({"status": response.status, "result": expiringSoon});
 		}).catch((err) => {
-			var status = err.status
-			delete err["status"]
-			return reject(err)
+			return reject(err);
 		});
 	})
 }
@@ -250,10 +242,10 @@ function levenshtein_distance(inputString, realString) {
 }
 
 // checks expiry dates and sends a notification to the user, if something is expiring
-function sendExpiryNotification() {
-	let currTime = Math.round(Date.now() / 1000).toString();
+async function sendExpiryNotification(currTime) {
+	//let currTime = Math.round(Date.now() / 1000).toString();
 	console.log("Current time: " + currTime)
-	scanExpiryDates(time).then((data) => {
+	scanExpiryDates(currTime).then((data) => {
         console.log(data);
 		let userids = "";
 		for (let i = 0; i < data.length; i++) {
@@ -291,6 +283,7 @@ function sendExpiryNotification() {
 					}).then((response) => response.text()).then((data) => {
 						console.log(user)
 						console.log(data);
+						return data;
 					});
 				})
 			})
@@ -319,7 +312,3 @@ async function shelfLifeGuide(id) {
 	const res = await axios.get("https://shelf-life-api.herokuapp.com/guides/" + id);
 	return res.data;
 }
-
-
-module.exports = {getNotification, requestIngredientsAPI, requestIngredients, searchForIngredient, scanExpiryDates, 
-	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient};

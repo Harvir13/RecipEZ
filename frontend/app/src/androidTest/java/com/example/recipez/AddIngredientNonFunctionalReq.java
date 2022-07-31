@@ -39,12 +39,12 @@ public class AddIngredientNonFunctionalReq {
 
     @Before
     public void registerIdlingResource() {
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().register(EspressoIdlingResourceUtil.getIdlingResource());
     }
 
     @After
     public void unregisterIdlingResource() {
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource());
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResourceUtil.getIdlingResource());
     }
 
     @Test
