@@ -7,7 +7,8 @@ const UserManaging = require('../src/user/UserManaging.js')
 const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
 // const RecipeManaging = require('../src/recipes/RecipeManaging.js')
 const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
-const Verification = require('../src/verify.js')
+// const Verification = require('../src/verify.js')
+
 
 
 const {app} = require('../src/router.js')
@@ -16,7 +17,7 @@ const supertest = require('supertest')
 
 // jest.useFakeTimers()
 
-app.listen(8083, () => {})
+var server
 
 // jest.setTimeout(10000)
 
@@ -30,9 +31,9 @@ const RecipeManagingURL = "http://20.53.224.7:8082"
 // jest.mock('../src/ingredients/IngredientManaging.js')
 jest.mock('../src/verify.js')
 
-// jest.setTimeout(15000)
+jest.setTimeout(15000)
+  
 test("Success", async () => {
-
     const response = await request.post("/addRecipe").send({
         userID: 11111, 
         recipeID: 632660, 

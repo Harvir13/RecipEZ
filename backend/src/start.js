@@ -11,7 +11,6 @@ async function run () {
     }
     catch (err) {
         console.log(err)
-        await client.close()
 
     }
 }
