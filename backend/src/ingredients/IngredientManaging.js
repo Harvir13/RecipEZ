@@ -1,7 +1,7 @@
 // import express from "express";
 // import axios from "axios";
 // import {OAuth2Client} from 'google-auth-library';
-// import * as IngredientDBAccess from "./IngredientDBAccess.js"
+ //import * as IngredientDBAccess from "./IngredientDBAccess.js"
 // import * as UserManaging from "../user/UserManaging.js";
 const {getUserTokens} = require('../user/UserManaging.js');
 const {changeExpiry, usersWithExpiringIngredients, removeIngredient, storeIngredient, getIngredients} = require('./IngredientDBAccess.js');
@@ -18,7 +18,7 @@ app.use(express.json());
 const CLIENT_ID = "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleusercontent.com"
 const client = new OAuth2Client(CLIENT_ID);
 
-module.exports = {requestIngredients, searchForIngredient, scanExpiryDates, expiringIngredients, client};
+module.exports = {requestIngredients, searchForIngredient, scanExpiryDates, expiringIngredients, verify, client};
 
 async function verify(token) {
     // const ticket = await client.verifyIdToken({
