@@ -7,6 +7,7 @@ const UserManaging = require('../src/user/UserManaging.js')
 const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
 // const RecipeManaging = require('../src/recipes/RecipeManaging.js')
 const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
+const Verification = require('../src/verify.js')
 
 
 const {app} = require('../src/router.js')
@@ -25,12 +26,11 @@ const RecipeManagingURL = "http://20.53.224.7:8082"
 
 // addRecipe tests
 
-jest.mock('../src/user/UserManaging.js')
-jest.mock('../src/ingredients/IngredientManaging.js')
+// jest.mock('../src/user/UserManaging.js')
+// jest.mock('../src/ingredients/IngredientManaging.js')
+jest.mock('../src/verify.js')
 
 // jest.setTimeout(15000)
-
-
 test("Success", async () => {
 
     const response = await request.post("/addRecipe").send({
@@ -48,7 +48,6 @@ test("Success", async () => {
 
 // removeRecipe tests
 test("Missing Recipe in Bookmarked List", async () => {
-
     const response = await request.post("/removeRecipe").send({
         userID: 11111, 
         recipeID: 632671, 
@@ -265,7 +264,7 @@ test("Success", async () => {
 
 test("Invalid recipe ID", async () => {
     const response = await request.get("/getRecipeDetails?recipeid=0")
-    console.log(response.body)
+    // console.log(response.body)
     expect(response.status).toEqual(455)
 })
 
