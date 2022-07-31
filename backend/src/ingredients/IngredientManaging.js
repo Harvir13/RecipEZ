@@ -1,8 +1,8 @@
 const UserManaging = require('../user/UserManaging.js');
 const {changeExpiry, usersWithExpiringIngredients, removeIngredient, storeIngredient, getIngredients} = require('./IngredientDBAccess.js');
-const {OAuth2Client} = require('google-auth-library');
 const axios = require('axios');
 const express = require('express')
+const {verify} = require('../verify.js')
  
 const API_KEY = "d1e4859a4c854f3a9f5f8cdbbf2bf18f";
 const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
@@ -10,18 +10,6 @@ const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9
 var app = express();
 app.use(express.json());
 
-const CLIENT_ID = "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleusercontent.com"
-const client = new OAuth2Client(CLIENT_ID);
-
-async function verify(token) {
-    // const ticket = await client.verifyIdToken({
-    //     idToken: token,
-    //     audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-    // });
-    // const payload = ticket.getPayload();
-    // const userid = payload['sub'];
-    return new Promise((resolve, reject) => {resolve("hi")})
-}
 
 // setInterval(function() {
 // 	sendExpiryNotification();
@@ -334,5 +322,4 @@ async function shelfLifeGuide(id) {
 
 
 module.exports = {getNotification, requestIngredientsAPI, requestIngredients, searchForIngredient, scanExpiryDates, 
-	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient,
-	verify, client};
+	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient};
