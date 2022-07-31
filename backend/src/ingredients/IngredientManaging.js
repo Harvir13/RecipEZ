@@ -1,8 +1,3 @@
-// import express from "express";
-// import axios from "axios";
-// import {OAuth2Client} from 'google-auth-library';
- //import * as IngredientDBAccess from "./IngredientDBAccess.js"
-// import * as UserManaging from "../user/UserManaging.js";
 const UserManaging = require('../user/UserManaging.js');
 const {changeExpiry, usersWithExpiringIngredients, removeIngredient, storeIngredient, getIngredients} = require('./IngredientDBAccess.js');
 const {OAuth2Client} = require('google-auth-library');
@@ -18,10 +13,6 @@ app.use(express.json());
 const CLIENT_ID = "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleusercontent.com"
 const client = new OAuth2Client(CLIENT_ID);
 
-module.exports = {getNotification, requestIngredients, searchForIngredient, scanExpiryDates, 
-	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient,
-	verify, client};
-
 async function verify(token) {
     // const ticket = await client.verifyIdToken({
     //     idToken: token,
@@ -30,18 +21,7 @@ async function verify(token) {
     // const payload = ticket.getPayload();
     // const userid = payload['sub'];
     return new Promise((resolve, reject) => {resolve("hi")})
-
-  }
-
-async function run() {
-	var server = app.listen(8086, (req, res) => {
-		var host = server.address().address;
-		var port = server.address().port;
-		console.log("Example server successfully running at http://%s:%s", host, port);
-	});
 }
-
-run();
 
 // setInterval(function() {
 // 	sendExpiryNotification();
@@ -53,7 +33,7 @@ const getNotification = async(req, res) => {
 }
 
 //expects {userid: xxx}
-const requestIngredients = async (req, res) => {
+const requestIngredientsAPI = async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
 		getIngredients(req.query["userid"]).then((response) => {
 			res.status(response.status).send(response.result);
@@ -65,18 +45,18 @@ const requestIngredients = async (req, res) => {
 	});
 }
 
-// function requestIngredients(userid, googlesignintoken) {
-// 	return new Promise((resolve, reject) => {
-//         verify(googlesignintoken).then(() => {
-//             	getIngredients(userid).then((response) => {
-// 				return resolve({"status": 200, data: response.result})
-//         	}).catch((err) => {
-//             	console.log(err)
-// 				return reject({"status": err.status, "data": err})
-//         	}) 
-//     	})
-// 	})
-// }
+function requestIngredients(userid, googlesignintoken) {
+	return new Promise((resolve, reject) => {
+        verify(googlesignintoken).then(() => {
+            	getIngredients(userid).then((response) => {
+				return resolve({"status": 200, data: response.result})
+        	}).catch((err) => {
+            	console.log(err)
+				return reject({"status": err.status, "data": err})
+        	}) 
+    	})
+	})
+}
 
 // expects {userid: xxx, ingredient: xxx}
 const deleteIngredient = async (req, res) => {
@@ -351,3 +331,8 @@ async function shelfLifeGuide(id) {
 	const res = await axios.get("https://shelf-life-api.herokuapp.com/guides/" + id);
 	return res.data;
 }
+
+
+module.exports = {getNotification, requestIngredientsAPI, requestIngredients, searchForIngredient, scanExpiryDates, 
+	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient,
+	verify, client};

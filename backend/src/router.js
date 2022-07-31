@@ -1,6 +1,7 @@
 const express = require('express');
-const UserManaging = require('../user/UserManaging.js');
+const UserManaging = require('./user/UserManaging.js');
 const RecipeManaging = require('./recipes/RecipeManaging.js')
+const IngredientManaging = require('./ingredients/IngredientManaging.js')
 
 
 const app = express()
@@ -23,6 +24,12 @@ app.get("/getUserTokens", UserManaging.getUserTokensAPI)
 app.put("/addRestrictions", UserManaging.addRestrictions)
 app.put("/deleteRestrictions", UserManaging.deleteRestrictions)
 app.get("/getRestrictions", UserManaging.getRestrictionsAPI)
+app.get("/requestIngredients", IngredientManaging.requestIngredientsAPI)
+app.post("/deleteIngredient", IngredientManaging.deleteIngredient)
+app.post("/updateExpiryDate", IngredientManaging.updateExpiryDate)
+app.get("/getIngredientSuggestions", IngredientManaging.getIngredientSuggestions)
+app.get("/requestExpiryDate", IngredientManaging.requestExpiryDate)
+app.post("/addIngredient", IngredientManaging.addIngredient)
 
 
 async function run () {
