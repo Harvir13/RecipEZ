@@ -532,7 +532,12 @@ app.post("/addRecipe", async (req, res) => {
             var status = response.status
             delete response["status"]
             return res.status(status).send(response)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             var status = err.status
             delete err["status"]
             res.status(status).send(err)
@@ -549,7 +554,13 @@ app.post("/removeRecipe", async (req, res) => {
             var status = response.status
             delete response["status"]
             return res.status(status).send(response)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) 
+    }).catch(err => {
             console.log("remove recipe")
             var status = err.status
             delete err["status"]
@@ -567,6 +578,7 @@ app.get("/getRecipes", async (req, res) => {
             var recipeList = []
             var pathList = []
             var recipes = data["recipes"]
+            console.log(data["recipes"])
             var paths = data["paths"]
             for (let i = 0; i < recipes.length; i++) {
                 var currRecipeItem = {}
@@ -586,7 +598,12 @@ app.get("/getRecipes", async (req, res) => {
             // console.log(retObj)
             var status = data.status
             return res.status(status).send(retObj)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             var status = err.status
             delete err["status"]
             res.status(status).send(err)
@@ -598,6 +615,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
         // console.log(req.query)
         var ingredients = req.query["ingredients"].split(",")
+        console.log("filter")
 
         var missingIngredientThreshold = 4 // recipes will be suggested if the user has 40% of the ingredients
 
@@ -647,7 +665,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
             axios.get("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=" + apiKey).then(response =>
                 response.data
             ).then (data => {
-                // console.log(data)
+                console.log(data)
                 if (data.length === 0) {
                     // console.log("here")
                     return res.send([]);
@@ -677,13 +695,13 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                     }
                 }
                 idList = idList.slice(0,-1)
-                // console.log("ids: " + idList)
+                console.log("ids: " + idList)
                 
 
                 axios.get("https://api.spoonacular.com/recipes/informationBulk?ids=" + idList + "&apiKey=" + apiKey).then(response2 =>
                     response2.data
                 ).then(data => {
-                    // console.log(data)
+                    console.log(data)
                     var returnList = []
                     
                     for (let k = 0; k < data.length; k++) {
@@ -701,6 +719,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                         }
                     }
                     var recipesWithTitles = checkForTitles(returnList)
+            
                     var retList = []
                     for (let i = 0; i < recipesWithTitles.length; i++) {
                         let currItem = {};
@@ -711,6 +730,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                         retList.push(currItem)
                         // console.log(currItem)
                     }
+                    console.log(retList)
                     res.send(retList)
                 })
             })
@@ -894,7 +914,12 @@ app.post("/addNewPath", async (req, res) => {
             var status = response.status
             delete response["status"]
             return res.status(status).send(response)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             var status = err.status
             delete err["status"]
             res.status(status).send(err)
@@ -909,7 +934,12 @@ app.post("/removeExistingPath", async (req, res) => {
             var status = response.status
             delete response["status"]
             return res.status(status).send(response)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             console.log("remove existing path")
             var status = err.status
             delete err["status"]
@@ -945,7 +975,12 @@ app.get("/getAllPaths", async (req, res) => {
             // console.log(retArr)
             var status = response.status
             return res.status(status).send(retArr)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             var status = err.status
             delete err["status"]
             res.status(status).send(err)

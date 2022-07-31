@@ -1,5 +1,5 @@
 var axios = require("axios");
-// var UserManaging = require("../src/user/UserManaging.js");
+// var RecipeDBAccess = require("../src/recipes/RecipeDBAccess.js");
 // var IngredientManaging = require('../src/ingredients/IngredientManaging.js');
 // const fetch = require("node-fetch");
 // import * as UserManaging from "../src/user/UserManaging.js"
@@ -13,7 +13,6 @@ const RecipeManagingURL = "http://20.53.224.7:8084"
 jest.mock('../src/user/UserManaging.js')
 jest.mock('../src/ingredients/IngredientManaging.js')
 
-jest.setTimeout(10000);
 
 test("Success", () => {
     
@@ -81,7 +80,7 @@ test("Success", () => {
 
 // //requestFilteredRecipes tests
 
-test("Invalid list of filters", () => {
+// test("Invalid list of filters", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 21) {
@@ -95,12 +94,12 @@ test("Invalid list of filters", () => {
     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=11111&ingredients=apples,sugar&filters=italian,gluten-free"
         ).then(response => {
 
-        }).catch(err => {
-            expect(err.response.status).toEqual(454)
-        })
-})
+//         }).catch(err => {
+//             expect(err.response.status).toEqual(454)
+//         })
+// })
 
-test("Invalid list of ingredients", () => {
+// test("Invalid list of ingredients", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 21) {
@@ -120,7 +119,7 @@ test("Invalid list of ingredients", () => {
         })
 })
 
-test("Success", () => {
+// test("Success", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 21) {
@@ -140,10 +139,10 @@ test("Success", () => {
         })
 })
 
-// //generatedSuggestedRecipes tests
+// // //generatedSuggestedRecipes tests
 
 
-test("No Ingredients", () => {
+// test("No Ingredients", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 11111) {
@@ -174,7 +173,7 @@ test("No Ingredients", () => {
         })
 })
 
-test("Not enough ingredients to make a recipe", () => {
+// test("Not enough ingredients to make a recipe", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 11111) {
@@ -205,7 +204,7 @@ test("Not enough ingredients to make a recipe", () => {
         })
 })
 
-test("Success", () => {
+// test("Success", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 11111) {
@@ -475,3 +474,4 @@ test("Success", () => {
 //             expect(response.data.lenght).toBeGreaterThan(0)
 //         })
 // })
+
