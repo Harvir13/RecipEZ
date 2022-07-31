@@ -3,8 +3,6 @@ const {MongoClient} = require('mongodb')
 const uri = "mongodb://localhost:27017";
 const client = new MongoClient(uri);
 
-module.exports = {changeExpiry, usersWithExpiringIngredients, removeIngredient, storeIngredient, getIngredients, client};
-
 function getIngredients(userid) {
     return new Promise((resolve, reject) => {
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
@@ -102,3 +100,5 @@ function changeExpiry(userid, ingredient, expiry) {
         }) 
     })
 }
+
+module.exports = {changeExpiry, usersWithExpiringIngredients, removeIngredient, storeIngredient, getIngredients, client};

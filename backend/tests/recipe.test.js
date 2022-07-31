@@ -6,7 +6,7 @@ var axios = require("axios");
 const UserManaging = require('../src/user/UserManaging.js')
 const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
 
-const RecipeManagingURL = "http://20.53.224.7:8084"
+const RecipeManagingURL = "http://20.53.224.7:8082"
 
 // addRecipe tests
 
@@ -80,7 +80,7 @@ test("Success", () => {
 
 // //requestFilteredRecipes tests
 
-// test("Invalid list of filters", () => {
+test("Invalid list of filters", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 21) {
@@ -94,12 +94,12 @@ test("Success", () => {
     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=11111&ingredients=apples,sugar&filters=italian,gluten-free"
         ).then(response => {
 
-//         }).catch(err => {
-//             expect(err.response.status).toEqual(454)
-//         })
-// })
+        }).catch(err => {
+            expect(err.response.status).toEqual(454)
+        })
+})
 
-// test("Invalid list of ingredients", () => {
+test("Invalid list of ingredients", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 21) {
@@ -119,7 +119,7 @@ test("Success", () => {
         })
 })
 
-// test("Success", () => {
+test("Success", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 21) {
@@ -139,10 +139,10 @@ test("Success", () => {
         })
 })
 
-// // //generatedSuggestedRecipes tests
+ //generatedSuggestedRecipes tests
 
 
-// test("No Ingredients", () => {
+test("No Ingredients", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 11111) {
@@ -173,7 +173,7 @@ test("Success", () => {
         })
 })
 
-// test("Not enough ingredients to make a recipe", () => {
+test("Not enough ingredients to make a recipe", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 11111) {
@@ -204,7 +204,7 @@ test("Success", () => {
         })
 })
 
-// test("Success", () => {
+test("Success", () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         if(userid === 11111) {
