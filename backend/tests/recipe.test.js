@@ -1,5 +1,5 @@
 var axios = require("axios");
-// var UserManaging = require("../src/user/UserManaging.js");
+// var RecipeDBAccess = require("../src/recipes/RecipeDBAccess.js");
 // var IngredientManaging = require('../src/ingredients/IngredientManaging.js');
 // const fetch = require("node-fetch");
 // import * as UserManaging from "../src/user/UserManaging.js"
@@ -76,283 +76,283 @@ test("Success", () => {
 
 // //requestFilteredRecipes tests
 
-test("Invalid list of filters", () => {
+// test("Invalid list of filters", () => {
 
-    // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
-    //     if(userid === 21) {
-    //         return ["bread"]
-    //     }
-    //     else {
-    //         return []
-    //     }
-    // })
+//     // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+//     //     if(userid === 21) {
+//     //         return ["bread"]
+//     //     }
+//     //     else {
+//     //         return []
+//     //     }
+//     // })
 
-    axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=21&ingredients=apples,sugar&filters=italian,gluten-free"
-        ).then(response => {
+//     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=21&ingredients=apples,sugar&filters=italian,gluten-free"
+//         ).then(response => {
 
-        }).catch(err => {
-            expect(err.response.status).toEqual(454)
-        })
-})
+//         }).catch(err => {
+//             expect(err.response.status).toEqual(454)
+//         })
+// })
 
-test("Invalid list of ingredients", () => {
+// test("Invalid list of ingredients", () => {
 
-    // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
-    //     if(userid === 21) {
-    //         return ["bread"]
-    //     }
-    //     else {
-    //         return []
-    //     }
-    // })
+//     // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+//     //     if(userid === 21) {
+//     //         return ["bread"]
+//     //     }
+//     //     else {
+//     //         return []
+//     //     }
+//     // })
 
-    axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=21&ingredients=asdfasdfadsf-asdf&filters=vegetarian"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toEqual(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+//     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=21&ingredients=asdfasdfadsf-asdf&filters=vegetarian"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toEqual(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-test("Success", () => {
+// test("Success", () => {
 
-    // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
-    //     if(userid === 21) {
-    //         return ["bread"]
-    //     }
-    //     else {
-    //         return []
-    //     }
-    // })
+//     // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+//     //     if(userid === 21) {
+//     //         return ["bread"]
+//     //     }
+//     //     else {
+//     //         return []
+//     //     }
+//     // })
 
-    axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=21&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=vegetarian,glutenFree"
-        ).then(response => {
-            console.log(response)
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toBeGreaterThan(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+//     axios.get(RecipeManagingURL + "/requestFilteredRecipes?userid=21&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=vegetarian,glutenFree"
+//         ).then(response => {
+//             console.log(response)
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toBeGreaterThan(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-// //generatedSuggestedRecipes tests
+// // //generatedSuggestedRecipes tests
 
 
-test("No Ingredients", () => {
+// test("No Ingredients", () => {
 
-    // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
-    //     if(userid === 21) {
-    //         return ["bread"]
-    //     } else if (userid === 22) {
-    //         return ["rice"]
-    //     } else {
-    //         return []
-    //     }
-    // })
+//     // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+//     //     if(userid === 21) {
+//     //         return ["bread"]
+//     //     } else if (userid === 22) {
+//     //         return ["rice"]
+//     //     } else {
+//     //         return []
+//     //     }
+//     // })
 
-    // IngredientManaging.requestIngredients = jest.fn.mockImplementation((userid, googlesignintoken) => {
-    //     if (userid === 22) {
-    //         return []
-    //     } else if (userid === 23) {
-    //         return ["Breadfruit"]
-    //     } else if (userid === 21) {
-    //         return ["lettuce","tomatoes","apple","banana","rice","bread"]
-    //     }
-    //     else {
-    //         return []
-    //     }
-    // })
+//     // IngredientManaging.requestIngredients = jest.fn.mockImplementation((userid, googlesignintoken) => {
+//     //     if (userid === 22) {
+//     //         return []
+//     //     } else if (userid === 23) {
+//     //         return ["Breadfruit"]
+//     //     } else if (userid === 21) {
+//     //         return ["lettuce","tomatoes","apple","banana","rice","bread"]
+//     //     }
+//     //     else {
+//     //         return []
+//     //     }
+//     // })
 
-    axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=22"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toEqual(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+//     axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=22"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toEqual(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-test("Not enough ingredients to make a recipe", () => {
+// test("Not enough ingredients to make a recipe", () => {
 
-    // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
-    //     if(userid === 21) {
-    //         return ["bread"]
-    //     } else if (userid === 22) {
-    //         return ["rice"]
-    //     } else {
-    //         return []
-    //     }
-    // })
+//     // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+//     //     if(userid === 21) {
+//     //         return ["bread"]
+//     //     } else if (userid === 22) {
+//     //         return ["rice"]
+//     //     } else {
+//     //         return []
+//     //     }
+//     // })
 
-    // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
-    //     if(userid === 21) {
-    //         return ["bread"]
-    //     } else if (userid === 22) {
-    //         return ["rice"]
-    //     } else {
-    //         return []
-    //     }
-    // })
+//     // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+//     //     if(userid === 21) {
+//     //         return ["bread"]
+//     //     } else if (userid === 22) {
+//     //         return ["rice"]
+//     //     } else {
+//     //         return []
+//     //     }
+//     // })
 
-    axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=23"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toEqual(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+//     axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=23"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toEqual(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-test("Success", () => {
+// test("Success", () => {
 
-    // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
-    //     if(userid === 21) {
-    //         return ["bread"]
-    //     } else if (userid === 22) {
-    //         return ["rice"]
-    //     } else {
-    //         return []
-    //     }
-    // })
+//     // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+//     //     if(userid === 21) {
+//     //         return ["bread"]
+//     //     } else if (userid === 22) {
+//     //         return ["rice"]
+//     //     } else {
+//     //         return []
+//     //     }
+//     // })
 
-    // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
-    //     if(userid === 21) {
-    //         return ["bread"]
-    //     } else if (userid === 22) {
-    //         return ["rice"]
-    //     } else {
-    //         return []
-    //     }
-    // })
+//     // UserManaging.getRestrictions = jest.fn.mockImplementation((userid, googlesignintoken) => {
+//     //     if(userid === 21) {
+//     //         return ["bread"]
+//     //     } else if (userid === 22) {
+//     //         return ["rice"]
+//     //     } else {
+//     //         return []
+//     //     }
+//     // })
 
-    axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=21"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toBeGreaterThan(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+//     axios.get(RecipeManagingURL + "/generateSuggestedRecipesList?userid=21"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toBeGreaterThan(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
 
 // // searchRecipe tests
 
-test("Not enough ingredients to make a recipe", () => {
-    axios.get(RecipeManagingURL + "/searchRecipe?query=card"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toEqual(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+// test("Not enough ingredients to make a recipe", () => {
+//     axios.get(RecipeManagingURL + "/searchRecipe?query=card"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toEqual(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-test("Success", () => {
-    axios.get(RecipeManagingURL + "/searchRecipe?query=pasta"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.length).toBeGreaterThan(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+// test("Success", () => {
+//     axios.get(RecipeManagingURL + "/searchRecipe?query=pasta"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.length).toBeGreaterThan(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
 // getRecipeDetails tests
 
-test("Invalid recipe ID", () => {
-    axios.get(RecipeManagingURL + "/getRecipeDetails?recipeID=0"
-        ).then(response => {
+// test("Invalid recipe ID", () => {
+//     axios.get(RecipeManagingURL + "/getRecipeDetails?recipeID=0"
+//         ).then(response => {
             
-        }).catch(err => {
-            expect(err.response.status).toEqual(455)
-        })
-})
+//         }).catch(err => {
+//             expect(err.response.status).toEqual(455)
+//         })
+// })
 
-test("Success", () => {
-    axios.get(RecipeManagingURL + "/getRecipeDetails?recipeID=632660"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.instructions).toBeDefined()
-            expect(response.data.nutritionalDetails).toBeDefined()
-        }).catch(err => {
-            console.log(err)
-        })
-})
+// test("Success", () => {
+//     axios.get(RecipeManagingURL + "/getRecipeDetails?recipeID=632660"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.instructions).toBeDefined()
+//             expect(response.data.nutritionalDetails).toBeDefined()
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
 // addNewPath tests
 
-test("Success", () => {
-    axios.post(RecipeManagingURL + "/addNewPath", {
-                userID: 21, 
-                path: "burgers"
-        }).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.result).toEqual("Successfully added path to path list")
-        }).catch(err => {
-            console.log(err)
-        })
-})
+// test("Success", () => {
+//     axios.post(RecipeManagingURL + "/addNewPath", {
+//                 userID: 21, 
+//                 path: "burgers"
+//         }).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.result).toEqual("Successfully added path to path list")
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-test("Path already exists", () => {
-    axios.post(RecipeManagingURL + "/addNewPath", {
-                userID: 21, 
-                path: "pastry"
-        }).then(response => {
+// test("Path already exists", () => {
+//     axios.post(RecipeManagingURL + "/addNewPath", {
+//                 userID: 21, 
+//                 path: "pastry"
+//         }).then(response => {
             
-        }).catch(err => {
-            expect(err.response.status).toEqual(456)
-        })
-})
+//         }).catch(err => {
+//             expect(err.response.status).toEqual(456)
+//         })
+// })
 
 
 // removeExistingPath tests
 
-test("Path does not exist", () => {
-    axios.post(RecipeManagingURL + "/removeExistingPath", {
-                userID: 21, 
-                path: "breakfast"
-        }).then(response => {
+// test("Path does not exist", () => {
+//     axios.post(RecipeManagingURL + "/removeExistingPath", {
+//                 userID: 21, 
+//                 path: "breakfast"
+//         }).then(response => {
 
-        }).catch(err => {
-            expect(err.response.status).toEqual(457)
-        })
-})
+//         }).catch(err => {
+//             expect(err.response.status).toEqual(457)
+//         })
+// })
 
-test("Success", () => {
-    axios.post(RecipeManagingURL + "/removeExistingPath", {
-                userID: 21, 
-                path: "pasta"
-        }).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.result).toEqual("Successfully deleted recipe from paths list")
-        }).catch(err => {
-            console.log(err)
-        })
-})
+// test("Success", () => {
+//     axios.post(RecipeManagingURL + "/removeExistingPath", {
+//                 userID: 21, 
+//                 path: "pasta"
+//         }).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.result).toEqual("Successfully deleted recipe from paths list")
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
 
 // getAllPaths tests
 
-test("No paths", () => {
-    axios.get(RecipeManagingURL + "/getAllPaths?userid=24"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.lenght).toEqual(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+// test("No paths", () => {
+//     axios.get(RecipeManagingURL + "/getAllPaths?userid=24"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.lenght).toEqual(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
-test("Success", () => {
-    axios.get(RecipeManagingURL + "/getAllPaths?userid=21"
-        ).then(response => {
-            expect(response.status).toEqual(200)
-            expect(response.data.lenght).toBeGreaterThan(0)
-        }).catch(err => {
-            console.log(err)
-        })
-})
+// test("Success", () => {
+//     axios.get(RecipeManagingURL + "/getAllPaths?userid=21"
+//         ).then(response => {
+//             expect(response.status).toEqual(200)
+//             expect(response.data.lenght).toBeGreaterThan(0)
+//         }).catch(err => {
+//             console.log(err)
+//         })
+// })
 
 // //  addToBookmarkedList tests
 
@@ -473,3 +473,4 @@ test("Success", () => {
 //             expect(response.data.lenght).toBeGreaterThan(0)
 //         })
 // })
+

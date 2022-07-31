@@ -1,9 +1,9 @@
-import express from 'express';
-import {OAuth2Client} from 'google-auth-library';
-import * as UserDBAccess from "./UserDBAccess.js";
-// const express = require('express') 
-// const {OAuth2Client} = require('google-auth-library')
-// const UserDBAccess = require('./UserDBAccess.js')
+// import express from 'express';
+// import {OAuth2Client} from 'google-auth-library';
+// import * as UserDBAccess from "./UserDBAccess.js";
+const express = require('express') 
+const {OAuth2Client} = require('google-auth-library')
+const {getDietaryRestrictions, deleteDietaryRestrictions, addToDietaryRestrictions, getTokens, storeToken, storeUserInfo, scanDB} = require('./UserDBAccess.js')
 
 var app = express()
 app.use(express.json())
@@ -228,10 +228,10 @@ app.get("/checkUserExists", async (req, res) => {
         verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query);
         var email = req.query["email"]
-        UserDBAccess.scanDB(email).then(data => {
+        scanDB(email).then(data => {
             // User doesn't exist in db, so we need to store their info
             if (data["userID"] === 0) {
-                UserDBAccess.storeUserInfo(email).then(response => {
+                storeUserInfo(email).then(response => {
                     var status = response.status
                     delete response["status"]
                     res.status(status).send(response)
@@ -256,7 +256,7 @@ app.post('/storeUserToken', async (req, res) => {
         verify(req.body.googleSignInToken).then(() => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, token: xxx}
-        UserDBAccess.storeToken(req.body["userID"], req.body["token"]).then(response => {
+        storeToken(req.body["userID"], req.body["token"]).then(response => {
             var status = response.status
                     delete response["status"]
                     res.status(status).send(response)
@@ -271,7 +271,7 @@ app.post('/storeUserToken', async (req, res) => {
 app.get("/getUserTokens", async (req, res) => {
         verify(req.query["googlesignintoken"]).then(() => {
         //req.query should contains userids=xxx,xx,xx
-        UserDBAccess.getTokens(req.body["userids"]).then(response => {
+        getTokens(req.body["userids"]).then(response => {
             // DO SOME PROCEESSING ON data HERE TO ONLY SEND WHAT WE NEED
             var data = response.result
             var retArr = []
@@ -290,9 +290,9 @@ app.get("/getUserTokens", async (req, res) => {
         }) 
 })
 
-export default function getUserTokens(userids) {
+function getUserTokens(userids) {
     return new Promise((resolve, reject) => {
-        UserDBAccess.getTokens(userids).then(response => {
+        getTokens(userids).then(response => {
             // DO SOME PROCEESSING ON data HERE TO ONLY SEND WHAT WE NEED
             var data = response.result
             var retArr = []
@@ -317,7 +317,7 @@ app.put("/addRestrictions", async (req, res) => {
         console.log(req.body)
         //req.body should contain data like {userID: xxx, restriction: xxx}
 
-        UserDBAccess.addToDietaryRestrictions(req.body["userID"], req.body["restriction"]).then(data => {
+        addToDietaryRestrictions(req.body["userID"], req.body["restriction"]).then(data => {
             var status = data["status"]
             delete data["status"]
             res.status(status).send(data)
@@ -333,10 +333,10 @@ app.put("/deleteRestrictions", async (req, res) => {
         console.log(req.body)
         
         //req.body should contain data like {userID: xxx, restriction: xxx}
-        UserDBAccess.deleteDietaryRestrictions(req.body["userID"], req.body["restriction"]).then(data => {
+        deleteDietaryRestrictions(req.body["userID"], req.body["restriction"]).then(data => {
             var status = data["status"]
             delete data["status"]
-            res,status(status).send(data)
+            res.status(status).send(data)
         })}).catch ((err) => {
             var status = err.status
             delete err["status"]
@@ -350,7 +350,7 @@ app.get("/getRestrictions", async (req, res) => {
         console.log(req.query)
         
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ...]}
-        UserDBAccess.getDietaryRestrictions(req.query["userid"]).then(response => {
+        getDietaryRestrictions(req.query["userid"]).then(response => {
             var data = response.result
             var status = response.status
             var retObj = {}
@@ -372,10 +372,10 @@ app.get("/getRestrictions", async (req, res) => {
 })
 
 
-export function getRestrictions(userid, googlesignintoken) {
+function getRestrictions(userid, googlesignintoken) {
     return new Promise((resolve, reject) => {
         verify(googlesignintoken).then(() => {
-            UserDBAccess.getDietaryRestrictions(userid).then(response => {
+            getDietaryRestrictions(userid).then(response => {
                 var data = response.result
                 var status = response.status
                 var retObj = {}
@@ -398,5 +398,6 @@ export function getRestrictions(userid, googlesignintoken) {
             return reject({"status": 400, "data": err})
         }) 
     })
-    
 }
+
+module.exports = {getRestrictions, getUserTokens}

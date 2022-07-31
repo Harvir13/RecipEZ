@@ -1,16 +1,16 @@
-import express from 'express';
-import {OAuth2Client} from 'google-auth-library';
-import { getRestrictions } from '../user/UserManaging.js';
-import { requestIngredients } from '../ingredients/IngredientManaging.js';
-import * as RecipeDBAccess from "./RecipeDBAccess.js"
-import axios from "axios";
+// import express from 'express';
+// import {OAuth2Client} from 'google-auth-library';
+// import { getRestrictions } from '../user/UserManaging.js';
+// import { requestIngredients } from '../ingredients/IngredientManaging.js';
+// import * as RecipeDBAccess from "./RecipeDBAccess.js"
+// import axios from "axios";
 
-// const {OAuth2Client} = require('google-auth-library');
-// const axios = require('axios');
-// const express = require('express')
-// const {getPaths, removeFromPathList, addToPathList, getBookmarkedRecipes, removeFromBookmarkedList, addToBookmarkedList} = require('./RecipeDBAccess.js')
-// const {getRestrictions} = require('../user/UserManaging.js')
-// const {requestIngredients} = require('../ingredients/IngredientManaging.js')
+const {OAuth2Client} = require('google-auth-library');
+const axios = require('axios');
+const express = require('express')
+const {getPaths, removeFromPathList, addToPathList, getBookmarkedRecipes, removeFromBookmarkedList, addToBookmarkedList} = require('./RecipeDBAccess.js')
+const {getRestrictions} = require('../user/UserManaging.js')
+const {requestIngredients} = require('../ingredients/IngredientManaging.js')
 // const RecipeDBAccess = require("./RecipeDBAccess.js")
 
 var app = express()
@@ -528,11 +528,16 @@ app.post("/addRecipe", async (req, res) => {
         // console.log(req.body)
         
         //req.body should contain data like {userID: xxx, recipeID: xxx, path: home/xxx/xxx, title: xxx, image: xxx}
-        RecipeDBAccess.addToBookmarkedList(req.body["userID"], req.body["recipeID"], req.body["path"], req.body["title"], req.body["image"]).then(response => {
+        addToBookmarkedList(req.body["userID"], req.body["recipeID"], req.body["path"], req.body["title"], req.body["image"]).then(response => {
             var status = response.status
             delete response["status"]
             return res.status(status).send(response)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             var status = err.status
             delete err["status"]
             res.status(status).send(err)
@@ -544,12 +549,18 @@ app.post("/removeRecipe", async (req, res) => {
         // console.log(req.body)
         
         //req.body should contain data like {userID: xxx, recipeID: xxx}
-        RecipeDBAccess.removeFromBookmarkedList(req.body["userID"], req.body["recipeID"]).then(response => {
+        removeFromBookmarkedList(req.body["userID"], req.body["recipeID"]).then(response => {
             // console.log("remove recipe")
             var status = response.status
             delete response["status"]
             return res.status(status).send(response)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) 
+    }).catch(err => {
             console.log("remove recipe")
             var status = err.status
             delete err["status"]
@@ -562,11 +573,12 @@ app.get("/getRecipes", async (req, res) => {
         // console.log(req.query)
         //req.query should contain data like ?userid=xxx
         var id = req.query["userid"]
-        RecipeDBAccess.getBookmarkedRecipes(id).then(data => {
+        getBookmarkedRecipes(id).then(data => {
             // console.log(data)
             var recipeList = []
             var pathList = []
             var recipes = data["recipes"]
+            console.log(data["recipes"])
             var paths = data["paths"]
             for (let i = 0; i < recipes.length; i++) {
                 var currRecipeItem = {}
@@ -586,7 +598,12 @@ app.get("/getRecipes", async (req, res) => {
             // console.log(retObj)
             var status = data.status
             return res.status(status).send(retObj)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             var status = err.status
             delete err["status"]
             res.status(status).send(err)
@@ -598,6 +615,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
         // console.log(req.query)
         var ingredients = req.query["ingredients"].split(",")
+        console.log("filter")
 
         var missingIngredientThreshold = 4 // recipes will be suggested if the user has 40% of the ingredients
 
@@ -632,7 +650,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
 
         // fetch("http://" + ip + ":8082/getRestrictions?userid=" + req.query["userid"] + "&googlesignintoken=" + req.query["googlesignintoken"])
         getRestrictions(parseInt(req.query["userid"], 10), req.query["googlesignintoken"]).then(result =>
-            result.json()
+            result.data
         ).then(data => {
             if (data["dietaryRestrictions"] === undefined || data["dietaryRestrictions"].length === 0) {
                 skipRestrictions = 1
@@ -647,7 +665,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
             axios.get("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=" + apiKey).then(response =>
                 response.data
             ).then (data => {
-                // console.log(data)
+                console.log(data)
                 if (data.length === 0) {
                     // console.log("here")
                     return res.send([]);
@@ -677,13 +695,13 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                     }
                 }
                 idList = idList.slice(0,-1)
-                // console.log("ids: " + idList)
+                console.log("ids: " + idList)
                 
 
                 axios.get("https://api.spoonacular.com/recipes/informationBulk?ids=" + idList + "&apiKey=" + apiKey).then(response2 =>
                     response2.data
                 ).then(data => {
-                    // console.log(data)
+                    console.log(data)
                     var returnList = []
                     
                     for (let k = 0; k < data.length; k++) {
@@ -701,6 +719,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                         }
                     }
                     var recipesWithTitles = checkForTitles(returnList)
+            
                     var retList = []
                     for (let i = 0; i < recipesWithTitles.length; i++) {
                         let currItem = {};
@@ -711,6 +730,7 @@ app.get("/requestFilteredRecipes", async (req, res) => {
                         retList.push(currItem)
                         // console.log(currItem)
                     }
+                    console.log(retList)
                     res.send(retList)
                 })
             })
@@ -890,11 +910,16 @@ app.post("/addNewPath", async (req, res) => {
     verify(req.body.googleSignInToken).then(() => {
         // console.log(req.body)
         //req.body should contain data like {userID: xxx, path: home/xxx/xxx}
-        RecipeDBAccess.addToPathList(req.body["userID"], req.body["path"]).then(response => {
+        addToPathList(req.body["userID"], req.body["path"]).then(response => {
             var status = response.status
             delete response["status"]
             return res.status(status).send(response)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             var status = err.status
             delete err["status"]
             res.status(status).send(err)
@@ -905,11 +930,16 @@ app.post("/removeExistingPath", async (req, res) => {
     verify(req.body.googleSignInToken).then(() => {
         // console.log(req.body)
         //req.body should contain data like {userID: xxx, path: xxx/xxx}
-        RecipeDBAccess.removeFromPathList(req.body["userID"], req.body["path"]).then(response => {
+        removeFromPathList(req.body["userID"], req.body["path"]).then(response => {
             var status = response.status
             delete response["status"]
             return res.status(status).send(response)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             console.log("remove existing path")
             var status = err.status
             delete err["status"]
@@ -922,7 +952,7 @@ app.get("/getAllPaths", async (req, res) => {
         // console.log(req.query)
         //req.query should contain data like ?userid=xxx
         var id = req.query["userid"]
-        RecipeDBAccess.getPaths(id).then(response => {
+        getPaths(id).then(response => {
             // console.log(result)
             var result = response.result
             var idPathJSON = {}
@@ -945,7 +975,12 @@ app.get("/getAllPaths", async (req, res) => {
             // console.log(retArr)
             var status = response.status
             return res.status(status).send(retArr)
-        })}).catch(err => {
+        }).catch(err => {
+            console.log("remove recipe")
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             var status = err.status
             delete err["status"]
             res.status(status).send(err)

@@ -1,7 +1,7 @@
-import express from 'express';
-import {MongoClient} from 'mongodb';
-// const express = require('express')
-// const {MongoClient} = require('mongodb')
+// import express from 'express';
+// import {MongoClient} from 'mongodb';
+const express = require('express')
+const {MongoClient} = require('mongodb')
 
 var app = express()
 app.use(express.json())
@@ -42,7 +42,7 @@ app.post("/addToBookmarkedList", async (req, res) => {
         })   
 })
 
-export function addToBookmarkedList (userID, recipeID, path, title, image) {
+function addToBookmarkedList (userID, recipeID, path, title, image) {
     return new Promise ((resolve, reject) => {
         var newEntry = {}
         newEntry["userID"] = parseInt(userID, 10)
@@ -94,7 +94,7 @@ app.post("/removeFromBookmarkedList", async (req, res) => {
         }) 
 })
 
-export function removeFromBookmarkedList(userID, recipeID) {
+function removeFromBookmarkedList(userID, recipeID) {
     return new Promise((resolve, reject) => {
         var entryToDelete = {}
         entryToDelete["userID"] = parseInt(userID, 10)
@@ -136,7 +136,7 @@ app.get("/getBookmarkedRecipes", async (req, res) => {
         }) 
 })
 
-export function getBookmarkedRecipes(userid) {
+function getBookmarkedRecipes(userid) {
     return new Promise((resolve, reject) => {
         client.db("RecipeDB").collection("BookmarkedRecipes").find({"userID": parseInt(userid, 10)}).toArray().then(result => {
             console.log("BOOKMARKED RECIPES:" + result)
@@ -180,7 +180,7 @@ app.post("/addToPathList", async (req, res) => {
         }) 
 })
 
-export function addToPathList(userID, path) {
+function addToPathList(userID, path) {
     return new Promise((resolve, reject) => {
         var newEntry = {}
         newEntry["userID"] = parseInt(userID, 10)
@@ -222,7 +222,7 @@ app.post("/removeFromPathList", async (req, res) => {
         }) 
 })
 
-export function removeFromPathList(userID, path) {
+function removeFromPathList(userID, path) {
     return new Promise((resolve, reject) => {
         var entryToDelete = {}
         entryToDelete["userID"] = parseInt(userID, 10)
@@ -255,7 +255,7 @@ app.get("/getPaths", async (req, res) => {
         }) 
 })
 
-export function getPaths(userid) {
+function getPaths(userid) {
     return new Promise((resolve, reject) => {
         client.db("RecipeDB").collection("Paths").find({"userID": parseInt(userid, 10)}).toArray().then(result => {
             var retObj = {}
@@ -289,4 +289,4 @@ async function run () {
 
 run()
 
-// module.exports = {getPaths, removeFromPathList, addToPathList, getBookmarkedRecipes, removeFromBookmarkedList, addToBookmarkedList}
+module.exports = {getPaths, removeFromPathList, addToPathList, getBookmarkedRecipes, removeFromBookmarkedList, addToBookmarkedList}
