@@ -128,4 +128,4 @@ function getDietaryRestrictions(userid) {
     })
 }
 
-module.exports = {getDietaryRestrictions, deleteDietaryRestrictions, addToDietaryRestrictions, getTokens, storeToken, storeUserInfo, scanDB}
+module.exports = {getDietaryRestrictions, deleteDietaryRestrictions, addToDietaryRestrictions, getTokens, storeToken, storeUserInfo, scanDB, client}
