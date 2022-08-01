@@ -20,5 +20,14 @@
   "devDependencies": {
     "jest": "^28.1.3",
     "supertest": "^6.2.4"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/vendor/**"
+    ],
+    "collectCoverage": true,
+    "forceExit": true
   }
 }
