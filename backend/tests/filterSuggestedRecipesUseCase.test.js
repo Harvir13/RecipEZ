@@ -33,7 +33,7 @@ test("Success", async () => {
     // })
     const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=dairyFree")
         expect(response.status).toEqual(200)
-        // console.log(response.body)
+        console.log(response.body)
         expect(response.body.length).toBeGreaterThan(0)
 })
 
