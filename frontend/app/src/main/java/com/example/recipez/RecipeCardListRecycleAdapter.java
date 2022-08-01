@@ -36,7 +36,7 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         if (this.getItemCount() == 0) {
-            // todo: come back to this later
+            // todo: come back to this later... maybe
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.placeholder_no_recipe, parent, false);
         } else {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_card_cell, parent, false);
@@ -53,7 +53,7 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
             try {
                 Picasso.get().load(recipeArrayList.get(position).getString("image")).fit().centerCrop().into(holder.recipeImage);
                 holder.recipeTitle.setText(recipeArrayList.get(position).getString("title"));
-
+                holder.missingIngredientCount.setText(recipeArrayList.get(position).getString("ingredientsAlreadyHave"));
                 holder.recipeCard.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -64,6 +64,7 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
                             bundle.putInt("RECIPE_ID", recipeArrayList.get(position).getInt("id"));
                             bundle.putString("RECIPE_TITLE", recipeArrayList.get(position).getString("title"));
                             bundle.putString("RECIPE_IMAGE", recipeArrayList.get(position).getString("image"));
+                            bundle.putString("MISSING_INGREDIENTS", recipeArrayList.get(position).getString("ingredientsAlreadyHave"));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -87,12 +88,14 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
         private ImageView recipeImage;
         private TextView recipeTitle;
         private CardView recipeCard;
+        private TextView missingIngredientCount;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             recipeCard = itemView.findViewById(R.id.recipe_card);
             recipeImage = itemView.findViewById(R.id.recipe_card_image);
             recipeTitle = itemView.findViewById(R.id.recipe_card_title);
+            missingIngredientCount = itemView.findViewById(R.id.missing_ingredient_count_text);
         }
     }
 }
