@@ -1,4 +1,4 @@
-const IngredientDBAccess = require("../src/ingredients/IngredientDBAccess.js");
+const {MongoClient} = require('mongodb');
 const IngredientManagingAccess = require("../src/ingredients/IngredientManaging.js");
 const supertest = require('supertest');
 
@@ -6,6 +6,9 @@ const {app} = require('../src/router.js');
 
 const server = app.listen(8083);
 const request = supertest(app);
+
+const uri = "mongodb://localhost:27017";
+const client = new MongoClient(uri);
 
 jest.mock('../src/verify.js');
 
@@ -199,7 +202,35 @@ test("addIngredient: ingredient already present", async () => {
     expect(response.body).toEqual({ name: "apple", expiry: 259201, image: "apple.jpg" });
 });
 
-afterAll(() => {
-    server.close();
-    IngredientDBAccess.client.close();
-})
+beforeAll(async () => {
+    const res1 = await client.db("IngredientDB").collection("Users").insertOne({
+        "userid": 11111,
+        "ingredients": []
+    });
+    const res2 = await client.db("IngredientDB").collection("Users").insertOne({
+        "userid": 22222,
+        "ingredients": [
+            {
+            "name": "orange",
+            "expiry": 123456789,
+            "image": "orange.png"
+            },
+            {
+            "name": "chicken",
+            "expiry": 259200,
+            "image": "whole-chicken.jpg"
+            },
+            {
+            "name": "apple",
+            "expiry": 259201,
+            "image": "apple.jpg"
+            }
+        ]
+    });
+});
+
+afterAll(async () => {
+    const res1 = await client.db("IngredientDB").collection("Users").deleteOne({userid: 11111});
+    const res2 = await client.db("IngredientDB").collection("Users").deleteOne({userid: 22222});
+});
+

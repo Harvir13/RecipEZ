@@ -1,3 +1,4 @@
+const {MongoClient} = require('mongodb');
 const IngredientDBAccess = require("../src/ingredients/IngredientDBAccess.js");
 const IngredientManagingAccess = require("../src/ingredients/IngredientManaging.js");
 const supertest = require('supertest');
@@ -6,6 +7,9 @@ const {app} = require('../src/router.js');
 
 const server = app.listen(8082);
 const request = supertest(app);
+
+const uri = "mongodb://localhost:27017";
+const client = new MongoClient(uri);
 
 jest.mock('../src/verify.js');
 
@@ -409,12 +413,39 @@ test("sendExpiryNotification: no expiring items", async () => {
     expect(response).toEqual([]);
 });
 
-test("has expiring items", async () => {
+test("sendExpiryNotifcation: has expiring items", async () => {
     const response = await IngredientManagingAccess.sendExpiryNotification(86400);
     expect(response).toEqual([22222]);
 });
 
-afterAll(() => {
-    server.close();
-    IngredientDBAccess.client.close();
+beforeAll(async () => {
+    const res1 = await client.db("IngredientDB").collection("Users").insertOne({
+        "userid": 11111,
+        "ingredients": []
+    });
+    const res2 = await client.db("IngredientDB").collection("Users").insertOne({
+        "userid": 22222,
+        "ingredients": [
+            {
+            "name": "orange",
+            "expiry": 123456789,
+            "image": "orange.png"
+            },
+            {
+            "name": "chicken",
+            "expiry": 259200,
+            "image": "whole-chicken.jpg"
+            },
+            {
+            "name": "apple",
+            "expiry": 259201,
+            "image": "apple.jpg"
+            }
+        ]
+    });
+});
+
+afterAll(async () => {
+    const res1 = await client.db("IngredientDB").collection("Users").deleteOne({userid: 11111});
+    const res2 = await client.db("IngredientDB").collection("Users").deleteOne({userid: 22222});
 });
