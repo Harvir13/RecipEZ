@@ -70,7 +70,7 @@
             app:layout_constraintHorizontal_bias="0.061"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.387"
+            app:layout_constraintVertical_bias="0.447"
             tools:cardCornerRAdius="5dp">
 
             <LinearLayout
@@ -118,7 +118,7 @@
             app:layout_constraintHorizontal_bias="0.925"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.387"
+            app:layout_constraintVertical_bias="0.447"
             tools:cardCornerRAdius="5dp">
 
             <LinearLayout
@@ -150,25 +150,16 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout"
-            android:layout_width="350dp"
-            android:layout_height="198dp"
+        <Button
+            android:id="@+id/sign_out_buton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sign_out_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.491"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.766">
-
-            <ListView
-                android:id="@+id/settings_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/settings_list_border"
-                tools:layout_editor_absoluteX="30dp"
-                tools:layout_editor_absoluteY="405dp" />
-        </RelativeLayout>
+            app:layout_constraintVertical_bias="0.685" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
