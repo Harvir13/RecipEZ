@@ -11,7 +11,6 @@ const request = supertest(app)
 
 jest.mock('../src/verify.js')
 
-jest.setTimeout(30000);
 
 beforeAll(async () => {
     await client.db("RecipeDB").collection("Paths").insertOne({"userID": 11111, "path": "sauce"})
