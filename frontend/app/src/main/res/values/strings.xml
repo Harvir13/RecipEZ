@@ -39,6 +39,7 @@
     <string name="sign_out_button">Sign Out</string>
 
     <!-- Bookmark List Fragment -->
+    <string name="bookmark_fragment_title">Bookmarks</string>
     <string name="bookmarked_list_title_text">Bookmarked Recipes</string>
     <string name="folder_name_text">Folder name</string>
     <string name="add_folder_dialog_button">New Folder</string>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".RecipesFragment">
 
     <LinearLayout
@@ -12,14 +12,20 @@
         android:orientation="vertical">
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="5dp">
 
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/recipe_list_search_bar"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:background="@drawable/searchview_background"
                 app:iconifiedByDefault="false"
+                app:queryBackground="@android:color/transparent"
                 app:queryHint="Search for a recipe">
 
             </androidx.appcompat.widget.SearchView>
@@ -29,7 +35,9 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_alignEnd="@id/recipe_list_search_bar"
-                android:elevation="6dp"
+                android:layout_alignParentStart="false"
+                android:layout_marginEnd="16dp"
+                android:elevation="10dp"
                 android:src="@drawable/ic_filter" />
 
         </RelativeLayout>
@@ -39,6 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
+            android:paddingStart="16dp"
             android:text="@string/recipe_list_based_on_your_pantry_text"
             android:textSize="18sp" />
 
