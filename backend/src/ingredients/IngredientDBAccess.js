@@ -12,9 +12,6 @@ function getIngredients(userid) {
             else {
                 return resolve({"status": 200, "result": result.ingredients});
             }
-        }).catch(err => {
-            console.log(err)
-            return reject({"status": 400, "result": err})
         });
     });
 }
@@ -36,10 +33,7 @@ function storeIngredient(userid, inputIngredient) {
             client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(userid, 10) }, newIngredients).then(result => {
                 return resolve({"status": 200, "result": inputIngredient});
             });
-        }).catch(err => {
-            console.log(err)
-            return reject({"status": 400, "result": err})
-        }) 
+        });
     })
 }
 
@@ -54,8 +48,6 @@ function removeIngredient(userid, ingredient) {
         client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(userid, 10) }, updateString).then(() => {
             return resolve({"status": 200, "result": "Successfully deleted ingredient"});
         })
-        }).catch(err => {
-            return reject({"status": 400, "result": err})
         });
     });
 }
@@ -73,10 +65,7 @@ function usersWithExpiringIngredients(time) {
                 if (hasExpiring) expiringUsers.push(user.userid);
             });
             return resolve({"status": 200, "result": expiringUsers})
-        }).catch(err => {
-            console.log(err)
-            return reject({"status": 400, "result": err})
-        }) 
+        });
     })
 }
 
@@ -94,10 +83,7 @@ function changeExpiry(userid, ingredient, expiry) {
             client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(userid, 10) }, updateString).then(result => {
                 return resolve({"status": 200, "result": "Successfully changed expiry date"})
             })
-        }).catch(err => {
-            console.log(err)
-            return reject({"status": 400, "result": err})
-        }) 
+        });
     })
 }
 
