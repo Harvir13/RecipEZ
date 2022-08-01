@@ -9,19 +9,19 @@ const request = supertest(app);
 
 jest.mock('../src/verify.js');
 
-test("requestIngredients: user with unregistered userID", () => {
+test("requestIngredients: user with unregistered userID", async () => {
     return request.get("/requestIngredients?userid=-1").then((response) => {
         expect(response.status).toBe(404);
     });
 });
 
-test("requestIngredients: user with no ingredients", () => {
+test("requestIngredients: user with no ingredients", async () => {
     return request.get("/requestIngredients?userid=11111").then((response) => {
         expect(response.body).toEqual([]);
     });
 });
 
-test("requestIngredients: user with ingredients", () => {
+test("requestIngredients: user with ingredients", async () => {
     return request.get("/requestIngredients?userid=22222").then((response) => {
         expect(response.body).toEqual([
             { name: "orange", expiry: 123456789, image: "orange.png" },
@@ -31,7 +31,7 @@ test("requestIngredients: user with ingredients", () => {
     });
 });
 
-test("deleteIngredient: user with unregistered userID", () => {
+test("deleteIngredient: user with unregistered userID", async () => {
     return request.post("/deleteIngredient").send({
         userid: -1,
         ingredient: "apple"
@@ -132,12 +132,6 @@ test("getIngredientSuggestions: has results", async () => {
     ]);
 });
 
-test("requestExpiryDate: no results", async () => {
-    const response = await request.get("/requestExpiryDate?ingredient=asjdkfjsl");
-    expect(response.status).toBe(200);
-    expect(parseInt(response.text, 10)).toBe(-1);
-});
-
 test("requestExpiryDate: has results", async () => {
     const response = await request.get("/requestExpiryDate?ingredient=apple");
     expect(response.status).toBe(200);
@@ -162,7 +156,7 @@ test("addIngredient: user with unregistered userID", async () => {
     });
 });
 
-test("addIngredient: negative expiry value", () => {
+test("addIngredient: negative expiry value", async () => {
     return request.post("/addIngredient").send({
         userid: 11111,
         ingredient: "apple",
@@ -172,7 +166,7 @@ test("addIngredient: negative expiry value", () => {
     });
 });
 
-test("addIngredient: ingredient doesn't exist in Spoonaular API", () => {
+test("addIngredient: ingredient doesn't exist in Spoonaular API", async () => {
     return request.post("/addIngredient").send({
         userid: 11111,
         ingredient: "asjdkfljsl",
