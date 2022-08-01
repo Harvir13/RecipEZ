@@ -10,6 +10,11 @@ const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
 // const Verification = require('../src/verify.js')
 const UserDBAccess = require('../src/user/UserDBAccess.js')
 
+const {MongoClient, Db} = require('mongodb')
+
+const uri = "mongodb://localhost:27017"
+const client = new MongoClient(uri)
+
 
 
 const {app} = require('../src/router.js')
@@ -18,7 +23,15 @@ const supertest = require('supertest')
 
 const server = app.listen(8083)
 
+
+beforeAll(async () => {
+    await client.db("RecipeDB").collection("BookmarkedRecipes").insertOne({"userID": 11111, "recipeID": 73420, "path": "dessert", "image": "https://spoonacular.com/recipeImages/73420-312x231.jpg", "title": "Apple Or Peach Strudel"})
+    await client.db("RecipeDB").collection("Paths").insertOne({"userID": 11111, "path": "dessert"})
+})
+
 afterAll(async () => {
+    await client.db("RecipeDB").collection("BookmarkedRecipes").remove({"userID": 11111, "recipeID": 73420, "path": "dessert", "image": "https://spoonacular.com/recipeImages/73420-312x231.jpg", "title": "Apple Or Peach Strudel"})
+    await client.db("RecipeDB").collection("Paths").remove({"userID": 11111, "path": "dessert"})
     await UserDBAccess.client.close()
     server.close()
 })
@@ -26,7 +39,7 @@ afterAll(async () => {
 const request = supertest(app)
 jest.mock('../src/verify.js')
 
-jest.setTimeout(20000)
+// jest.setTimeout(20000)
 
 // addRecipe tests
 
