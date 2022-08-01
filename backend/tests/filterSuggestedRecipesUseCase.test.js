@@ -34,18 +34,6 @@ test("Invalid list of ingredients", async () => {
 })
 
 test("Success", async () => {
-    // UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
-    //     return new Promise ((resolve, reject) => {
-    //         console.log("in mock")
-    //         if(userid === 11111) {
-    //             console.log(userid)
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": ["bread"]}})
-    //         }
-    //         else {
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": []}})
-    //         }
-    //     })
-    // })
     const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=dairyFree")
         expect(response.status).toEqual(200)
         console.log(response.body)
