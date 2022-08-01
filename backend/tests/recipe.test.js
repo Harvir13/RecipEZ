@@ -1,27 +1,16 @@
 var axios = require("axios");
-// var RecipeDBAccess = require("../src/recipes/RecipeDBAccess.js");
-// var IngredientManaging = require('../src/ingredients/IngredientManaging.js');
-// const fetch = require("node-fetch");
-// import * as UserManaging from "../src/user/UserManaging.js"
 const UserManaging = require('../src/user/UserManaging.js')
 const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
-// const RecipeManaging = require('../src/recipes/RecipeManaging.js')
 const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
-// const Verification = require('../src/verify.js')
 const UserDBAccess = require('../src/user/UserDBAccess.js')
-
 const {MongoClient, Db} = require('mongodb')
-
 const uri = "mongodb://localhost:27017"
-const client = new MongoClient(uri)
-
-
-
 const {app} = require('../src/router.js')
-// const {app} = require('../src/start.js')
 const supertest = require('supertest')
 
 const server = app.listen(8083)
+
+const client = new MongoClient(uri)
 
 
 beforeAll(async () => {
@@ -37,12 +26,10 @@ afterAll(async () => {
 })
 
 const request = supertest(app)
+
 jest.mock('../src/verify.js')
 
-// jest.setTimeout(20000)
-
 // addRecipe tests
-
   
 test("Success", async () => {
     const response = await request.post("/addRecipe").send({

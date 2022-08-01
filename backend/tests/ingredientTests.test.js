@@ -2,7 +2,6 @@ const {MongoClient} = require('mongodb');
 const IngredientDBAccess = require("../src/ingredients/IngredientDBAccess.js");
 const IngredientManagingAccess = require("../src/ingredients/IngredientManaging.js");
 const supertest = require('supertest');
-
 const {app} = require('../src/router.js');
 
 const server = app.listen(8082);
@@ -36,7 +35,6 @@ test("getIngredients: user with ingredients", async () => {
     });
 });
 
-
 //tests for storeIngredient
 test("storeIngredient: user with unregistered userID", async () => {
     return IngredientDBAccess.storeIngredient(-1, {
@@ -68,7 +66,6 @@ test("storeIngredient: correct input", async () => {
     expect(del.status).toBe(200);
     expect(response.result).toEqual({ name: "apple", expiry: 86400, image: "apple.jpg" });
 });
-
 
 //tests for removeIngredient
 test("removeIngredient: user with unregistered userID", async () => {
@@ -103,7 +100,6 @@ test("removeIngredient: has stored ingredient", async () => {
         { name: "chicken", expiry: 259200, image: "whole-chicken.jpg" }
     ]);
 });
-
 
 //tests for usersWithExpiringIngredients
 test("usersWithExpiringIngredients: negative expiry value", async () => {
