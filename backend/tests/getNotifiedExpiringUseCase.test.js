@@ -4,7 +4,7 @@ const {app} = require('../src/router.js');
 
 jest.mock('axios');
 
-const server = app.listen(8084);
+const server = app.listen(8088);
 
 const uri = "mongodb://localhost:27017";
 const client = new MongoClient(uri);
