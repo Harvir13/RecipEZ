@@ -36,7 +36,7 @@ test("No Ingredients", async () => {
     //         }
     //     })   
     // })
-    const response = await request.get("/generateSuggestedRecipesList?userid=22222")
+    const response = await request.get("/generateSuggestedRecipesList?userid=11111")
     expect(response.status).toEqual(200)
     expect(response.body.length).toEqual(0)
 })
