@@ -1,11 +1,34 @@
 const supertest = require('supertest')
 
 const {app} = require('../src/router.js')
+const {MongoClient} = require('mongodb')
 
-const server = app.listen(8086)
+const uri = "mongodb://localhost:27017"
+const client = new MongoClient(uri)
+
+const server = app.listen(8084)
 const request = supertest(app)
 
 jest.mock('../src/verify.js')
+
+jest.setTimeout(30000);
+
+beforeAll(async () => {
+
+    await request.post("/addNewPath").send({
+        userID: 11111, 
+        path: "sauce"
+    })
+})
+
+afterAll(async () => {
+    await client.close()
+    server.close()
+})
+
+afterEach(async () => {
+    await new Promise(resolve => setTimeout(() => resolve(), 10000)); // avoid jest open handle error
+  });
 
 test("getAllPaths: no user", async () => {
     const response = await request.get("/getAllPaths?userid=-1")
@@ -51,6 +74,15 @@ test("addNewPath: success", async () => {
         expect(response.status).toEqual(200)
         expect(response.body.result).toEqual("Successfully added path to path list")
 })
+
+// test("addNewPath: success2", async () => {
+//     const response = await request.post("/addNewPath").send({
+//                 userID: 11111, 
+//                 path: "sauce"
+//         })
+//         expect(response.status).toEqual(200)
+//         expect(response.body.result).toEqual("Successfully added path to path list")
+// })
 
 test("removeExistingPath: path does not exist", async () => {
     const response = await request.post("/removeExistingPath").send({
@@ -140,6 +172,3 @@ test("removeRecipe: success", async () => {
     expect(response.body.result).toEqual("Successfully deleted recipe from bookmarked list")
 })
 
-afterAll(() => {
-    server.close()
-})
