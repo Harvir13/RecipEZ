@@ -75,17 +75,14 @@ const getUserTokensAPI = async (req, res) => {
 function getUserTokens(userids) {
     return new Promise((resolve, reject) => {
         getTokens(userids).then(response => {
-            // DO SOME PROCEESSING ON data HERE TO ONLY SEND WHAT WE NEED
             var data = response.result
             var retArr = []
-            console.log(data)
             for (let i = 0; i < data.length; i++) {
                 let currObj = {}
                 currObj["userID"] = data[i]["userID"]
                 currObj["token"] = data[i]["token"]
                 retArr.push(currObj)
             }
-            res.status(response.status).send(retArr)
             return resolve({"status": response.status, "result": retArr})
         }).catch ((err) => {
             return reject(err)

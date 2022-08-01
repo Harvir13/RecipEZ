@@ -10,10 +10,7 @@ const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9
 var app = express();
 app.use(express.json());
 
-module.exports = {getNotification, requestIngredientsAPI, requestIngredients, searchForIngredient, scanExpiryDates, sendExpiryNotification,
-	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient, client};
-
-// setInterval(function() {
+// setInterval(function() { // should move this to router.js
 // 	sendExpiryNotification(Math.round(Date.now() / 1000).toString());
 // }, 300000)
 
@@ -73,7 +70,6 @@ const updateExpiryDate = async (req, res) => {
 	});
 }
 
-//expects {ingredient: xxx}
 function searchForIngredient(ingredient) {
 	return new Promise((resolve, reject) => {
 		spoonacularSearch(ingredient).then((data) => {
@@ -126,7 +122,7 @@ const requestExpiryDate = async (req, res) => {
 	});
 }
 
-// expects body of {userid: xxx, ingredient: xxx, expiry: xxx}
+// expects {userid: xxx, ingredient: xxx, expiry: xxx}
 const addIngredient = async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {
 		searchForIngredient(req.body.ingredient).then((spoonacularIng) => {
@@ -153,7 +149,6 @@ const addIngredient = async (req, res) => {
 	});
 }
 
-// expects {userid: xxx, time: xxx}
 function scanExpiryDates(time) {
 	return new Promise((resolve, reject) => {
 		usersWithExpiringIngredients(time).then(response => {
@@ -165,17 +160,6 @@ function scanExpiryDates(time) {
 	
 }
 
-// app.get("/scanExpiryDates", async (req, res) => {
-// 	verify(req.query["googlesignintoken"]).then(() => {
-// 		axios.get("http://localhost:8085/usersWithExpiringIngredients?time=" + req.query["time"]).then((response) => {
-// 			res.send(response.data);
-// 		}).catch((err) => {
-// 			res.status(err.response.status).send(err);
-// 		});
-// 	});
-// });
-
-// expects {userid: xxx, time: zzz}
 function expiringIngredients(userid, time) {
 	return new Promise((resolve, reject) => {
 		if (time < 0) return reject({"status": 405, "result": "Error: invalid expiry value"});
@@ -197,29 +181,6 @@ function expiringIngredients(userid, time) {
 		});
 	})
 }
-// app.get("/expiringIngredients", async (req, res) => {
-// 	verify(req.query["googlesignintoken"]).then(() => {
-// 		if (req.query["time"] < 0) return res.status(405).send(new Error("Error: invalid expiry value"));
-// 		IngredientDBAccess.getIngredients(userid).then((response) => {
-// 			let data = response.result;
-// 			let expiringSoon = [];
-// 			data.forEach((ingredient) => {
-// 				let ingDate = new Date(0);
-// 				let currDate = new Date(0);
-// 				ingDate.setUTCSeconds(ingredient.expiry - (86400 * 2)); // 86400 = 1 day in seconds
-// 				currDate.setUTCSeconds(parseInt(req.query["time"], 10));
-// 				if (ingDate <= currDate) {
-// 					expiringSoon.push(ingredient);
-// 				}
-// 			});
-// 			res.status(response.status).send(expiringSoon);
-// 		}).catch((err) => {
-// 			var status = err.status
-// 			delete err["status"]
-// 			res.status(status).send(err);
-// 		});
-// 	});
-// });
 
 function levenshtein_distance(inputString, realString) {
 	let prevRow = [];
@@ -243,52 +204,42 @@ function levenshtein_distance(inputString, realString) {
 
 // checks expiry dates and sends a notification to the user, if something is expiring
 async function sendExpiryNotification(currTime) {
-	//let currTime = Math.round(Date.now() / 1000).toString();
-	console.log("Current time: " + currTime)
-	scanExpiryDates(currTime).then((data) => {
-        console.log(data);
-		let userids = "";
-		for (let i = 0; i < data.length; i++) {
-			userids += data.toString();
-			userids += ",";
-		}
-		userids = userids.slice(0,-1)
-		console.log(userids);
-		UserManaging.getUserTokens(userids).then((response) => {
-			return response.result;
-		}).then((tokens) => {
-			console.log(tokens)
-			data.forEach((user) => {
-				console.log(user)
-				expiringIngredients(user.toString(), currTime).then((response) => {
-					return response.result
-				}).then((ingredient) => {
-					console.log("Expiring Ingredients:" + ingredient)
-					var currToken = tokens.find((pair) => pair.userID == user).token
-					var expiring = ""
-					for (let i = 0; i < ingredient.length; i++) {
-						expiring = expiring + ingredient[i]["name"] + ","
-					}
-					expiring = expiring.slice(0,-1)
-					console.log("userid: " + user, "ingredients: " + expiring)
-					var json = {
-						"data": {
-							"ingredients": expiring
-						},
-						"to": currToken.toString()
-					}
-					axios.post("https://fcm.googleapis.com/fcm/send", JSON.stringify(json), {
-						"Content-Type": "application/json",
-						Authorization: SERVER_KEY
-					}).then((response) => response.text()).then((data) => {
-						console.log(user)
-						console.log(data);
-						return data;
-					});
-				})
-			})
-		})
+	const data = await scanExpiryDates(currTime);
+	let userids = "";
+	for (let i = 0; i < data.length; i++) {
+		userids += data[i].toString();
+		userids += ",";
+	}
+	userids = userids.slice(0,-1);
+	console.log(userids);
+	const tokensData = await UserManaging.getUserTokens(userids);
+	const tokens = tokensData.result;
+	data.forEach((user) => {
+		expiringIngredients(user.toString(), currTime).then((response) => response.result).then((ingredient) => {
+			var currToken = tokens.find((pair) => pair.userID == user).token
+			var expiring = ""
+			for (let i = 0; i < ingredient.length; i++) {
+				expiring = expiring + ingredient[i]["name"] + ","
+			}
+			expiring = expiring.slice(0,-1)
+			var json = {
+				"data": {
+					"ingredients": expiring
+				},
+				"to": currToken.toString()
+			}
+			sendNotificationFirebase(json).then((result) => {});
+		});
 	});
+	return data;
+}
+
+async function sendNotificationFirebase(json) {
+	const res = await axios.post("https://fcm.googleapis.com/fcm/send", JSON.stringify(json), {
+		"Content-Type": "application/json",
+		Authorization: SERVER_KEY
+	});
+	return res;
 }
 
 async function spoonacularSearch(ingredient) {
@@ -312,3 +263,6 @@ async function shelfLifeGuide(id) {
 	const res = await axios.get("https://shelf-life-api.herokuapp.com/guides/" + id);
 	return res.data;
 }
+
+module.exports = {getNotification, requestIngredientsAPI, requestIngredients, searchForIngredient, scanExpiryDates, sendExpiryNotification,
+	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient, sendNotificationFirebase};
