@@ -27,6 +27,18 @@ const requestIngredientsAPI = async (req, res) => {
 	});
 }
 
+function requestIngredients(userid, googlesignintoken) {
+    return new Promise((resolve, reject) => {
+        verify(googlesignintoken).then(() => {
+                getIngredients(userid).then((response) => {
+                return resolve({"status": 200, data: response.result})
+            }).catch((err) => {
+                return reject({"status": err.status, "data": err})
+            }) 
+        })
+    })
+}
+
 // expects {userid: xxx, ingredient: xxx}
 const deleteIngredient = async (req, res) => {
 	verify(req.body.googleSignInToken).then(() => {
@@ -243,4 +255,4 @@ async function shelfLifeGuide(id) {
 }
 
 module.exports = {requestIngredientsAPI, searchForIngredient, scanExpiryDates, sendExpiryNotification, expiringIngredients,
-	deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient, sendNotificationFirebase};
+	deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient, sendNotificationFirebase, requestIngredients};

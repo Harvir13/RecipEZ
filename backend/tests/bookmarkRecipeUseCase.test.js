@@ -1,7 +1,7 @@
 const supertest = require('supertest')
 
 const {app} = require('../src/router.js')
-const {MongoClient} = require('mongodb')
+const {MongoClient, Db} = require('mongodb')
 
 const uri = "mongodb://localhost:27017"
 const client = new MongoClient(uri)
@@ -14,14 +14,11 @@ jest.mock('../src/verify.js')
 jest.setTimeout(30000);
 
 beforeAll(async () => {
-
-    await request.post("/addNewPath").send({
-        userID: 11111, 
-        path: "sauce"
-    })
+    await client.db("RecipeDB").collection("Paths").insertOne({"userID": 11111, "path": "sauce"})
 })
 
 afterAll(async () => {
+    await client.db("RecipeDB").collection("Paths").remove({"userID": 11111, "path": "sauce"})
     await client.close()
     server.close()
 })

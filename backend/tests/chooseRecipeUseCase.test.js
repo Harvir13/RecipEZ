@@ -5,82 +5,59 @@ const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
 // const RecipeManaging = require('../src/recipes/RecipeManaging.js')
 const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
 const supertest = require('supertest');
-
 const {app} = require('../src/router.js');
+
+const {MongoClient} = require('mongodb')
+
+const uri = "mongodb://localhost:27017"
+const client = new MongoClient(uri)
 
 const server = app.listen(8087);
 const request = supertest(app);
 
 jest.mock('../src/verify.js');
 
+
+beforeAll(async () => {
+    await client.db("UserDB").collection("Users").insertOne({"userID": 11111, "dietaryRestrictions": ["bread"]})
+    await client.db("UserDB").collection("Users").insertOne({"userID": 22222, "dietaryRestrictions": ["Apple"]})
+    await client.db("UserDB").collection("Users").insertOne({"userID": 33333, "dietaryRestrictions": []})
+    await client.db("IngredientDB").collection("Users").insertOne({"userid": 11111, "ingredients": [{"name": "Apple"}, {"name":"Blue berries"}, {"name": "Orange"}]})
+    await client.db("IngredientDB").collection("Users").insertOne({"userid": 22222, "ingredients": [{"name": "Breadfruit"}]})
+    await client.db("IngredientDB").collection("Users").insertOne({"userid": 33333, "ingredients": []})
+})
+
+afterAll(async () => {
+    await client.db("UserDB").collection("Users").remove({"userID": 11111, "dietaryRestrictions": ["bread"]})
+    await client.db("UserDB").collection("Users").remove({"userID": 22222, "dietaryRestrictions": ["Apple"]})
+    await client.db("UserDB").collection("Users").remove({"userID": 33333, "dietaryRestrictions": []})
+    await client.db("IngredientDB").collection("Users").remove({"userid": 11111, "ingredients": [{"name": "Apple"}, {"name":"Blue berries"}, {"name": "Orange"}]})
+    await client.db("IngredientDB").collection("Users").remove({"userid": 22222, "ingredients": [{"name": "Breadfruit"}]})
+    await client.db("IngredientDB").collection("Users").remove({"userid": 33333, "ingredients": []})
+    await client.close()
+    server.close()
+})
+
 test("No Ingredients", async () => {
-    // UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
-    //     return new Promise((resolve, reject) => {
-    //         if(userid === 11111) {
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": ["bread"]}})
-    //         } else if (userid === 33333) {
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": ["Apple"]}})
-    //         } else {
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": []}})
-    //         }
-    //     })   
-    // })
-    // IngredientManaging.requestIngredients = jest.fn().mockImplementation((userid, googlesignintoken) => {
-    //     return new Promise((resolve, reject) => {
-    //         if(userid === 11111) {
-    //             return resolve({"status": 200, "data": ["Apple", "Blue berries", "Orange"]})
-    //         } else if (userid === 33333) {
-    //             return resolve({"status": 200, "data": ["Breadfruit"]})
-    //         } else {
-    //             return resolve({"status": 200, "data": []})
-    //         }
-    //     })   
-    // })
-    const response = await request.get("/generateSuggestedRecipesList?userid=22222")
+    const response = await request.get("/generateSuggestedRecipesList?userid=33333")
+    console.log(response)
     expect(response.status).toEqual(200)
     expect(response.body.length).toEqual(0)
 })
 
 test("No user", async () => {
-    // UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
-    //     return new Promise((resolve, reject) => {
-    //         if(userid === 11111) {
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": ["bread"]}})
-    //         } else if (userid === 33333) {
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": ["Apple"]}})
-    //         } else {
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": []}})
-    //         }
-    //     })   
-    // })
-    // IngredientManaging.requestIngredients = jest.fn().mockImplementation((userid, googlesignintoken) => {
-    //     return new Promise((resolve, reject) => {
-    //         return resolve({"status": 200, "data": [{"name": "Apple"},{"name": "Blue berries"},{"name": "Orange"}]})
-    //     })   
-    // })
-
-    const response = await request.get("/generateSuggestedRecipesList?userid=-1")
-    expect(response.status).toEqual(200)
+    try {
+        const response = await request.get("/generateSuggestedRecipesList?userid=-1")
+    } catch (e) {
+        console.log(e)
+        expect(e.status).toEqual(404)
+    }
+    
 })
 
 
 test("Success", async () => {
-    // UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
-    //     return new Promise((resolve, reject) => {
-    //         if(userid === 11111) {
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": ["bread"]}})
-    //         } else if (userid === 33333) {
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": ["Apple"]}})
-    //         } else {
-    //             return resolve({"status": 200, "data": {"dietaryRestrictions": []}})
-    //         }
-    //     })   
-    // })
-    // IngredientManaging.requestIngredients = jest.fn().mockImplementation((userid, googlesignintoken) => {
-    //     return new Promise((resolve, reject) => {
-    //         return resolve({"status": 200, "data": [{"name": "Apple"},{"name": "Blue berries"},{"name": "Orange"}]})
-    //     })   
-    // })
+
     const response = await request.get("/generateSuggestedRecipesList?userid=11111")
     expect(response.status).toEqual(200)
     expect(response.body).toEqual(expect.arrayContaining([{

@@ -5,7 +5,9 @@ const client = new MongoClient(uri);
 
 function getIngredients(userid) {
     return new Promise((resolve, reject) => {
+        console.log(userid)
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
+            console.log(result)
             if (result === null) {
                 return reject({"status": 404, "result": "Error: invalid userID"});
             }

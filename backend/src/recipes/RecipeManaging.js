@@ -328,7 +328,12 @@ const generateSuggestedRecipesList = async (req, res) => {
                     res.send(retList)
                 })
             })
-        })}).catch(err => {
+        }).catch(err => {
+            // console.log(err)
+            var status = err.status
+            delete err["status"]
+            res.status(status).send(err)
+        }) }).catch(err => {
             // console.log(err)
             res.status(400).send(err)
         }) 

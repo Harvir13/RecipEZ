@@ -1,11 +1,26 @@
 const supertest = require('supertest')
-
 const {app} = require('../src/router.js')
+const {MongoClient} = require('mongodb')
+
+const uri = "mongodb://localhost:27017"
+const client = new MongoClient(uri)
 
 const server = app.listen(8085)
 const request = supertest(app)
 
+
+
 jest.mock('../src/verify.js')
+
+beforeAll(async () => {
+    await client.db("UserDB").collection("Users").insertOne({"userID": 11111, "dietaryRestrictions": ["bread"]})
+})
+
+afterAll(async () => {
+    await client.db("UserDB").collection("Users").remove({"userID": 11111, "dietaryRestrictions": ["bread"]})
+    await client.close()
+    server.close()
+})
 
 test("No user", async () => {
     const response = await request.get("/requestFilteredRecipes?userid=-1&ingredients=apples,sugar&filters=italian,gluten-free")
