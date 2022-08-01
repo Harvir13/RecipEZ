@@ -26,10 +26,6 @@ afterAll(async () => {
     server.close()
 })
 
-afterEach(async () => {
-    await new Promise(resolve => setTimeout(() => resolve(), 10000)); // avoid jest open handle error
-  });
-
 test("getAllPaths: no user", async () => {
     const response = await request.get("/getAllPaths?userid=-1")
     console.log(response)
