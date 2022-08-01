@@ -53,7 +53,7 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
             try {
                 Picasso.get().load(recipeArrayList.get(position).getString("image")).fit().centerCrop().into(holder.recipeImage);
                 holder.recipeTitle.setText(recipeArrayList.get(position).getString("title"));
-                holder.missingIngredientCount.setText(recipeArrayList.get(position).getString("ingredientsAlreadyHave"));
+//                holder.missingIngredientCount.setText(recipeArrayList.get(position).getString("ingredientsAlreadyHave"));
                 holder.recipeCard.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -64,7 +64,7 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
                             bundle.putInt("RECIPE_ID", recipeArrayList.get(position).getInt("id"));
                             bundle.putString("RECIPE_TITLE", recipeArrayList.get(position).getString("title"));
                             bundle.putString("RECIPE_IMAGE", recipeArrayList.get(position).getString("image"));
-                            bundle.putString("MISSING_INGREDIENTS", recipeArrayList.get(position).getString("ingredientsAlreadyHave"));
+//                            bundle.putString("MISSING_INGREDIENTS", recipeArrayList.get(position).getString("ingredientsAlreadyHave"));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

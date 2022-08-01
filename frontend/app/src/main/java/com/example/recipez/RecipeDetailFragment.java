@@ -179,9 +179,9 @@ public class RecipeDetailFragment extends Fragment {
                                 }
                                 JSONArray instructionSubArray = instructionArray.getJSONObject(i).getJSONArray("steps");
                                 for (int j = 0; j < instructionSubArray.length(); j++) {
-                                    instructionParser.append("- ");
+                                    instructionParser.append(j + 1).append(". ");
                                     instructionParser.append(instructionSubArray.getString(j));
-                                    instructionParser.append("\n");
+                                    instructionParser.append("\n\n");
                                 }
                             }
                             recipeInstructions.setText(instructionParser.toString());
