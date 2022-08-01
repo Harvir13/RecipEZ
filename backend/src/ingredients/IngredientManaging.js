@@ -10,11 +10,7 @@ const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9
 var app = express();
 app.use(express.json());
 
-<<<<<<< HEAD
-// setInterval(function() {
-=======
 // setInterval(function() { // should move this to router.js
->>>>>>> 08b7828b1a92baba78d81cf43002deec0d5308fa
 // 	sendExpiryNotification(Math.round(Date.now() / 1000).toString());
 // }, 300000)
 

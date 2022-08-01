@@ -8,6 +8,7 @@ const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
 // const RecipeManaging = require('../src/recipes/RecipeManaging.js')
 const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
 // const Verification = require('../src/verify.js')
+const UserDBAccess = require('../src/user/UserDBAccess.js')
 
 
 
@@ -15,27 +16,20 @@ const {app} = require('../src/router.js')
 // const {app} = require('../src/start.js')
 const supertest = require('supertest')
 
-// jest.useFakeTimers()
-
 const server = app.listen(8083)
 
-afterAll(() => {
+afterAll(async () => {
+    await UserDBAccess.client.close()
     server.close()
 })
 
-// jest.setTimeout(10000)
-
 const request = supertest(app)
+jest.mock('../src/verify.js')
 
-const RecipeManagingURL = "http://20.53.224.7:8082"
+jest.setTimeout(20000)
 
 // addRecipe tests
 
-// jest.mock('../src/user/UserManaging.js')
-// jest.mock('../src/ingredients/IngredientManaging.js')
-jest.mock('../src/verify.js')
-
-jest.setTimeout(15000)
   
 test("Success", async () => {
     const response = await request.post("/addRecipe").send({
