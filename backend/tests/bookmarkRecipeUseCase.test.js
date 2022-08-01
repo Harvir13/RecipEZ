@@ -37,7 +37,7 @@ test("getAllPaths: success", async () => {
     const response = await request.get("/getAllPaths?userid=11111")
     console.log(response)
     expect(response.status).toEqual(200)
-    expect(response.body.length).toEqual(0)
+    expect(response.body.length).toEqual(1)
 })
 
 test("getRecipes: no user", async () => {
@@ -71,15 +71,6 @@ test("addNewPath: success", async () => {
         expect(response.body.result).toEqual("Successfully added path to path list")
 })
 
-// test("addNewPath: success2", async () => {
-//     const response = await request.post("/addNewPath").send({
-//                 userID: 11111, 
-//                 path: "sauce"
-//         })
-//         expect(response.status).toEqual(200)
-//         expect(response.body.result).toEqual("Successfully added path to path list")
-// })
-
 test("removeExistingPath: path does not exist", async () => {
     const response = await request.post("/removeExistingPath").send({
                 userID: 11111, 
@@ -102,7 +93,7 @@ test("removeExistingPath: empty folder", async () => {
                 userID: 11111, 
                 path: "sauce"
         })
-        expect(response.status).toEqual(457)
+        expect(response.status).toEqual(200)
 })
 
 test("removeExistingPath: success", async () => {
