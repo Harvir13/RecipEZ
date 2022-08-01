@@ -2,28 +2,30 @@ const supertest = require('supertest')
 
 const {app} = require('../src/router.js')
 
-const server = app.listen(8082)
+const server = app.listen(8086)
 const request = supertest(app)
+
+jest.mock('../src/verify.js')
 
 test("getAllPaths: no user", async () => {
     const response = await request.get("/getAllPaths?userid=-1")
     console.log(response)
     expect(response.status).toEqual(200)
-    expect(response.body.length).toBeGreaterThan(0)
+    expect(response.body.length).toEqual(0)
 })
 
 test("getAllPaths: success", async () => {
     const response = await request.get("/getAllPaths?userid=11111")
     console.log(response)
     expect(response.status).toEqual(200)
-    expect(response.body.length).toBeGreaterThan(0)
+    expect(response.body.length).toEqual(0)
 })
 
 test("getRecipes: no user", async () => {
     const response = await request.get("/getRecipes?userid=-1")
     console.log(response)
     expect(response.status).toEqual(200)
-    expect(response.body["recipes"].length).toBeGreaterThan(0)
+    expect(response.body["recipes"].length).toEqual(0)
 })
 
 test("getRecipes: success", async () => {
@@ -72,8 +74,7 @@ test("removeExistingPath: empty folder", async () => {
                 userID: 11111, 
                 path: "sauce"
         })
-        expect(response.status).toEqual(200)
-        expect(response.body.result).toEqual("Successfully deleted path from paths list")
+        expect(response.status).toEqual(457)
 })
 
 test("removeExistingPath: success", async () => {
