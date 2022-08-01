@@ -404,15 +404,15 @@ test("expiringIngredients: correct input w/o an expiring ingredient", () => {
     });
 });
 
-// test("sendExpiryNotification: no expiring items", async () => {
-//     const response = await IngredientManagingAccess.sendExpiryNotification(0);
-//     expect(response).toEqual([]);
-// });
+test("sendExpiryNotification: no expiring items", async () => {
+    const response = await IngredientManagingAccess.sendExpiryNotification(0);
+    expect(response).toEqual([]);
+});
 
-// test("has expiring items", async () => {
-//     const response = await IngredientManagingAccess.sendExpiryNotification(86400);
-//     expect(response).toEqual([22222]);
-// });
+test("has expiring items", async () => {
+    const response = await IngredientManagingAccess.sendExpiryNotification(86400);
+    expect(response).toEqual([22222]);
+});
 
 afterAll(() => {
     server.close();

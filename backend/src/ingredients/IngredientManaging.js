@@ -14,11 +14,6 @@ app.use(express.json());
 // 	sendExpiryNotification(Math.round(Date.now() / 1000).toString());
 // }, 300000)
 
-const getNotification = async(req, res) => {
-	sendExpiryNotification();
-	res.send({"result": "Sent notification"});
-}
-
 //expects {userid: xxx}
 const requestIngredientsAPI = async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
@@ -30,18 +25,6 @@ const requestIngredientsAPI = async (req, res) => {
 			res.status(status).send(err);
 		});
 	});
-}
-
-function requestIngredients(userid, googlesignintoken) {
-	return new Promise((resolve, reject) => {
-        verify(googlesignintoken).then(() => {
-            	getIngredients(userid).then((response) => {
-				return resolve({"status": 200, data: response.result})
-        	}).catch((err) => {
-				return reject({"status": err.status, "data": err})
-        	}) 
-    	})
-	})
 }
 
 // expects {userid: xxx, ingredient: xxx}
@@ -83,10 +66,6 @@ const getIngredientSuggestions = async (req, res) => {
 	verify(req.query["googlesignintoken"]).then(() => {
 		spoonacularSuggest(req.query["string"]).then((data) => {
 			res.send(data.results);
-		}).catch((err) => {
-			var status = err.status;
-			delete err["status"];
-			res.status(status).send(err);
 		});
 	});
 }
@@ -211,26 +190,25 @@ async function sendExpiryNotification(currTime) {
 		userids += ",";
 	}
 	userids = userids.slice(0,-1);
-	console.log(userids);
 	const tokensData = await UserManaging.getUserTokens(userids);
 	const tokens = tokensData.result;
-	data.forEach((user) => {
-		expiringIngredients(user.toString(), currTime).then((response) => response.result).then((ingredient) => {
-			var currToken = tokens.find((pair) => pair.userID == user).token
-			var expiring = ""
-			for (let i = 0; i < ingredient.length; i++) {
-				expiring = expiring + ingredient[i]["name"] + ","
-			}
-			expiring = expiring.slice(0,-1)
-			var json = {
-				"data": {
-					"ingredients": expiring
-				},
-				"to": currToken.toString()
-			}
-			sendNotificationFirebase(json).then((result) => {});
-		});
-	});
+	for (const user of data) {
+		const expiringData = await expiringIngredients(user, currTime);
+		const ingredient = expiringData.result;
+		var currToken = tokens.find((pair) => pair.userID == user).token;
+		var expiring = "";
+		for (let i = 0; i < ingredient.length; i++) {
+			expiring = expiring + ingredient[i]["name"] + ",";
+		}
+		expiring = expiring.slice(0,-1);
+		var json = {
+			"data": {
+				"ingredients": expiring
+			},
+			"to": currToken.toString()
+		};
+		sendNotificationFirebase(json).then((result) => {}).catch((err) => {});
+	}
 	return data;
 }
 
@@ -264,5 +242,5 @@ async function shelfLifeGuide(id) {
 	return res.data;
 }
 
-module.exports = {getNotification, requestIngredientsAPI, requestIngredients, searchForIngredient, scanExpiryDates, sendExpiryNotification,
-	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient, sendNotificationFirebase};
+module.exports = {requestIngredientsAPI, searchForIngredient, scanExpiryDates, sendExpiryNotification, expiringIngredients,
+	deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient, sendNotificationFirebase};
