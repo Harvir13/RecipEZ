@@ -58,13 +58,9 @@ test("No user", async () => {
     //         return resolve({"status": 200, "data": [{"name": "Apple"},{"name": "Blue berries"},{"name": "Orange"}]})
     //     })   
     // })
-    try {
-        const response = await request.get("/generateSuggestedRecipesList?userid=-1")
-    } catch (e) {
-        expect(response.status).toEqual(200)
-    }
-    
-    
+
+    const response = await request.get("/generateSuggestedRecipesList?userid=-1")
+    expect(response.status).toEqual(200)
 })
 
 
