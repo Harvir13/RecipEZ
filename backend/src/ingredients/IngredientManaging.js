@@ -10,9 +10,6 @@ const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9
 var app = express();
 app.use(express.json());
 
-module.exports = {getNotification, requestIngredientsAPI, requestIngredients, searchForIngredient, scanExpiryDates, sendExpiryNotification,
-	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient, client};
-
 // setInterval(function() {
 // 	sendExpiryNotification(Math.round(Date.now() / 1000).toString());
 // }, 300000)
@@ -312,3 +309,6 @@ async function shelfLifeGuide(id) {
 	const res = await axios.get("https://shelf-life-api.herokuapp.com/guides/" + id);
 	return res.data;
 }
+
+module.exports = {getNotification, requestIngredientsAPI, requestIngredients, searchForIngredient, scanExpiryDates, sendExpiryNotification,
+	expiringIngredients, deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient};

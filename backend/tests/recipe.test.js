@@ -17,7 +17,11 @@ const supertest = require('supertest')
 
 // jest.useFakeTimers()
 
-var server
+const server = app.listen(8083)
+
+afterAll(() => {
+    server.close()
+})
 
 // jest.setTimeout(10000)
 
