@@ -63,7 +63,9 @@ function storeToken(userID, token) {
                 })
             }
             else {
-                return resolve({"status": 200, "result": "User already exists, in Token Table. Did not add user to Token table again."})
+                client.db("UserDB").collection("Tokens").updateOne({"userID": parseInt(userID, 10)}, {$set: {"token": token}}).then(result => {
+                    return resolve({"status": 200, "result": "Updated token"})
+                })  
             }
         }).catch(err => {
             console.log(err)

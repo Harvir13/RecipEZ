@@ -227,17 +227,19 @@ public class LoginActivity extends AppCompatActivity {
          * B) User uninstalls/reinstalls the app
          * C) User clears app data
          */
-//        @Override
-//        public void onNewToken(@NonNull String token) {
-//            Log.d(TAG, "Refreshed token: " + token);
-//
-//            // If you want to send messages to this application instance or
-//            // manage this apps subscriptions on the server side, send the
-//            // FCM registration token to your app server.
-//            SharedPreferences sharedpreferences = getApplicationContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
-//            int userID = sharedpreferences.getInt("userID", 0);
-//            sendRegistrationToServer(token, userID);
-//        }
+       @Override
+       public void onNewToken(@NonNull String token) {
+           Log.d(TAG, "Refreshed token: " + token);
+
+           // If you want to send messages to this application instance or
+           // manage this apps subscriptions on the server side, send the
+           // FCM registration token to your app server.
+           SharedPreferences sharedpreferences = getApplicationContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
+           int userID = sharedpreferences.getInt("userID", 0);
+           if (userID != 0) {
+                sendRegistrationToServer(token, userID);
+           }
+       }
     }
 
     public final class UserAccountFetching {
