@@ -16,6 +16,7 @@
     <string name="dialog_ingredient_list_title">Ingredients</string>
     <string name="filter_ingredient_item_checkbox">Ingredient name</string>
     <string name="placeholder_no_recipe_text">No recipes found</string>
+    <string name="missing_ingredient_count_text">\? / \?</string>
 
     <!-- Recipe (Details) Fragment -->
     <string name="recipe_detail_title">Recipe Title</string>
@@ -35,8 +36,10 @@
     <string name="user_pref_name_text">Your name</string>
     <string name="allergy_and_restrictions_text">Allergy and Food Restrictions</string>
     <string name="bookmarked_list_text">Bookmarked Recipes</string>
+    <string name="sign_out_button">Sign Out</string>
 
     <!-- Bookmark List Fragment -->
+    <string name="bookmark_fragment_title">Bookmarks</string>
     <string name="bookmarked_list_title_text">Bookmarked Recipes</string>
     <string name="folder_name_text">Folder name</string>
     <string name="add_folder_dialog_button">New Folder</string>

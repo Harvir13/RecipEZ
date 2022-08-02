@@ -267,7 +267,7 @@ public class RecipesFragment extends Fragment {
                             Log.d(TAG, e.toString());
                             e.printStackTrace();
                         }
-                        Log.d(TAG, response.toString());
+                        Log.d(TAG, "search recipe " + response.toString());
 
                     }
                 }, new Response.ErrorListener() {
@@ -377,7 +377,7 @@ public class RecipesFragment extends Fragment {
                             Log.d(TAG, e.toString());
                             e.printStackTrace();
                         }
-                        Log.d(TAG, response.toString());
+                        Log.d(TAG, "filter recipe " + response.toString());
                     }
                 }, new Response.ErrorListener() {
                     @Override

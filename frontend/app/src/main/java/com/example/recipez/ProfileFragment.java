@@ -1,7 +1,5 @@
 package com.example.recipez;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -13,14 +11,17 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -30,6 +31,7 @@ import com.squareup.picasso.Picasso;
  */
 public class ProfileFragment extends Fragment {
     final static String TAG = "ProfileFragment";
+    private GoogleSignInClient mGoogleSignInClient;
 
     /**
      * Use this factory method to create a new instance of
@@ -47,6 +49,11 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.oath_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
 
         // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -56,7 +63,8 @@ public class ProfileFragment extends Fragment {
                 Intent a = new Intent(Intent.ACTION_MAIN);
                 a.addCategory(Intent.CATEGORY_HOME);
                 a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(a);}
+                startActivity(a);
+            }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
 
@@ -76,7 +84,6 @@ public class ProfileFragment extends Fragment {
 
         TextView userGooglePrefNameText;
         ImageView userGooglePhoto;
-        ListView settingsList;
         CardView bookmarkListButton;
         CardView allergyAndFoodRestrictionButton;
 
@@ -86,37 +93,13 @@ public class ProfileFragment extends Fragment {
         userGooglePhoto = view.findViewById(R.id.user_photo_image);
         Picasso.get().load(account.getPhotoUrl()).transform(new CircleTransform()).into(userGooglePhoto);
 
-        String[] settingsListArray = {"App settings", "Sign out"};
-        settingsList = view.findViewById(R.id.settings_list);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, settingsListArray);
-        settingsList.setAdapter(arrayAdapter);
-        settingsList.setClickable(true);
-        settingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        Button signOutButton;
+        signOutButton = view.findViewById(R.id.sign_out_buton);
+        signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // this is so scuffed rn, pls look away
-                // (prob gonna get rid of the list/adapter all together)
-                if (i == 0) { // app settings
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage("To be implemented");
-                    builder.setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-                if (i == 1) { // google sign out
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage("To be implemented");
-                    builder.setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+            public void onClick(View v) {
+                if (v.getId() == R.id.sign_out_buton) {
+                    signOut();
                 }
             }
         });
@@ -138,5 +121,16 @@ public class ProfileFragment extends Fragment {
                 getParentFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
             }
         });
+    }
+
+    private void signOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Intent loginActivityIntent = new Intent(getActivity(), LoginActivity.class);
+                        startActivity(loginActivityIntent);
+                    }
+                });
     }
 }
