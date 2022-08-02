@@ -28,21 +28,21 @@ afterAll(async () => {
 
 test("getAllPaths: no user", async () => {
     const response = await request.get("/getAllPaths?userid=-1")
-    console.log(response)
+    // console.log(response)
     expect(response.status).toEqual(200)
     expect(response.body.length).toEqual(0)
 })
 
 test("getAllPaths: success", async () => {
     const response = await request.get("/getAllPaths?userid=11111")
-    console.log(response)
+    // console.log(response)
     expect(response.status).toEqual(200)
     expect(response.body.length).toEqual(1)
 })
 
 test("getRecipes: no user", async () => {
     const response = await request.get("/getRecipes?userid=-1")
-    console.log(response)
+    // console.log(response)
     expect(response.status).toEqual(200)
     expect(response.body["recipes"].length).toEqual(0)
 })
