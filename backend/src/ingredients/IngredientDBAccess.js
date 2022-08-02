@@ -5,9 +5,7 @@ const client = new MongoClient(uri);
 
 function getIngredients(userid) {
     return new Promise((resolve, reject) => {
-        console.log(userid)
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
-            console.log(result)
             if (result === null) {
                 return reject({"status": 404, "result": "Error: invalid userID"});
             }
@@ -20,27 +18,18 @@ function getIngredients(userid) {
 
 function storeIngredient(userid, inputIngredient) {
     return new Promise((resolve, reject) => {
+        if (userid < 0) return resolve({"status": 404, "result": "invalid userID"});
         if (inputIngredient.expiry < 0) return reject({"status": 405, "result": "Error: invalid expiry value"});
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
-            // if (result == null) {
-            //     return resolve({"status": 404, "result": "invalid userID"});
-            // }
             let alreadyHaveIng = false;
-            // if (result == null) return reject ({"status": 404, "result": "Error: invalid userID"});
-            if (result !== null) {
-                result.ingredients.forEach((ingredient => {
-                    if (ingredient.name == inputIngredient.name) alreadyHaveIng = true;
-                }));
-                if (!alreadyHaveIng) result.ingredients.push(inputIngredient);
-                let newIngredients = {$set: { ingredients: result.ingredients }};
-                client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(userid, 10) }, newIngredients).then(result => {
-                    return resolve({"status": 200, "result": inputIngredient});
-                });
-            }else {
-                client.db("IngredientDB").collection("Users").insertOne({ userid: parseInt(userid, 10), ingredients: [inputIngredient]}).then(result => {
-                    return resolve({"status": 200, "result": inputIngredient});
-                });
-            }
+            result.ingredients.forEach((ingredient => {
+                if (ingredient.name == inputIngredient.name) alreadyHaveIng = true;
+            }));
+            if (!alreadyHaveIng) result.ingredients.push(inputIngredient);
+            let newIngredients = {$set: { ingredients: result.ingredients }};
+            client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(userid, 10) }, newIngredients).then(result => {
+                return resolve({"status": 200, "result": inputIngredient});
+            });
         });
     })
 }
@@ -80,7 +69,6 @@ function usersWithExpiringIngredients(time) {
                     }
                 });
                 if (hasExpiring) expiringUsers.push(user.userid);
-                console.log(expiringUsers)
             });
             return resolve({"status": 200, "result": expiringUsers})
         });

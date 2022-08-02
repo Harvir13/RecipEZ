@@ -14,7 +14,7 @@ jest.mock('../src/verify.js');
 
 test("requestIngredients: user with unregistered userID", async () => {
     return request.get("/requestIngredients?userid=-1").then((response) => {
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(200);
     });
 });
 
@@ -39,7 +39,7 @@ test("deleteIngredient: user with unregistered userID", async () => {
         userid: -1,
         ingredient: "apple"
     }).then((response) => {
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(200);
     });
 });
 
@@ -71,7 +71,7 @@ test("updateExpiryDate: user with unregistered userID", async () => {
         ingredient: "apple",
         expiry: 86400
     }).then((response) => {
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(200);
     });
 });
 
