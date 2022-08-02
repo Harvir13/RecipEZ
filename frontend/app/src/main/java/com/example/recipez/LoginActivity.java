@@ -235,9 +235,10 @@ public class LoginActivity extends AppCompatActivity {
            // manage this apps subscriptions on the server side, send the
            // FCM registration token to your app server.
            SharedPreferences sharedpreferences = getApplicationContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
+           UserAccountFetching userAccount = new UserAccountFetching();
            int userID = sharedpreferences.getInt("userID", 0);
            if (userID != 0) {
-                sendRegistrationToServer(token, userID);
+                userAccount.sendRegistrationToServer(token, userID);
            }
        }
     }
