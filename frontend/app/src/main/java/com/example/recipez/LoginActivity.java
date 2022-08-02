@@ -235,10 +235,35 @@ public class LoginActivity extends AppCompatActivity {
            // manage this apps subscriptions on the server side, send the
            // FCM registration token to your app server.
            SharedPreferences sharedpreferences = getApplicationContext().getSharedPreferences("UserData", Context.MODE_PRIVATE);
-           UserAccountFetching userAccount = new UserAccountFetching();
            int userID = sharedpreferences.getInt("userID", 0);
            if (userID != 0) {
-                userAccount.sendRegistrationToServer(token, userID);
+               // Instantiate the RequestQueue.
+               RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+               String url = "http://20.53.224.7:8082/storeUserToken";
+               // 10.0.2.2 is a special alias to localhost for developers
+
+               Map<String, String> jsonParams = new HashMap();
+               jsonParams.put("token", token);
+               jsonParams.put("userID", String.valueOf(userID));
+               jsonParams.put("googleSignInToken", sharedpreferences.getString("googleSignInToken", ""));
+
+               // Request a string response from the provided URL.
+               JsonObjectRequest jsonRequest = new JsonObjectRequest
+                       (Request.Method.POST, url, new JSONObject(jsonParams),new Response.Listener<JSONObject>() {
+                           @Override
+                           public void onResponse(JSONObject response) {
+                               Log.d(TAG, response.toString());
+                           }
+                       }, new Response.ErrorListener() {
+                           @Override
+                           public void onErrorResponse(VolleyError error) {
+                               Log.d(TAG, error.toString());
+                           }
+                       }) {
+               };
+
+               // Add the request to the RequestQueue.
+               queue.add(jsonRequest);
            }
        }
     }
@@ -265,6 +290,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             try {
                                 SharedPreferences.Editor myEdit = sharedpreferences.edit();
+                                Log.d(TAG, response.get("userID").toString());
                                 int userID = (int) response.get("userID");
                                 myEdit.putInt("userID", userID);
                                 myEdit.apply();
