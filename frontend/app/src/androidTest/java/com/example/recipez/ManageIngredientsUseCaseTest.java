@@ -259,6 +259,18 @@ public class ManageIngredientsUseCaseTest {
             e.printStackTrace();
         }
 
+        // The dialog should be dismissed and an entry of “Breadfruit” should appear on the list with the expiry date January 1, 2023.
+        ViewInteraction textView4 = onView(
+                allOf(withId(R.id.ingredientName), withText("Breadfruit"),
+                        withParent(withParent(IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class))),
+                        isDisplayed()));
+        textView4.check(matches(withText("Breadfruit")));
+        ViewInteraction textView5 = onView(
+                allOf(withId(R.id.ingredientExpiry), withText("January 1, 2023"),
+                        withParent(withParent(IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class))),
+                        isDisplayed()));
+        textView5.check(matches(withText("January 1, 2023")));
+
         onView(allOf(withId(R.id.fridgeRecyclerView), hasChildCount(2)));
 
         // 9. Press the trash icon on the “Apple” entry
