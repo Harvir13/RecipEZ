@@ -50,14 +50,23 @@ function removeIngredient(userid, ingredient) {
 }
 
 function usersWithExpiringIngredients(time) {
+    console.log("userWithExpiringIngredients time")
+    console.log(time)
     return new Promise((resolve, reject) => {
         if (time < 0) return reject({"status": 405, "result": "Error: invalid expiry value"});
         let expiringUsers = []
         client.db("IngredientDB").collection("Users").find().toArray().then((result) => {
             result.forEach((user) => {
                 let hasExpiring = false;
+                var totalTime = parseInt(time, 10) + (86400 * 2)
                 user.ingredients.forEach((ingredient) => {
-                    if (ingredient.expiry <= time + (86400 * 2)) hasExpiring = true;
+                    var expiration = parseInt(ingredient.expiry, 10)
+                    console.log(expiration)
+                    console.log(totalTime)
+                    if (expiration <= totalTime) {
+                        console.log(user)
+                        hasExpiring = true;
+                    }
                 });
                 if (hasExpiring) expiringUsers.push(user.userid);
             });
