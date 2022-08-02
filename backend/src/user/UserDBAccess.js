@@ -27,7 +27,9 @@ function scanDB(email) {
 async function generateUserID () {
     try {
         const result = await client.db("UserDB").collection("Users").countDocuments()
+        console.log(result)
         const newID = result + 1
+        console.log("new id")
         console.log(newID)
         return newID
     }
@@ -39,9 +41,10 @@ async function generateUserID () {
 
 function storeUserInfo(email) {
     return new Promise((resolve, reject) => {
-        const id = generateUserID()
-        var newUser = {"email": email}
+        generateUserID().then(id => {
+            var newUser = {"email": email}
         newUser["userID"] = id;
+        console.log(id)
         newUser["dietaryRestrictions"] = [];
         client.db("UserDB").collection("Users").insertOne(newUser).then(result => {
             return resolve({"status": 200, "userID": id})
@@ -49,6 +52,7 @@ function storeUserInfo(email) {
             console.log(err)
             return reject({"status": 400, "result": err})
         }) 
+        })  
     })
 }
 

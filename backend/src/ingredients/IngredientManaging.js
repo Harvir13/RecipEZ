@@ -2,7 +2,8 @@ const UserManaging = require('../user/UserManaging.js');
 const {changeExpiry, usersWithExpiringIngredients, removeIngredient, storeIngredient, getIngredients} = require('./IngredientDBAccess.js');
 const axios = require('axios');
 const express = require('express')
-const {verify} = require('../verify.js')
+const {verify} = require('../verify.js');
+const { ConnectionCheckedInEvent } = require('mongodb');
  
 const API_KEY = "d1e4859a4c854f3a9f5f8cdbbf2bf18f";
 const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
@@ -10,9 +11,9 @@ const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9
 var app = express();
 app.use(express.json());
 
-// setInterval(function() { // should move this to router.js
-// 	sendExpiryNotification(Math.round(Date.now() / 1000).toString());
-// }, 300000)
+setInterval(function() { // should move this to router.js
+	sendExpiryNotification(Math.round(Date.now() / 1000).toString());
+}, 10000)
 
 //expects {userid: xxx}
 const requestIngredientsAPI = async (req, res) => {
@@ -204,6 +205,8 @@ async function sendExpiryNotification(currTime) {
 	userids = userids.slice(0,-1);
 	const tokensData = await UserManaging.getUserTokens(userids);
 	const tokens = tokensData.result;
+	console.log(userids)
+	console.log(tokens)
 	for (const user of data) {
 		const expiringData = await expiringIngredients(user, currTime);
 		const ingredient = expiringData.result;
@@ -219,6 +222,7 @@ async function sendExpiryNotification(currTime) {
 			},
 			"to": currToken.toString()
 		};
+		console.log(data)
 		sendNotificationFirebase(json).then((result) => {}).catch((err) => {});
 	}
 	return data;

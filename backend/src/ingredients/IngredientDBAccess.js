@@ -22,19 +22,25 @@ function storeIngredient(userid, inputIngredient) {
     return new Promise((resolve, reject) => {
         if (inputIngredient.expiry < 0) return reject({"status": 405, "result": "Error: invalid expiry value"});
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
-            if (result == null) {
-                return resolve({"status": 404, "result": "invalid userID"});
-            }
+            // if (result == null) {
+            //     return resolve({"status": 404, "result": "invalid userID"});
+            // }
             let alreadyHaveIng = false;
-            if (result == null) return reject ({"status": 404, "result": "Error: invalid userID"});
-            result.ingredients.forEach((ingredient => {
-                if (ingredient.name == inputIngredient.name) alreadyHaveIng = true;
-            }));
-            if (!alreadyHaveIng) result.ingredients.push(inputIngredient);
-            let newIngredients = {$set: { ingredients: result.ingredients }};
-            client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(userid, 10) }, newIngredients).then(result => {
-                return resolve({"status": 200, "result": inputIngredient});
-            });
+            // if (result == null) return reject ({"status": 404, "result": "Error: invalid userID"});
+            if (result !== null) {
+                result.ingredients.forEach((ingredient => {
+                    if (ingredient.name == inputIngredient.name) alreadyHaveIng = true;
+                }));
+                if (!alreadyHaveIng) result.ingredients.push(inputIngredient);
+                let newIngredients = {$set: { ingredients: result.ingredients }};
+                client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(userid, 10) }, newIngredients).then(result => {
+                    return resolve({"status": 200, "result": inputIngredient});
+                });
+            }else {
+                client.db("IngredientDB").collection("Users").insertOne({ userid: parseInt(userid, 10), ingredients: [inputIngredient]}).then(result => {
+                    return resolve({"status": 200, "result": inputIngredient});
+                });
+            }
         });
     })
 }
@@ -61,10 +67,17 @@ function usersWithExpiringIngredients(time) {
         client.db("IngredientDB").collection("Users").find().toArray().then((result) => {
             result.forEach((user) => {
                 let hasExpiring = false;
+                var totalTime = time + (86400 * 2)
                 user.ingredients.forEach((ingredient) => {
-                    if (ingredient.expiry <= time + (86400 * 2)) hasExpiring = true;
+                    console.log(ingredient.expiry)
+                    console.log(totalTime)
+                    if (ingredient.expiry <= totalTime) {
+                        console.log(user)
+                        hasExpiring = true;
+                    }
                 });
                 if (hasExpiring) expiringUsers.push(user.userid);
+                console.log(expiringUsers)
             });
             return resolve({"status": 200, "result": expiringUsers})
         });

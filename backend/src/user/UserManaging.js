@@ -14,6 +14,7 @@ const checkUserExists = async (req, res) => {
             // User doesn't exist in db, so we need to store their info
             if (data["userID"] === 0) {
                 storeUserInfo(email).then(response => {
+                    console.log(response)
                     var status = response.status
                     delete response["status"]
                     res.status(status).send(response)
