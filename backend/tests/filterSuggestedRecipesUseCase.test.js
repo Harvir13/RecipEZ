@@ -29,14 +29,12 @@ test("No user", async () => {
 
 test("Invalid list of ingredients", async () => {
     const response = await request.get("/requestFilteredRecipes?userid=11111&filters=vegetarian")
-    console.log(response)
     expect(response.status).toEqual(400)
 })
 
 test("Success", async () => {
     const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=dairyFree")
         expect(response.status).toEqual(200)
-        console.log(response.body)
         expect(response.body.length).toBeGreaterThan(0)
 })
 

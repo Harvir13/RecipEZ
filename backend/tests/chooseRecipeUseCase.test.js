@@ -40,7 +40,6 @@ afterAll(async () => {
 
 test("No Ingredients", async () => {
     const response = await request.get("/generateSuggestedRecipesList?userid=33333")
-    console.log(response)
     expect(response.status).toEqual(200)
     expect(response.body.length).toEqual(0)
 })
@@ -49,7 +48,6 @@ test("No user", async () => {
     try {
         const response = await request.get("/generateSuggestedRecipesList?userid=-1")
     } catch (e) {
-        console.log(e)
         expect(e.status).toEqual(404)
     }
     
