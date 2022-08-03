@@ -1,6 +1,7 @@
 const {MongoClient} = require('mongodb');
 const IngredientDBAccess = require("../src/ingredients/IngredientDBAccess.js");
 const IngredientManagingAccess = require("../src/ingredients/IngredientManaging.js");
+const UserManaging = require('../src/user/UserManaging.js');
 const supertest = require('supertest');
 const {app} = require('../src/router.js');
 
@@ -427,11 +428,31 @@ test("expiringIngredients: correct input w/o an expiring ingredient", () => {
 });
 
 test("sendExpiryNotification: no expiring items", async () => {
+    UserManaging.getUserTokens = jest.fn().mockImplementation((userid) => {
+        return new Promise ((resolve, reject) => {
+            if(parseInt(userid, 10) === 22222) {
+                return resolve( { status: 200, result: [ { userID: 22222, token: 'dadsfadsfasdf' } ] });
+            }
+            else {
+                return resolve({ status: 200, result: [] });
+            }
+        });
+    });
     const response = await IngredientManagingAccess.sendExpiryNotification(0);
     expect(response).toEqual([]);
 });
 
 test("sendExpiryNotifcation: has expiring items", async () => {
+    UserManaging.getUserTokens = jest.fn().mockImplementation((userid) => {
+        return new Promise ((resolve, reject) => {
+            if(parseInt(userid, 10) === 22222) {
+                return resolve( { status: 200, result: [ { userID: 22222, token: 'dadsfadsfasdf' } ] });
+            }
+            else {
+                return resolve({ status: 200, result: [] });
+            }
+        });
+    });
     const response = await IngredientManagingAccess.sendExpiryNotification(86400);
     expect(response).toEqual([22222]);
 });
