@@ -178,6 +178,28 @@ test("requestIngredients: user with ingredients", () => {
     });
 });
 
+test("requestIngredients: user with unregistered userID (API)", async () => {
+    return IngredientManagingAccess.requestIngredients(-1, "token").catch((err) => {
+        expect(err.status).toBe(404);
+    });
+});
+
+test("requestIngredients: user with no ingredients (API)", async () => {
+    return IngredientManagingAccess.requestIngredients(11111, "token").then((response) => {
+        expect(response.data).toEqual([]);
+    });
+});
+
+test("requestIngredients: user with ingredients (API)", async () => {
+    return IngredientManagingAccess.requestIngredients(22222, "token").then((response) => {
+        expect(response.data).toEqual([
+            { name: "orange", expiry: parseInt("123456789", 10), image: "orange.png" },
+            { name: "chicken", expiry: 259200, image: "whole-chicken.jpg" },
+            { name: "apple", expiry: 259201, image: "apple.jpg" }
+        ]);
+    });
+});
+
 
 //tests for deleteIngredient
 test("deleteIngredient: user with unregistered userID", () => {
