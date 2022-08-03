@@ -1,9 +1,3 @@
-const IngredientDBAccess = require("../src/ingredients/IngredientDBAccess.js");
-const IngredientManagingAccess = require("../src/ingredients/IngredientManaging.js");
-const UserManaging = require('../src/user/UserManaging.js')
-const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
-// const RecipeManaging = require('../src/recipes/RecipeManaging.js')
-const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
 const supertest = require('supertest');
 const {app} = require('../src/router.js');
 
@@ -46,7 +40,7 @@ test("No Ingredients", async () => {
 
 test("No user", async () => {
     try {
-        const response = await request.get("/generateSuggestedRecipesList?userid=-1")
+        await request.get("/generateSuggestedRecipesList?userid=-1")
     } catch (e) {
         expect(e.status).toEqual(404)
     }

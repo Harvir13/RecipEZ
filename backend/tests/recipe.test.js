@@ -407,7 +407,7 @@ test("Success", async () => {
 // removeFromBookmarkedList tests
 test("Missing Recipe in Bookmarked List", async () => {
     try {
-        await(RecipeDBAccess.removeFromBookmarkedList(22222, 632660))
+        await (RecipeDBAccess.removeFromBookmarkedList(22222, 632660))
     } catch(e) {
         expect(e.status).toEqual(453)
         expect(e.result).toEqual("Missing recipe from bookmarked list")

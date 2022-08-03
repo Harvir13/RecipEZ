@@ -230,7 +230,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    const res1 = await client.db("IngredientDB").collection("Users").deleteOne({userid: 11111});
-    const res2 = await client.db("IngredientDB").collection("Users").deleteOne({userid: 22222});
+    await client.db("IngredientDB").collection("Users").deleteOne({userid: 11111});
+    await client.db("IngredientDB").collection("Users").deleteOne({userid: 22222});
 });
 

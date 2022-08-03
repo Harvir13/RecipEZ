@@ -14,7 +14,7 @@ const API_KEY = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
 function checkForTitles(recipeList) {
     var hasTitle = []
     for (let i = 0; i < recipeList.length; i++) {
-        if (recipeList[i].hasOwnProperty("title")) {
+        if (Object.prototype.hasOwnProperty.call(recipeList[i], "title")) {
             hasTitle.push(recipeList[i])
         }
     }
@@ -336,7 +336,7 @@ const getRecipeDetails = async (req, res) => {
                         })
                     })
                 })
-            }).catch(err => {
+            }).catch(() => {
                 return res.status(455).send({"result": "Recipe does not exist"})
             })
         }

@@ -1,7 +1,7 @@
 const supertest = require('supertest')
 
 const {app} = require('../src/router.js')
-const {MongoClient, Db} = require('mongodb')
+const {MongoClient} = require('mongodb')
 
 const uri = "mongodb://localhost:27017"
 const client = new MongoClient(uri)

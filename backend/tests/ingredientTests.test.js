@@ -415,11 +415,11 @@ test("sendExpiryNotifcation: has expiring items", async () => {
 });
 
 beforeAll(async () => {
-    const res1 = await client.db("IngredientDB").collection("Users").insertOne({
+    await client.db("IngredientDB").collection("Users").insertOne({
         "userid": 11111,
         "ingredients": []
     });
-    const res2 = await client.db("IngredientDB").collection("Users").insertOne({
+    await client.db("IngredientDB").collection("Users").insertOne({
         "userid": 22222,
         "ingredients": [
             {
@@ -439,19 +439,19 @@ beforeAll(async () => {
             }
         ]
     });
-    const res3 = await client.db("UserDB").collection("Tokens").insertOne({
+    await client.db("UserDB").collection("Tokens").insertOne({
         "userID": 11111,
         "token": "dakfjasljf"
     })
-    const res4 = await client.db("UserDB").collection("Tokens").insertOne({
+    await client.db("UserDB").collection("Tokens").insertOne({
         "userID": 22222,
         "token": "dadsfadsfasdf"
     })
 });
 
 afterAll(async () => {
-    const res1 = await client.db("IngredientDB").collection("Users").deleteOne({userid: 11111});
-    const res2 = await client.db("IngredientDB").collection("Users").deleteOne({userid: 22222});
-    const res3 = await client.db("UserDB").collection("Tokens").deleteOne({userID: 11111});
-    const res4 = await client.db("UserDB").collection("Tokens").deleteOne({userID: 22222});
+    await client.db("IngredientDB").collection("Users").deleteOne({userid: 11111});
+    await client.db("IngredientDB").collection("Users").deleteOne({userid: 22222});
+    await client.db("UserDB").collection("Tokens").deleteOne({userID: 11111});
+    await client.db("UserDB").collection("Tokens").deleteOne({userID: 22222});
 });
