@@ -5,10 +5,8 @@ const IngredientManaging = require('../ingredients/IngredientManaging.js')
 
 const {verify} = require('../verify.js')
 
-const apiKey = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
-const ip = "20.53.224.7"
-
-
+console.log("api key:" + process.env.API_KEY)
+const API_KEY = process.env.API_KEY;
 
 
 function checkForTitles(recipeList) {
@@ -166,7 +164,7 @@ const requestFilteredRecipes = async (req, res) => {
                 var restrictions = data["dietaryRestrictions"]
             }
             // console.log(ingredientList)
-            axios.get("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=" + apiKey).then(response =>
+            axios.get("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=" + API_KEY).then(response =>
                 response.data
             ).then (data => {
                 console.log(data)
@@ -202,7 +200,7 @@ const requestFilteredRecipes = async (req, res) => {
                 console.log("ids: " + idList)
                 
 
-                axios.get("https://api.spoonacular.com/recipes/informationBulk?ids=" + idList + "&apiKey=" + apiKey).then(response2 =>
+                axios.get("https://api.spoonacular.com/recipes/informationBulk?ids=" + idList + "&apiKey=" + API_KEY).then(response2 =>
                     response2.data
                 ).then(data => {
                     console.log(data)
@@ -292,7 +290,7 @@ const generateSuggestedRecipesList = async (req, res) => {
                     // console.log(ingredients)
                 }
                 
-                axios.get("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredients + "&apiKey=" + apiKey).then(response =>
+                axios.get("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredients + "&apiKey=" + API_KEY).then(response =>
                     response.data
                 ).then (data => {
                     // console.log("recipes returned: " + data)
@@ -320,7 +318,7 @@ const generateSuggestedRecipesList = async (req, res) => {
                             currItem["title"] = recipesWithTitles[j]["title"]
                             currItem["image"] = recipesWithTitles[j]["image"]
                             currItem["id"] = recipesWithTitles[j]["id"]
-                            currItem["ingredientsAlreadyHave"] = recipesWithTitles[j]["usedIngredientCount"].toString() + " / " + (recipesWithTitles[j]["missedIngredientCount"] + recipesWithTitles[j]["usedIngredientCount"]).toString()
+                            currItem["ingredientsIAlreadyHave"] = recipesWithTitles[j]["usedIngredientCount"].toString() + " / " + (recipesWithTitles[j]["missedIngredientCount"] + recipesWithTitles[j]["usedIngredientCount"]).toString()
                             retList.push(currItem)
                         }
                     }
@@ -344,7 +342,7 @@ const searchRecipe = async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
         var name = encodeURIComponent(req.query["recipename"])
         console.log(name)
-        axios.get("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=" + apiKey).then(response => {
+        axios.get("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=" + API_KEY).then(response => {
             console.log(response)
             return response.data
     }).then (data => {
@@ -371,7 +369,7 @@ const searchRecipe = async (req, res) => {
 const getRecipeDetails = async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
         console.log(req.query["recipeid"])
-        axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=" + apiKey).then(response =>
+        axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=" + API_KEY).then(response =>
             response.data
         ).then(data => {
             console.log(data)
@@ -386,7 +384,7 @@ const getRecipeDetails = async (req, res) => {
                 ingredients.push(amount["value"].toString() + " " + amount["unit"] + " " + name)
             }
             returnObj["ingredientsAndAmounts"] = ingredients
-            axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/nutritionWidget.json?apiKey=" + apiKey).then(response =>
+            axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/nutritionWidget.json?apiKey=" + API_KEY).then(response =>
                 response.data
             ).then(data => {
                 // console.log("Recipe Details")
@@ -398,7 +396,7 @@ const getRecipeDetails = async (req, res) => {
                 nutrition["fat"] = data["fat"]
                 nutrition["protein"] = data["protein"]
                 returnObj["nutritionDetails"] = nutrition
-                axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/analyzedInstructions?apiKey=" + apiKey).then(response =>
+                axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/analyzedInstructions?apiKey=" + API_KEY).then(response =>
                     response.data
                 ).then(data => {
                     var instructions = []

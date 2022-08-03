@@ -64,7 +64,7 @@ test("Success", async () => {
         title: 'Roja Sangria',
         image: 'https://spoonacular.com/recipeImages/658737-312x231.jpg',
         id: 658737,
-        ingredientsAlreadyHave: '2 / 7'
+        ingredientsIAlreadyHave: '2 / 7'
       }]))
 })
 

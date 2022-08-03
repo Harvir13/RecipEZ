@@ -4,7 +4,7 @@ const axios = require('axios');
 const express = require('express')
 const {verify} = require('../verify.js');
  
-const API_KEY = "d1e4859a4c854f3a9f5f8cdbbf2bf18f";
+const API_KEY = process.env.API_KEY;
 const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
 
 var app = express();
