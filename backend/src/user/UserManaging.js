@@ -5,16 +5,12 @@ const ip = "20.53.224.7"
 
 
 const checkUserExists = async (req, res) => {
-    console.log("signing in")
-        console.log("token: " + req.query["googlesignintoken"])
         verify(req.query["googlesignintoken"]).then(() => {
-        console.log(req.query);
         var email = req.query["email"]
         scanDB(email).then(data => {
             // User doesn't exist in db, so we need to store their info
             if (data["userID"] === 0) {
                 storeUserInfo(email).then(response => {
-                    console.log(response)
                     var status = response.status
                     delete response["status"]
                     res.status(status).send(response)
@@ -22,13 +18,11 @@ const checkUserExists = async (req, res) => {
             }
             //user already exists in the database, data will contain {"userID": xx}
             else {
-                console.log(data)
                 var status = data.status
                 delete data["status"]
                 res.status(status).send(data)
             }
         })}).catch ((err) => {
-            console.log(err)
             var status = err.status
             delete err["status"]
             res.status(status).send(err)
@@ -37,14 +31,12 @@ const checkUserExists = async (req, res) => {
 
 const storeUserToken = async (req, res) => {
         verify(req.body.googleSignInToken).then(() => {
-        console.log(req.body)
         //req.body should contain data like {userID: xxx, token: xxx}
         storeToken(req.body["userID"], req.body["token"]).then(response => {
             var status = response.status
                     delete response["status"]
                     res.status(status).send(response)
         })}).catch ((err) => {
-            console.log(err)
             var status = err.status
             delete err["status"]
             res.status(status).send(err)
@@ -58,7 +50,6 @@ const getUserTokensAPI = async (req, res) => {
             // DO SOME PROCEESSING ON data HERE TO ONLY SEND WHAT WE NEED
             var data = response.result
             var retArr = []
-            console.log(data)
             for (let i = 0; i < data.length; i++) {
                 let currObj = {}
                 currObj["userID"] = data[i]["userID"]
@@ -92,11 +83,8 @@ function getUserTokens(userids) {
 }
 
 const addRestrictions = async (req, res) => {
-        console.log("adding restriction")
         verify(req.body.googleSignInToken).then(() => {
-        console.log(req.body)
         //req.body should contain data like {userID: xxx, restriction: xxx}
-
         addToDietaryRestrictions(req.body["userID"], req.body["restriction"]).then(data => {
             var status = data["status"]
             delete data["status"]
@@ -110,8 +98,6 @@ const addRestrictions = async (req, res) => {
 
 const deleteRestrictions = async (req, res) => {
         verify(req.body.googleSignInToken).then(() => {
-        console.log(req.body)
-        
         //req.body should contain data like {userID: xxx, restriction: xxx}
         deleteDietaryRestrictions(req.body["userID"], req.body["restriction"]).then(data => {
             var status = data["status"]
@@ -125,10 +111,7 @@ const deleteRestrictions = async (req, res) => {
 }
 
 const getRestrictionsAPI = async (req, res) => {
-        console.log("token: " + req.query["googlesignintoken"])
         verify(req.query["googlesignintoken"]).then(() => {
-        console.log(req.query)
-        
         //req.body should contain data like {userID: xxx, dietaryRestrictions: [xxx, xxx, ...]}
         getDietaryRestrictions(req.query["userid"]).then(response => {
             var data = response.result
@@ -141,7 +124,6 @@ const getRestrictionsAPI = async (req, res) => {
             else {
                 retObj["dietaryRestrictions"] = data["dietaryRestrictions"]
             }
-            console.log(retObj)
             res.status(status).send(retObj)
             
         })}).catch ((err) => {
@@ -166,15 +148,12 @@ function getRestrictions(userid, googlesignintoken) {
                 else {
                     retObj["dietaryRestrictions"] = data["dietaryRestrictions"]
                 }
-                console.log("return restricitons")
-                console.log(retObj)
                 return resolve({"status": status, "data": retObj})
                 
             }).catch ((err) => {
                 return reject(err)
             }) 
         }).catch ((err) => {
-            console.log(err)
             return reject({"status": 400, "data": err})
         }) 
     })
