@@ -28,7 +28,7 @@ afterAll(async () => {
 
 test("getAllPaths: no user", async () => {
     const response = await request.get("/getAllPaths?userid=-1")
-    // console.log(response)
+    // 
     expect(response.status).toEqual(404)
 })
 
@@ -40,7 +40,7 @@ test("getAllPaths: success", async () => {
 
 test("getRecipes: no user", async () => {
     const response = await request.get("/getRecipes?userid=-1")
-    // console.log(response)
+    // 
     expect(response.status).toEqual(404)
 })
 

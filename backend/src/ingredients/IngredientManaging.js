@@ -12,8 +12,6 @@ var app = express();
 app.use(express.json());
 
 // setInterval(function() { // should move this to router.js
-// 	console.log("time pass into sendExpiryNotification")
-// 	console.log(Math.round(Date.now() / 1000).toString())
 // 	sendExpiryNotification(Math.round(Date.now() / 1000).toString());
 // }, 10000)
 

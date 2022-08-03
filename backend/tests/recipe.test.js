@@ -267,9 +267,9 @@ test("Success", async () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
         return new Promise ((resolve, reject) => {
-            console.log("in mock")
+            
             if(userid === 11111) {
-                console.log(userid)
+                
                 return resolve({"status": 200, "data": {"dietaryRestrictions": ["bread"]}})
             }
             else {
@@ -385,7 +385,7 @@ test("Unregistered user", async () => {
 
     const response = await request.get("/generateSuggestedRecipesList?userid=-1")
 
-    // console.log(response.body.length)
+    // 
 
     expect(response.status).toEqual(404)
 })

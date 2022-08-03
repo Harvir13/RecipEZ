@@ -6,7 +6,7 @@ const IngredientManaging = require('../ingredients/IngredientManaging.js')
 
 const {verify} = require('../verify.js')
 
-console.log("api key:" + process.env.API_KEY)
+// console.log("api key:" + process.env.API_KEY)
 // const API_KEY = process.env.API_KEY;
 const API_KEY = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
 
