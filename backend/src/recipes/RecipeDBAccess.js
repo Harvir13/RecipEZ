@@ -31,7 +31,7 @@ function getFromCache(recipeID) {
         client.db("RecipeDB").collection("Cache").findOne({ recipeid: parseInt(recipeID, 10) }).then((result) => {
             if (result == null) return reject({"status": 400, "result": "No recipe in cache"})
             delete result._id
-            return resolve({"status": 200, "result": result})
+            return resolve({"status": 200, result})
         })
     })
 }
