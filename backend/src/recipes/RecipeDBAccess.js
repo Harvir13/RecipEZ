@@ -4,14 +4,6 @@ const uri = "mongodb://localhost:27017"
 const client = new MongoClient(uri)
 var MAX_CACHE_ENTRIES = 20
 
-//TODO: Add this
-/*
-check db for recipe; if there and db not full, add and set refcount to one
-if full use refcount replacement policy
-if recipe already bookmarked, do nothing, if not remove refcount by 1
-if refcount reaches 0 delete
-*/
-
 //for testing purposes only
 function changeCacheSize(size) {
     MAX_CACHE_ENTRIES = size
