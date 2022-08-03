@@ -2,8 +2,7 @@ const {MongoClient} = require('mongodb')
 
 const uri = "mongodb://localhost:27017"
 const client = new MongoClient(uri)
-const MAX_CACHE_ENTRIES = 3
-const TEST_MAX_CACHE_ENTRIES = 3
+var MAX_CACHE_ENTRIES = 20
 
 //TODO: Add this
 /*
@@ -13,6 +12,10 @@ if recipe already bookmarked, do nothing, if not remove refcount by 1
 if refcount reaches 0 delete
 */
 
+//for testing purposes only
+function changeCacheSize(size) {
+    MAX_CACHE_ENTRIES = size
+}
 
 function checkCache(recipeID) {
     return new Promise((resolve, reject) => {
@@ -23,9 +26,18 @@ function checkCache(recipeID) {
     })
 }
 
-function addToCache(recipeID, recipeData) {
+function getFromCache(recipeID) {
+    return new Promise((resolve, reject) => {
+        client.db("RecipeDB").collection("Cache").findOne({ recipeid: parseInt(recipeID, 10) }).then((result) => {
+            if (result == null) return reject({"status": 400, "result": "No recipe in cache"})
+            delete result._id
+            return resolve({"status": 200, "result": result})
+        })
+    })
+}
+
+function addToCache(recipeID, recipeData, hasRecipe) {
     return new Promise(async (resolve, reject) => {
-        const hasRecipe = await checkCache(recipeID)
         if (hasRecipe) {
             const recipe = await client.db("RecipeDB").collection("Cache").findOne({ recipeid: parseInt(recipeID, 10) })
             const newRefcount = recipe.refcount + 1
@@ -42,7 +54,7 @@ function addToCache(recipeID, recipeData) {
                 })
             }
             const recipeInfo = {
-                recipeid: recipeID,
+                recipeid: parseInt(recipeID, 10),
                 refcount: 1,
                 recipedata: recipeData
             }
@@ -90,7 +102,6 @@ function addToBookmarkedList(userID, recipeID, path, title, image) {
         newEntry["path"] = path
         newEntry["image"] = image
         newEntry["title"] = title
-        console.log(newEntry)
         client.db("RecipeDB").collection("BookmarkedRecipes").insertOne(newEntry).then(result => {
             return resolve({"status": 200, "result": "Successfully added recipe to bookmarked list"})
         }).catch(err => {
@@ -189,4 +200,4 @@ function getPaths(userid) {
 }
 
 module.exports = {getPaths, removeFromPathList, addToPathList, getBookmarkedRecipes, removeFromBookmarkedList, addToBookmarkedList,
-    checkCache, addToCache, removeFromCache, flushCache, MAX_CACHE_ENTRIES}
+    checkCache, addToCache, removeFromCache, flushCache, getFromCache, changeCacheSize}
