@@ -207,12 +207,8 @@ async function sendExpiryNotification(currTime) {
 	userids = userids.slice(0,-1);
 	const tokensData = await UserManaging.getUserTokens(userids);
 	const tokens = tokensData.result;
-	console.log(userids)
-	console.log(tokens)
 	for (const user of data) {
 		const expiringData = await expiringIngredients(user, currTime);
-		console.log("expiring data")
-		// console.log(expiringData)
 		const ingredient = expiringData.result;
 		var currToken = tokens.find((pair) => pair.userID == user).token;
 		var expiring = "";
@@ -226,7 +222,6 @@ async function sendExpiryNotification(currTime) {
 			},
 			"to": currToken.toString()
 		};
-		console.log(json)
 		sendNotificationFirebase(json).then((result) => {}).catch((err) => {});
 	}
 	return data;
@@ -239,8 +234,6 @@ async function sendNotificationFirebase(json) {
 			Authorization: SERVER_KEY
 		}
 	});
-	console.log("firebase notificaiton result")
-	console.log(res.data.results)
 	return res;
 }
 
