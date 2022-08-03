@@ -84,6 +84,9 @@ function flushCache() {
 
 function addToBookmarkedList(userID, recipeID, path, title, image) {
     return new Promise ((resolve, reject) => {
+        if (parseInt(userID, 10) <= 0) {
+            return reject({"status": 404, "result": "User not found"})
+        }
         var newEntry = {}
         newEntry["userID"] = parseInt(userID, 10)
         newEntry["recipeID"] = parseInt(recipeID, 10)
@@ -102,6 +105,9 @@ function addToBookmarkedList(userID, recipeID, path, title, image) {
 
 function removeFromBookmarkedList(userID, recipeID) {
     return new Promise((resolve, reject) => {
+        if (parseInt(userID, 10) <= 0) {
+            return reject({"status": 404, "result": "User not found"})
+        }
         var entryToDelete = {}
         entryToDelete["userID"] = parseInt(userID, 10)
         entryToDelete["recipeID"] = parseInt(recipeID, 10)
@@ -120,6 +126,9 @@ function removeFromBookmarkedList(userID, recipeID) {
 
 function getBookmarkedRecipes(userid) {
     return new Promise((resolve, reject) => {
+        if (parseInt(userid, 10) <= 0) {
+            return reject({"status": 404, "result": "User not found"})
+        }
         client.db("RecipeDB").collection("BookmarkedRecipes").find({"userID": parseInt(userid, 10)}).toArray().then(result => {
             client.db("RecipeDB").collection("Paths").find({"userID": parseInt(userid, 10)}).toArray().then(result2 => {
                 var retObj = {};
@@ -137,6 +146,9 @@ function getBookmarkedRecipes(userid) {
 
 function addToPathList(userID, path) {
     return new Promise((resolve, reject) => {
+        if (parseInt(userID, 10) <= 0) {
+            return reject({"status": 404, "result": "User not found"})
+        }
         var newEntry = {}
         newEntry["userID"] = parseInt(userID, 10)
         newEntry["path"] = path
@@ -158,6 +170,9 @@ function addToPathList(userID, path) {
 
 function removeFromPathList(userID, path) {
     return new Promise((resolve, reject) => {
+        if (parseInt(userID, 10) <= 0) {
+            return reject({"status": 404, "result": "User not found"})
+        }
         var entryToDelete = {}
         entryToDelete["userID"] = parseInt(userID, 10)
         entryToDelete["path"] = path
@@ -176,6 +191,9 @@ function removeFromPathList(userID, path) {
 
 function getPaths(userid) {
     return new Promise((resolve, reject) => {
+        if (parseInt(userid, 10) <= 0) {
+            return reject({"status": 404, "result": "User not found"})
+        }
         client.db("RecipeDB").collection("Paths").find({"userID": parseInt(userid, 10)}).toArray().then(result => {
             var retObj = {}
             retObj["status"] = 200

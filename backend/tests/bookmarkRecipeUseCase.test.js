@@ -29,8 +29,7 @@ afterAll(async () => {
 test("getAllPaths: no user", async () => {
     const response = await request.get("/getAllPaths?userid=-1")
     // console.log(response)
-    expect(response.status).toEqual(200)
-    expect(response.body.length).toEqual(0)
+    expect(response.status).toEqual(404)
 })
 
 test("getAllPaths: success", async () => {
@@ -43,8 +42,7 @@ test("getAllPaths: success", async () => {
 test("getRecipes: no user", async () => {
     const response = await request.get("/getRecipes?userid=-1")
     // console.log(response)
-    expect(response.status).toEqual(200)
-    expect(response.body["recipes"].length).toEqual(0)
+    expect(response.status).toEqual(404)
 })
 
 test("getRecipes: success", async () => {
@@ -58,8 +56,7 @@ test("addNewPath: no user", async () => {
                 userID: -1, 
                 path: "burgers"
         })
-        expect(response.status).toEqual(200)
-        expect(response.body.result).toEqual("Successfully added path to path list")
+        expect(response.status).toEqual(404)
 })
 
 test("addNewPath: success", async () => {
@@ -84,8 +81,7 @@ test("removeExistingPath: no user exists", async () => {
                 userID: -1, 
                 path: "burgers"
         })
-        expect(response.status).toEqual(200)
-        expect(response.body.result).toEqual("Successfully deleted path from paths list")
+        expect(response.status).toEqual(404)
 })
 
 test("removeExistingPath: empty folder", async () => {
@@ -113,8 +109,7 @@ test("addRecipe: no user", async () => {
         title: "Apricot Glazed Apple Tart",
         image: "https://spoonacular.com/recipeImages/632660-312x231.jpg"
     })
-    expect(response.status).toEqual(200)
-    expect(response.body.result).toEqual("Successfully added recipe to bookmarked list")
+    expect(response.status).toEqual(404)
 })
 
 test("addRecipe: no folder", async () => {
@@ -146,8 +141,7 @@ test("removeRecipe: no user", async () => {
         userID: -1, 
         recipeID: 632660, 
     })
-    expect(response.status).toEqual(200)
-    expect(response.body.result).toEqual("Successfully deleted recipe from bookmarked list")
+    expect(response.status).toEqual(404)
 })
 
 test("removeRecipe: success", async () => {

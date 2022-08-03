@@ -5,20 +5,20 @@ const client = new MongoClient(uri);
 
 function getIngredients(userid) {
     return new Promise((resolve, reject) => {
+        if(parseInt(userid, 10) <= 0) {
+            return reject({"status": 404, "result": "User not found"})
+        }
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
-            if (result === null) {
-                return reject({"status": 404, "result": "Error: invalid userID"});
-            }
-            else {
                 return resolve({"status": 200, "result": result.ingredients});
-            }
         });
     });
 }
 
 function storeIngredient(userid, inputIngredient) {
     return new Promise((resolve, reject) => {
-        if (userid < 0) return resolve({"status": 404, "result": "invalid userID"});
+        if(parseInt(userid, 10) <= 0) {
+            return reject({"status": 404, "result": "User not found"})
+        }
         if (inputIngredient.expiry < 0) return reject({"status": 405, "result": "Error: invalid expiry value"});
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
             let alreadyHaveIng = false;
@@ -36,8 +36,10 @@ function storeIngredient(userid, inputIngredient) {
 
 function removeIngredient(userid, ingredient) {
     return new Promise((resolve, reject) => {
+        if(parseInt(userid, 10) <= 0) {
+            return reject({"status": 404, "result": "User not found"})
+        }
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
-            if (result == null) return reject ({"status": 404, "result": "Error: invalid userID"});
             let newIngredients = result.ingredients.filter(function (value) {
                 return value.name != ingredient;
             });
@@ -78,8 +80,10 @@ function usersWithExpiringIngredients(time) {
 function changeExpiry(userid, ingredient, expiry) {
     return new Promise((resolve, reject) => {
         if (expiry < 0) return reject({"status": 405, "result": "Error: invalid expiry value"});
+        if(parseInt(userid, 10) <= 0) {
+            return reject({"status": 404, "result": "User not found"})
+        }
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
-            if (result == null) return reject ({"status": 404, "result": "Error: invalid userID"});
             result.ingredients.forEach(function (value) {
                 if (value.name == ingredient) {
                     value.expiry = parseInt(expiry, 10);

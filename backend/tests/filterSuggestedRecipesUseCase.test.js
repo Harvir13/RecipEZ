@@ -24,7 +24,7 @@ afterAll(async () => {
 
 test("No user", async () => {
     const response = await request.get("/requestFilteredRecipes?userid=-1&ingredients=apples,sugar&filters=italian,gluten-free")
-    expect(response.status).toEqual(454)
+    expect(response.status).toEqual(404)
 })
 
 test("Invalid list of ingredients", async () => {
