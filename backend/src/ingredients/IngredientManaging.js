@@ -220,7 +220,7 @@ async function sendExpiryNotification(currTime) {
 			},
 			"to": currToken.toString()
 		};
-		sendNotificationFirebase(json).then((result) => {}).catch((err) => {});
+		sendNotificationFirebase(json).then().catch();
 	}
 	return data;
 }

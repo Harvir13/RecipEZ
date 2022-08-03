@@ -203,11 +203,11 @@ test("addIngredient: ingredient already present", async () => {
 });
 
 beforeAll(async () => {
-    const res1 = await client.db("IngredientDB").collection("Users").insertOne({
+    await client.db("IngredientDB").collection("Users").insertOne({
         "userid": 11111,
         "ingredients": []
     });
-    const res2 = await client.db("IngredientDB").collection("Users").insertOne({
+    await client.db("IngredientDB").collection("Users").insertOne({
         "userid": 22222,
         "ingredients": [
             {

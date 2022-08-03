@@ -1,9 +1,6 @@
 const {getDietaryRestrictions, deleteDietaryRestrictions, addToDietaryRestrictions, getTokens, storeToken, storeUserInfo, scanDB} = require('./UserDBAccess.js')
 const {verify} = require('../verify.js')
 
-const ip = "20.53.224.7"
-
-
 const checkUserExists = async (req, res) => {
         verify(req.query["googlesignintoken"]).then(() => {
         var email = req.query["email"]
@@ -148,7 +145,7 @@ function getRestrictions(userid, googlesignintoken) {
                 else {
                     retObj["dietaryRestrictions"] = data["dietaryRestrictions"]
                 }
-                return resolve({"status": status, "data": retObj})
+                return resolve({status, "data": retObj})
                 
             }).catch ((err) => {
                 return reject(err)

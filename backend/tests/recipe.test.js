@@ -1,4 +1,3 @@
-var axios = require("axios")
 const UserManaging = require('../src/user/UserManaging.js')
 const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
 const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
@@ -512,7 +511,7 @@ test("Success", async () => {
 test("Unregistered user", async () => {
 
     try {
-        const response = await(RecipeDBAccess.addToBookmarkedList(-1, 632660, "dessert", "Apricot Glazed Apple Tart", "https://spoonacular.com/recipeImages/632660-312x231.jpg"))
+        await(RecipeDBAccess.addToBookmarkedList(-1, 632660, "dessert", "Apricot Glazed Apple Tart", "https://spoonacular.com/recipeImages/632660-312x231.jpg"))
     } catch (e) {
         expect(e.status).toEqual(404)
     }  
@@ -537,9 +536,8 @@ test("Success", async () => {
 })
 
 test("Unregistered user", async () => {
-
     try {
-        const response = await(RecipeDBAccess.removeFromBookmarkedList(-1, 632660))
+        await(RecipeDBAccess.removeFromBookmarkedList(-1, 632660))
     } catch(e) {
         expect(e.status).toEqual(404)
     }
@@ -562,7 +560,7 @@ test("Success", async () => {
 test("Unregistered user", async () => {
 
     try {
-        const response = await RecipeDBAccess.getBookmarkedRecipes(-1)
+        await RecipeDBAccess.getBookmarkedRecipes(-1)
     } catch (e) {
         expect(e.status).toEqual(404)
     }
@@ -586,9 +584,8 @@ test("Path already exists", async () => {
 
 
 test("Unregistered user", async () => {
-
     try {
-        const response = await RecipeDBAccess.addToPathList(-1, "pasta")
+        await RecipeDBAccess.addToPathList(-1, "pasta")
     } catch(e) {
         expect(e.status).toEqual(404)
     }
@@ -612,9 +609,8 @@ test("Success", async () => {
 
 
 test("Unregistered user", async () => {
-
     try {
-        const response = await RecipeDBAccess.removeFromPathList(-1, "breakfast")
+        await RecipeDBAccess.removeFromPathList(-1, "breakfast")
     } catch (e) {
         expect(e.status).toEqual(404)
     }
@@ -637,9 +633,8 @@ test("Success", async () => {
 
 
 test("Unregistered user", async () => {
-
     try {
-        const response = await RecipeDBAccess.getPaths(-1)
+        await RecipeDBAccess.getPaths(-1)
     } catch (e ){
         expect(e.status).toEqual(404)
     }
