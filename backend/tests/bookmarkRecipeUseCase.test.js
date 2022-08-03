@@ -18,10 +18,10 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-    await client.db("RecipeDB").collection("Paths").remove({"userID": 11111, "path": "sauce"})
-    await client.db("RecipeDB").collection("BookmarkedRecipes").remove({"userID": 11111, "recipeID": 73420, "path": "dessert", "image": "https://spoonacular.com/recipeImages/73420-312x231.jpg", "title": "Apple Or Peach Strudel"})
-    await client.db("RecipeDB").collection("BookmarkedRecipes").remove({"userID": 11111, "recipeID" : 632660, "path" : "dessert", "image" : "https://spoonacular.com/recipeImages/632660-312x231.jpg", "title" : "Apricot Glazed Apple Tart"})
-    await client.db("RecipeDB").collection("BookmarkedRecipes").remove({"userID": 11111, "recipeID" : 632660, "path" : "dasfsakjsdl;jfl", "image" : "https://spoonacular.com/recipeImages/632660-312x231.jpg", "title" : "Apricot Glazed Apple Tart"})
+    await client.db("RecipeDB").collection("Paths").deleteOne({"userID": 11111, "path": "sauce"})
+    await client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne({"userID": 11111, "recipeID": 73420, "path": "dessert", "image": "https://spoonacular.com/recipeImages/73420-312x231.jpg", "title": "Apple Or Peach Strudel"})
+    await client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne({"userID": 11111, "recipeID" : 632660, "path" : "dessert", "image" : "https://spoonacular.com/recipeImages/632660-312x231.jpg", "title" : "Apricot Glazed Apple Tart"})
+    await client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne({"userID": 11111, "recipeID" : 632660, "path" : "dasfsakjsdl;jfl", "image" : "https://spoonacular.com/recipeImages/632660-312x231.jpg", "title" : "Apricot Glazed Apple Tart"})
     await client.close()
     server.close()
 })

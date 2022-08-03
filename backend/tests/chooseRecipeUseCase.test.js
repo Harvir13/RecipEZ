@@ -28,12 +28,12 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-    await client.db("UserDB").collection("Users").remove({"userID": 11111, "dietaryRestrictions": ["bread"]})
-    await client.db("UserDB").collection("Users").remove({"userID": 22222, "dietaryRestrictions": ["Apple"]})
-    await client.db("UserDB").collection("Users").remove({"userID": 33333, "dietaryRestrictions": []})
-    await client.db("IngredientDB").collection("Users").remove({"userid": 11111, "ingredients": [{"name": "Apple"}, {"name":"Blue berries"}, {"name": "Orange"}]})
-    await client.db("IngredientDB").collection("Users").remove({"userid": 22222, "ingredients": [{"name": "Breadfruit"}]})
-    await client.db("IngredientDB").collection("Users").remove({"userid": 33333, "ingredients": []})
+    await client.db("UserDB").collection("Users").deleteOne({"userID": 11111, "dietaryRestrictions": ["bread"]})
+    await client.db("UserDB").collection("Users").deleteOne({"userID": 22222, "dietaryRestrictions": ["Apple"]})
+    await client.db("UserDB").collection("Users").deleteOne({"userID": 33333, "dietaryRestrictions": []})
+    await client.db("IngredientDB").collection("Users").deleteOne({"userid": 11111, "ingredients": [{"name": "Apple"}, {"name":"Blue berries"}, {"name": "Orange"}]})
+    await client.db("IngredientDB").collection("Users").deleteOne({"userid": 22222, "ingredients": [{"name": "Breadfruit"}]})
+    await client.db("IngredientDB").collection("Users").deleteOne({"userid": 33333, "ingredients": []})
     await client.close()
     server.close()
 })

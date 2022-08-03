@@ -450,8 +450,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    const res1 = await client.db("IngredientDB").collection("Users").remove({userid: 11111});
-    const res2 = await client.db("IngredientDB").collection("Users").remove({userid: 22222});
-    const res3 = await client.db("UserDB").collection("Tokens").remove({userID: 11111});
-    const res4 = await client.db("UserDB").collection("Tokens").remove({userID: 22222});
+    const res1 = await client.db("IngredientDB").collection("Users").deleteOne({userid: 11111});
+    const res2 = await client.db("IngredientDB").collection("Users").deleteOne({userid: 22222});
+    const res3 = await client.db("UserDB").collection("Tokens").deleteOne({userID: 11111});
+    const res4 = await client.db("UserDB").collection("Tokens").deleteOne({userID: 22222});
 });

@@ -17,7 +17,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-    await client.db("UserDB").collection("Users").remove({"userID": 11111, "dietaryRestrictions": ["bread"]})
+    await client.db("UserDB").collection("Users").deleteOne({"userID": 11111, "dietaryRestrictions": ["bread"]})
     await client.close()
     server.close()
 })
