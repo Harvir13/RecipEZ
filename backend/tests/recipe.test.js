@@ -155,6 +155,20 @@ test("Success", async () => {
     expect(response.body.result).toEqual("Successfully added recipe to bookmarked list")
 })
 
+test("Unregistered user", async () => {
+    const response = await request.post("/addRecipe").send({
+        userID: -1, 
+        recipeID: 632660, 
+        path: "dessert",
+        title: "Apricot Glazed Apple Tart",
+        image: "https://spoonacular.com/recipeImages/632660-312x231.jpg"
+    })
+
+    expect(response.status).toEqual(404)
+})
+
+
+
 // removeRecipe tests
 test("Missing Recipe in Bookmarked List", async () => {
     const response = await request.post("/removeRecipe").send({
@@ -173,6 +187,16 @@ test("Success", async () => {
     expect(response.body.result).toEqual("Successfully deleted recipe from bookmarked list")
 })
 
+test("Unregistered user", async () => {
+
+    const response = await request.post("/removeRecipe").send({
+        userID: -1, 
+        recipeID: 632660, 
+    })
+
+    expect(response.status).toEqual(404)
+})
+
 // getRecipes tests
 test("No Bookmarked Recipes", async () => {
     const response = await request.get("/getRecipes?userid=22222")
@@ -184,6 +208,11 @@ test("Success", async () => {
     const response = await request.get("/getRecipes?userid=11111")
     expect(response.status).toEqual(200)
     expect(response.body["recipes"].length).toBeGreaterThan(0)
+})
+
+test("Unregistered user", async () => {
+    const response = await request.get("/getRecipes?userid=-1")
+    expect(response.status).toEqual(404)
 })
 
 //requestFilteredRecipes tests
@@ -233,6 +262,27 @@ test("Success", async () => {
     expect(response.status).toEqual(200)
     expect(response.body.length).toBeGreaterThan(0)
 })
+
+test("Success", async () => {
+
+    UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
+        return new Promise ((resolve, reject) => {
+            console.log("in mock")
+            if(userid === 11111) {
+                console.log(userid)
+                return resolve({"status": 200, "data": {"dietaryRestrictions": ["bread"]}})
+            }
+            else {
+                return resolve({"status": 200, "data": {"dietaryRestrictions": []}})
+            }
+        })
+    })
+
+    const response = await request.get("/requestFilteredRecipes?userid=-1&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=dairyFree")
+
+        expect(response.status).toEqual(404)
+})
+
 
 //  generatedSuggestedRecipes tests
 test("No Ingredients", async () => {
@@ -309,7 +359,35 @@ test("Success", async () => {
         image: 'https://spoonacular.com/recipeImages/658737-312x231.jpg',
         id: 658737,
         ingredientsIAlreadyHave: '2 / 7'
-    }]))
+      }]))
+})
+
+
+test("Unregistered user", async () => {
+
+    UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
+        return new Promise((resolve, reject) => {
+            if(userid === 11111) {
+                return resolve({"status": 200, "data": {"dietaryRestrictions": ["bread"]}})
+            } else if (userid === 33333) {
+                return resolve({"status": 200, "data": {"dietaryRestrictions": ["Apple"]}})
+            } else {
+                return resolve({"status": 200, "data": {"dietaryRestrictions": []}})
+            }
+        })   
+    })
+
+    IngredientManaging.requestIngredients = jest.fn().mockImplementation((userid, googlesignintoken) => {
+        return new Promise((resolve, reject) => {
+            return resolve({"status": 200, "data": [{"name": "Apple"},{"name": "Blue berries"},{"name": "Orange"}]})
+        })   
+    })
+
+    const response = await request.get("/generateSuggestedRecipesList?userid=-1")
+
+    // console.log(response.body.length)
+
+    expect(response.status).toEqual(404)
 })
 
 // searchRecipe tests
@@ -366,6 +444,16 @@ test("Path already exists", async () => {
     expect(response.status).toEqual(456)
 })
 
+test("Unregistered user", async () => {
+    const response = await request.post("/addNewPath").send({
+                userID: -1, 
+                path: "burgers"
+        })
+
+        expect(response.status).toEqual(404)
+})
+
+
 // removeExistingPath tests
 test("Path does not exist", async () => {
     const response = await request.post("/removeExistingPath").send({
@@ -384,6 +472,16 @@ test("Success", async () => {
     expect(response.body.result).toEqual("Successfully deleted path from paths list")
 })
 
+test("Unregistered user", async () => {
+    const response = await request.post("/removeExistingPath").send({
+                userID: -1, 
+                path: "burgers"
+        })
+
+        expect(response.status).toEqual(404)
+})
+
+
 // getAllPaths tests
 test("No paths", async () => {
     const response = await request.get("/getAllPaths?userid=22222")
@@ -397,11 +495,28 @@ test("Success", async () => {
     expect(response.body.length).toBeGreaterThan(0)
 })
 
-// addToBookmarkedList tests
+test("Unregistered user", async () => {
+    const response = await request.get("/getAllPaths?userid=-1")
+    expect(response.status).toEqual(404)
+})
+
+//  addToBookmarkedList tests
+
 test("Success", async () => {
     const response = await(RecipeDBAccess.addToBookmarkedList(11111, 632660, "dessert", "Apricot Glazed Apple Tart", "https://spoonacular.com/recipeImages/632660-312x231.jpg"))
     expect(response.status).toEqual(200)
     expect(response.result).toEqual("Successfully added recipe to bookmarked list")
+
+})
+
+test("Unregistered user", async () => {
+
+    try {
+        const response = await(RecipeDBAccess.addToBookmarkedList(-1, 632660, "dessert", "Apricot Glazed Apple Tart", "https://spoonacular.com/recipeImages/632660-312x231.jpg"))
+    } catch (e) {
+        expect(e.status).toEqual(404)
+    }  
+
 })
 
 // removeFromBookmarkedList tests
@@ -418,6 +533,17 @@ test("Success", async () => {
     const response = await(RecipeDBAccess.removeFromBookmarkedList(11111, 632660))
     expect(response.status).toEqual(200)
     expect(response.result).toEqual("Successfully deleted recipe from bookmarked list")
+
+})
+
+test("Unregistered user", async () => {
+
+    try {
+        const response = await(RecipeDBAccess.removeFromBookmarkedList(-1, 632660))
+    } catch(e) {
+        expect(e.status).toEqual(404)
+    }
+
 })
 
 // getBookmarkedRecipes tests
@@ -430,6 +556,16 @@ test("No Bookmarked Recipes", async () => {
 test("Success", async () => {
     const response = await RecipeDBAccess.getBookmarkedRecipes(11111)
     expect(response.recipes.length).toBeGreaterThan(0)
+
+})
+
+test("Unregistered user", async () => {
+
+    try {
+        const response = await RecipeDBAccess.getBookmarkedRecipes(-1)
+    } catch (e) {
+        expect(e.status).toEqual(404)
+    }
 })
 
 // addToPathList tests
@@ -445,6 +581,16 @@ test("Path already exists", async () => {
     } catch(e) {
         expect(e.status).toEqual(456)
         expect(e.result).toEqual("Path already exists")
+    }
+})
+
+
+test("Unregistered user", async () => {
+
+    try {
+        const response = await RecipeDBAccess.addToPathList(-1, "pasta")
+    } catch(e) {
+        expect(e.status).toEqual(404)
     }
 })
 
@@ -464,16 +610,39 @@ test("Success", async () => {
     expect(response.result).toEqual("Successfully deleted path from paths list")
 })
 
+
+test("Unregistered user", async () => {
+
+    try {
+        const response = await RecipeDBAccess.removeFromPathList(-1, "breakfast")
+    } catch (e) {
+        expect(e.status).toEqual(404)
+    }
+})
+
 // getPaths tests
 test("No paths", async () => {
     const response = await RecipeDBAccess.getPaths(22222)
     expect(response.status).toEqual(200)
     expect(response.result.length).toEqual(0)
+
+
 })
 
 test("Success", async () => {
     const response = await RecipeDBAccess.getPaths(11111)
     expect(response.status).toEqual(200)
     expect(response.result.length).toBeGreaterThan(0)
+})
+
+
+test("Unregistered user", async () => {
+
+    try {
+        const response = await RecipeDBAccess.getPaths(-1)
+    } catch (e ){
+        expect(e.status).toEqual(404)
+    }
+    
 })
 

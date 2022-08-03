@@ -157,8 +157,8 @@ test("changeExpiry: correct input", async () => {
 
 //tests for requestIngredients
 test("requestIngredients: user with unregistered userID", () => {
-    return request.get("/requestIngredients?userid=-1").catch((err) => {
-        expect(err.status).toBe(404);
+    return request.get("/requestIngredients?userid=-1").then((response) => {
+        expect(response.status).toBe(404);
     });
 });
 
@@ -184,8 +184,8 @@ test("deleteIngredient: user with unregistered userID", () => {
     return request.post("/deleteIngredient").send({
         userid: -1,
         ingredient: "apple"
-    }).catch((err) => {
-        expect(err.status).toBe(404);
+    }).then((response) => {
+        expect(response.status).toBe(404);
     });
 });
 
@@ -218,8 +218,8 @@ test("updateExpiryDate: user with unregistered userID", async () => {
         userid: -1,
         ingredient: "apple",
         expiry: 86400
-    }).catch((err) => {
-        expect(err.status).toBe(404);
+    }).then((response) => {
+        expect(response.status).toBe(404);
     });
 });
 

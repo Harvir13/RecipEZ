@@ -32,6 +32,9 @@ afterAll(async () => {
     server.close()
 })
 
+
+// generateSuggestedRecipesList
+
 test("No Ingredients", async () => {
     const response = await request.get("/generateSuggestedRecipesList?userid=33333")
     expect(response.status).toEqual(200)
@@ -60,6 +63,9 @@ test("Success", async () => {
       }]))
 })
 
+
+// getRecipeDetails
+
 test("Invalid recipe ID", async () => {
     const response = await request.get("/getRecipeDetails?recipeid=0")
     expect(response.status).toEqual(455)
@@ -71,6 +77,8 @@ test("Success", async () => {
     expect(response.body.instructions).toBeDefined()
     expect(response.body.nutritionDetails).toBeDefined()
 })
+
+// searchRecipe
 
 test("No recipe", async () => {
     const response = await request.get("/searchRecipe?recipename=asdadsfsdfasdf")

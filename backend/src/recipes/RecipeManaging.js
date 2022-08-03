@@ -43,6 +43,7 @@ const removeRecipe = async (req, res) => {
     verify(req.body.googleSignInToken).then(() => {   
         removeFromCache(req.body["recipeID"])
         //req.body should contain data like {userID: xxx, recipeID: xxx}
+
         removeFromBookmarkedList(req.body["userID"], req.body["recipeID"]).then(response => {
             var status = response.status
             delete response["status"]
@@ -61,6 +62,7 @@ const removeRecipe = async (req, res) => {
 
 const getRecipes = async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
+
         //req.query should contain data like ?userid=xxx
         var id = req.query["userid"]
         getBookmarkedRecipes(id).then(data => {
@@ -98,6 +100,9 @@ const getRecipes = async (req, res) => {
 //req.query is of the form ?ingredients=xxx,xxx&filters=xxx,xxx&userid=xxx where the filters are taken as true
 const requestFilteredRecipes = async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
+        if (parseInt(req.query["userid"], 10) <= 0) {
+            return res.status(404).send({"result": "User not found"})
+        }
         var ingredients = req.query["ingredients"].split(",")
         var missingIngredientThreshold = 4 // recipes will be suggested if the user has 40% of the ingredients
         var skipFilters = 0
@@ -197,6 +202,9 @@ const requestFilteredRecipes = async (req, res) => {
 // expects userid=xxx, googlesignintoken=yyy
 const generateSuggestedRecipesList = async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
+        if (parseInt(req.query["userid"], 10) <= 0) {
+            return res.status(404).send({"result": "User not found"})
+        }
         IngredientManaging.requestIngredients(req.query["userid"], req.query["googlesignintoken"]).then(response => {
             return response.data
         }).then(ingredientResponse => {
