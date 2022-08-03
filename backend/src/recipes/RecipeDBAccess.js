@@ -49,7 +49,7 @@ function addToCache(recipeID, recipeData, hasRecipe) {
         } else {
             const numEntries = await client.db("RecipeDB").collection("Cache").countDocuments({})
             if (numEntries >= MAX_CACHE_ENTRIES) {
-                client.db("RecipeDB").collection("Cache").find().sort({refcount: 1}).limit(1).toArray(async (res) => {
+                client.db("RecipeDB").collection("Cache").find().sort({refcount: 1}).limit(1).toArray(async (err, res) => {
                     await client.db("RecipeDB").collection("Cache").deleteOne({ recipeid: res[0].recipeid })
                 })
             }
