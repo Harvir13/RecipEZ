@@ -21,6 +21,7 @@ afterAll(async () => {
     await client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne({"userID": 11111, "recipeID": 73420, "path": "dessert", "image": "https://spoonacular.com/recipeImages/73420-312x231.jpg", "title": "Apple Or Peach Strudel"})
     await client.db("RecipeDB").collection("Paths").deleteOne({"userID": 11111, "path": "dessert"})
     await client.db("RecipeDB").collection("Cache").deleteOne({"recipeid": 632660})
+    await client.db("RecipeDB").collection("Cache").deleteOne({"recipeid": 632660})
     await UserDBAccess.client.close()
     server.close()
 })
