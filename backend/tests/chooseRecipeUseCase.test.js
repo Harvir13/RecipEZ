@@ -42,12 +42,9 @@ test("No Ingredients", async () => {
 })
 
 test("No user", async () => {
-    try {
-        await request.get("/generateSuggestedRecipesList?userid=-1")
-    } catch (e) {
-        expect(e.status).toEqual(404)
-    }
-    
+    request.get("/generateSuggestedRecipesList?userid=-1").catch((err) => {
+        expect(err.status).toEqual(404)
+    })
 })
 
 

@@ -4,7 +4,7 @@ const IngredientManagingAccess = require("../src/ingredients/IngredientManaging.
 const supertest = require('supertest');
 const {app} = require('../src/router.js');
 
-const server = app.listen(8091);
+app.listen(8091);
 const request = supertest(app);
 
 const uri = "mongodb://localhost:27017";

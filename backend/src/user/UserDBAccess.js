@@ -21,14 +21,9 @@ function scanDB(email) {
 }
 
 async function generateUserID () {
-    try {
-        const result = await client.db("UserDB").collection("Users").countDocuments()
-        const newID = result + 1
-        return newID
-    }
-    catch (err) {
-        throw err
-    }
+    const result = await client.db("UserDB").collection("Users").countDocuments()
+    const newID = result + 1
+    return newID
 }
 
 function storeUserInfo(email) {
