@@ -6,19 +6,15 @@ const client = new MongoClient(uri)
 function scanDB(email) {
     return new Promise((resolve, reject) => {
         client.db("UserDB").collection("Users").countDocuments({"email": email}).then(result => {
-            console.log(result)
             if (result > 0) {
-                console.log("User found")
                 client.db("UserDB").collection("Users").findOne({"email": email}).then(result =>{
                     return resolve({"status": 200, "userID": result["userID"]})
                 })
             }
             else {
-                console.log("False")
                 return resolve({"status": 200, "userID": 0})
             }
         }).catch(err => {
-            console.log(err)
             return reject({"status": 400, "result": err})
         }) 
     })
@@ -27,14 +23,10 @@ function scanDB(email) {
 async function generateUserID () {
     try {
         const result = await client.db("UserDB").collection("Users").countDocuments()
-        console.log(result)
         const newID = result + 1
-        console.log("new id")
-        console.log(newID)
         return newID
     }
     catch (err) {
-        console.log(err)
         throw err
     }
 }
@@ -44,12 +36,10 @@ function storeUserInfo(email) {
         generateUserID().then(id => {
             var newUser = {"email": email}
         newUser["userID"] = id;
-        console.log(id)
         newUser["dietaryRestrictions"] = [];
         client.db("UserDB").collection("Users").insertOne(newUser).then(result => {
             return resolve({"status": 200, "userID": id})
         }).catch(err => {
-            console.log(err)
             return reject({"status": 400, "result": err})
         }) 
         })  
@@ -72,7 +62,6 @@ function storeToken(userID, token) {
                 })  
             }
         }).catch(err => {
-            console.log(err)
             return reject({"status": 400, "result": err})
         }) 
     })
@@ -90,7 +79,6 @@ function getTokens(userids) {
             retObj["result"] = result
             return resolve(retObj)
         }).catch(err => {
-            console.log(err)
             return reject({"status": 400, "result": err})
         }) 
     })
@@ -102,7 +90,6 @@ function addToDietaryRestrictions(userID, restriction) {
         client.db("UserDB").collection("Users").updateOne({"userID": parseInt(userID, 10)}, {$push: {"dietaryRestrictions": restrictions}}).then(result => {
             return resolve({"status": 200, "result": "Successfully updated dietary restrictions list"})
         }).catch(err => {
-            console.log(err)
             return reject({"status": 400, "result": err})
         }) 
     })
@@ -115,7 +102,6 @@ function deleteDietaryRestrictions(userID, restriction) {
         client.db("UserDB").collection("Users").updateOne({"userID": parseInt(userID, 10)}, {$pull: {"dietaryRestrictions": restrictions}}).then(result => {
             return resolve({"status": 200, "result": "Successfully updated dietary restrictions list"})
         }).catch(err => {
-            console.log(err)
             return reject({"status": 400, "result": err})
         }) 
     })
@@ -123,12 +109,10 @@ function deleteDietaryRestrictions(userID, restriction) {
 
 function getDietaryRestrictions(userid) {
     return new Promise((resolve, reject) => {
-        console.log("restrictions for: " + userid)
         var userID = parseInt(userid, 10)
         client.db("UserDB").collection("Users").findOne({"userID": userID}).then(result => {
             return resolve({"status": 200, "result": result})
         }).catch(err => {
-            console.log(err)
             return reject({"status": 400, "result": err})
         }) 
     })

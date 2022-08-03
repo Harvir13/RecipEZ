@@ -1,6 +1,6 @@
 const axios = require('axios');
 const {getPaths, removeFromPathList, addToPathList, getBookmarkedRecipes, removeFromBookmarkedList, addToBookmarkedList,
-    checkCache, addToCache, removeFromCache} = require('./RecipeDBAccess.js')
+    checkCache, addToCache, removeFromCache, getFromCache} = require('./RecipeDBAccess.js')
 const UserManaging = require('../user/UserManaging.js')
 const IngredientManaging = require('../ingredients/IngredientManaging.js')
 
@@ -14,7 +14,7 @@ const API_KEY = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
 function checkForTitles(recipeList) {
     var hasTitle = []
     for (let i = 0; i < recipeList.length; i++) {
-        if (recipeList[i].hasOwnProperty("title")) {
+        if (Object.prototype.hasOwnProperty.call(recipeList[i], "title")) {
             hasTitle.push(recipeList[i])
         }
     }
@@ -23,7 +23,6 @@ function checkForTitles(recipeList) {
 
 const addRecipe =  async (req, res) => {
     verify(req.body.googleSignInToken).then(() => {
-
         //req.body should contain data like {userID: xxx, recipeID: xxx, path: home/xxx/xxx, title: xxx, image: xxx}
         addToBookmarkedList(req.body["userID"], req.body["recipeID"], req.body["path"], req.body["title"], req.body["image"]).then(response => {
             var status = response.status
@@ -42,7 +41,7 @@ const addRecipe =  async (req, res) => {
 
 const removeRecipe = async (req, res) => {
     verify(req.body.googleSignInToken).then(() => {   
-        //removeFromCache(req.body["recipeID"])
+        removeFromCache(req.body["recipeID"])
         //req.body should contain data like {userID: xxx, recipeID: xxx}
 
         removeFromBookmarkedList(req.body["userID"], req.body["recipeID"]).then(response => {
@@ -137,7 +136,6 @@ const requestFilteredRecipes = async (req, res) => {
             else {
                 var restrictions = data["dietaryRestrictions"]
             }
-            // console.log(ingredientList)
             axios.get("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredientList + "&apiKey=" + API_KEY).then(response =>
                 response.data
             ).then (data => {
@@ -164,7 +162,6 @@ const requestFilteredRecipes = async (req, res) => {
                     }
                 }
                 idList = idList.slice(0,-1)
-                console.log("ids: " + idList)
                 
 
                 axios.get("https://api.spoonacular.com/recipes/informationBulk?ids=" + idList + "&apiKey=" + API_KEY).then(response2 =>
@@ -276,9 +273,7 @@ const generateSuggestedRecipesList = async (req, res) => {
 const searchRecipe = async (req, res) => {
     verify(req.query["googlesignintoken"]).then(() => {
         var name = encodeURIComponent(req.query["recipename"])
-        console.log(name)
         axios.get("https://api.spoonacular.com/recipes/complexSearch?query=" + name + "&apiKey=" + API_KEY).then(response => {
-            console.log(response)
             return response.data
     }).then (data => {
             var recipes = data["results"]
@@ -299,54 +294,63 @@ const searchRecipe = async (req, res) => {
 
 //expects ?recipeid=xxx
 const getRecipeDetails = async (req, res) => {
-    verify(req.query["googlesignintoken"]).then(() => {
-        console.log(req.query["recipeid"])
-        axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=" + API_KEY).then(response =>
-            response.data
-        ).then(data => {
-            if (!data.hasOwnProperty('ingredients')) {
-                return res.status(455).send({"result": "Recipe does not exist"})
-            }
-            var returnObj = {}
-            var ingredients = []
-            for (let i = 0; i < data["ingredients"].length; i++) {
-                var amount = data["ingredients"][i]["amount"]["us"]
-                var name = data["ingredients"][i]["name"]
-                ingredients.push(amount["value"].toString() + " " + amount["unit"] + " " + name)
-            }
-            returnObj["ingredientsAndAmounts"] = ingredients
-            axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/nutritionWidget.json?apiKey=" + API_KEY).then(response =>
+    verify(req.query["googlesignintoken"]).then(async () => {
+        const recipeInCache = await checkCache(req.query["recipeid"])
+        if (recipeInCache) {
+            await addToCache(req.query["recipeid"], {}, true)
+            const recipeData = await getFromCache(req.query["recipeid"])
+            return res.send(recipeData.result.recipedata)
+        } else {
+            axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=" + API_KEY).then(response =>
                 response.data
             ).then(data => {
-                var nutrition = {}
-                nutrition["calories"] = data["calories"]
-                nutrition["carbs"] = data["carbs"]
-                nutrition["fat"] = data["fat"]
-                nutrition["protein"] = data["protein"]
-                returnObj["nutritionDetails"] = nutrition
-                axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/analyzedInstructions?apiKey=" + API_KEY).then(response =>
+                if (!data.hasOwnProperty('ingredients')) {
+                    return res.status(455).send({"result": "Recipe does not exist"})
+                }
+                var returnObj = {}
+                var ingredients = []
+                for (let i = 0; i < data["ingredients"].length; i++) {
+                    var amount = data["ingredients"][i]["amount"]["us"]
+                    var name = data["ingredients"][i]["name"]
+                    ingredients.push(amount["value"].toString() + " " + amount["unit"] + " " + name)
+                }
+                returnObj["ingredientsAndAmounts"] = ingredients
+                axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/nutritionWidget.json?apiKey=" + API_KEY).then(response =>
                     response.data
                 ).then(data => {
-                    var instructions = []
-                    var currStep = {}
-                    for (let j = 0; j < data.length; j++) {
-                        currStep["name"] = data[j]["name"]
-                        currStep["steps"] = []
-                        var allSteps = data[j]["steps"]
-                        for (let k = 0; k < allSteps.length; k++) {
-                            currStep["steps"].push(allSteps[k]["step"])
+                    var nutrition = {}
+                    nutrition["calories"] = data["calories"]
+                    nutrition["carbs"] = data["carbs"]
+                    nutrition["fat"] = data["fat"]
+                    nutrition["protein"] = data["protein"]
+                    returnObj["nutritionDetails"] = nutrition
+                    axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/analyzedInstructions?apiKey=" + API_KEY).then(response =>
+                        response.data
+                    ).then(data => {
+                        var instructions = []
+                        var currStep = {}
+                        for (let j = 0; j < data.length; j++) {
+                            currStep["name"] = data[j]["name"]
+                            currStep["steps"] = []
+                            var allSteps = data[j]["steps"]
+                            for (let k = 0; k < allSteps.length; k++) {
+                                currStep["steps"].push(allSteps[k]["step"])
+                            }
+                            instructions.push(currStep)
                         }
-                        instructions.push(currStep)
-                    }
-                    returnObj["instructions"] = instructions
-                    return res.send(returnObj)
+                        returnObj["instructions"] = instructions
+                        addToCache(req.query["recipeid"], returnObj, false).then(() => {
+                            return res.send(returnObj)
+                        })
+                    })
                 })
+            }).catch(() => {
+                return res.status(455).send({"result": "Recipe does not exist"})
             })
-        }).catch(err => {
-            return res.status(455).send({"result": "Recipe does not exist"})
-        }) }).catch(err => {
-            return res.status(400).send(err)
-        }) 
+        }
+    }).catch(err => {
+        return res.status(400).send(err)
+    }) 
 }
 
 const addNewPath = async (req, res) => {

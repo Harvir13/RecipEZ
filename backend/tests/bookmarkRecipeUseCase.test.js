@@ -1,7 +1,7 @@
 const supertest = require('supertest')
 
 const {app} = require('../src/router.js')
-const {MongoClient, Db} = require('mongodb')
+const {MongoClient} = require('mongodb')
 
 const uri = "mongodb://localhost:27017"
 const client = new MongoClient(uri)
@@ -18,10 +18,10 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-    await client.db("RecipeDB").collection("Paths").remove({"userID": 11111, "path": "sauce"})
-    await client.db("RecipeDB").collection("BookmarkedRecipes").remove({"userID": 11111, "recipeID": 73420, "path": "dessert", "image": "https://spoonacular.com/recipeImages/73420-312x231.jpg", "title": "Apple Or Peach Strudel"})
-    await client.db("RecipeDB").collection("BookmarkedRecipes").remove({"userID": 11111, "recipeID" : 632660, "path" : "dessert", "image" : "https://spoonacular.com/recipeImages/632660-312x231.jpg", "title" : "Apricot Glazed Apple Tart"})
-    await client.db("RecipeDB").collection("BookmarkedRecipes").remove({"userID": 11111, "recipeID" : 632660, "path" : "dasfsakjsdl;jfl", "image" : "https://spoonacular.com/recipeImages/632660-312x231.jpg", "title" : "Apricot Glazed Apple Tart"})
+    await client.db("RecipeDB").collection("Paths").deleteOne({"userID": 11111, "path": "sauce"})
+    await client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne({"userID": 11111, "recipeID": 73420, "path": "dessert", "image": "https://spoonacular.com/recipeImages/73420-312x231.jpg", "title": "Apple Or Peach Strudel"})
+    await client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne({"userID": 11111, "recipeID" : 632660, "path" : "dessert", "image" : "https://spoonacular.com/recipeImages/632660-312x231.jpg", "title" : "Apricot Glazed Apple Tart"})
+    await client.db("RecipeDB").collection("BookmarkedRecipes").deleteOne({"userID": 11111, "recipeID" : 632660, "path" : "dasfsakjsdl;jfl", "image" : "https://spoonacular.com/recipeImages/632660-312x231.jpg", "title" : "Apricot Glazed Apple Tart"})
     await client.close()
     server.close()
 })
@@ -34,7 +34,6 @@ test("getAllPaths: no user", async () => {
 
 test("getAllPaths: success", async () => {
     const response = await request.get("/getAllPaths?userid=11111")
-    // console.log(response)
     expect(response.status).toEqual(200)
     expect(response.body.length).toEqual(1)
 })

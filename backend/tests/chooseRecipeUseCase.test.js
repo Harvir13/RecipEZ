@@ -1,9 +1,3 @@
-const IngredientDBAccess = require("../src/ingredients/IngredientDBAccess.js");
-const IngredientManagingAccess = require("../src/ingredients/IngredientManaging.js");
-const UserManaging = require('../src/user/UserManaging.js')
-const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
-// const RecipeManaging = require('../src/recipes/RecipeManaging.js')
-const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
 const supertest = require('supertest');
 const {app} = require('../src/router.js');
 
@@ -28,12 +22,12 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-    await client.db("UserDB").collection("Users").remove({"userID": 11111, "dietaryRestrictions": ["bread"]})
-    await client.db("UserDB").collection("Users").remove({"userID": 22222, "dietaryRestrictions": ["Apple"]})
-    await client.db("UserDB").collection("Users").remove({"userID": 33333, "dietaryRestrictions": []})
-    await client.db("IngredientDB").collection("Users").remove({"userid": 11111, "ingredients": [{"name": "Apple"}, {"name":"Blue berries"}, {"name": "Orange"}]})
-    await client.db("IngredientDB").collection("Users").remove({"userid": 22222, "ingredients": [{"name": "Breadfruit"}]})
-    await client.db("IngredientDB").collection("Users").remove({"userid": 33333, "ingredients": []})
+    await client.db("UserDB").collection("Users").deleteOne({"userID": 11111, "dietaryRestrictions": ["bread"]})
+    await client.db("UserDB").collection("Users").deleteOne({"userID": 22222, "dietaryRestrictions": ["Apple"]})
+    await client.db("UserDB").collection("Users").deleteOne({"userID": 33333, "dietaryRestrictions": []})
+    await client.db("IngredientDB").collection("Users").deleteOne({"userid": 11111, "ingredients": [{"name": "Apple"}, {"name":"Blue berries"}, {"name": "Orange"}]})
+    await client.db("IngredientDB").collection("Users").deleteOne({"userid": 22222, "ingredients": [{"name": "Breadfruit"}]})
+    await client.db("IngredientDB").collection("Users").deleteOne({"userid": 33333, "ingredients": []})
     await client.close()
     server.close()
 })
@@ -43,16 +37,14 @@ afterAll(async () => {
 
 test("No Ingredients", async () => {
     const response = await request.get("/generateSuggestedRecipesList?userid=33333")
-    console.log(response)
     expect(response.status).toEqual(200)
     expect(response.body.length).toEqual(0)
 })
 
 test("No user", async () => {
     try {
-        const response = await request.get("/generateSuggestedRecipesList?userid=-1")
+        await request.get("/generateSuggestedRecipesList?userid=-1")
     } catch (e) {
-        console.log(e)
         expect(e.status).toEqual(404)
     }
     
