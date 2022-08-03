@@ -509,13 +509,9 @@ test("Success", async () => {
 })
 
 test("Unregistered user", async () => {
-
-    try {
-        await(RecipeDBAccess.addToBookmarkedList(-1, 632660, "dessert", "Apricot Glazed Apple Tart", "https://spoonacular.com/recipeImages/632660-312x231.jpg"))
-    } catch (e) {
-        expect(e.status).toEqual(404)
-    }  
-
+    RecipeDBAccess.addToBookmarkedList(-1, 632660, "dessert", "Apricot Glazed Apple Tart", "https://spoonacular.com/recipeImages/632660-312x231.jpg").catch((err) => {
+        expect(err.status).toEqual(404)
+    })
 })
 
 // removeFromBookmarkedList tests
