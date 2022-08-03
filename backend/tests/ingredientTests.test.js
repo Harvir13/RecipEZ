@@ -79,7 +79,7 @@ test("removeIngredient: no stored ingredient", async () => {
     const ingredients = await IngredientDBAccess.getIngredients(22222);
     expect(response.status).toBe(200);
     expect(ingredients.result).toEqual([
-        { name: "orange", expiry: 123456789, image: "orange.png" },
+        { name: "orange", expiry: parseInt("123456789", 10), image: "orange.png" },
         { name: "chicken", expiry: 259200, image: "whole-chicken.jpg" },
         { name: "apple", expiry: 259201, image: "apple.jpg" }
     ]);
@@ -96,7 +96,7 @@ test("removeIngredient: has stored ingredient", async () => {
     expect(response.status).toBe(200);
     expect(fixDB.status).toBe(200);
     expect(ingredients.result).toEqual([
-        { name: "orange", expiry: 123456789, image: "orange.png" },
+        { name: "orange", expiry: parseInt("123456789", 10), image: "orange.png" },
         { name: "chicken", expiry: 259200, image: "whole-chicken.jpg" }
     ]);
 });
@@ -139,7 +139,7 @@ test("changeExpiry: no stored ingredient", async () => {
     const ingredients = await IngredientDBAccess.getIngredients(22222);
     expect(response.status).toBe(200);
     expect(ingredients.result).toEqual([
-        { name: "orange", expiry: 123456789, image: "orange.png" },
+        { name: "orange", expiry: parseInt("123456789", 10), image: "orange.png" },
         { name: "chicken", expiry: 259200, image: "whole-chicken.jpg" },
         { name: "apple", expiry: 259201, image: "apple.jpg" }
     ]);
@@ -171,7 +171,7 @@ test("requestIngredients: user with no ingredients", () => {
 test("requestIngredients: user with ingredients", () => {
     return request.get("/requestIngredients?userid=22222").then((response) => {
         expect(response.body).toEqual([
-            { name: "orange", expiry: 123456789, image: "orange.png" },
+            { name: "orange", expiry: parseInt("123456789", 10), image: "orange.png" },
             { name: "chicken", expiry: 259200, image: "whole-chicken.jpg" },
             { name: "apple", expiry: 259201, image: "apple.jpg" }
         ]);
@@ -424,7 +424,7 @@ beforeAll(async () => {
         "ingredients": [
             {
             "name": "orange",
-            "expiry": 123456789,
+            "expiry": parseInt("123456789", 10),
             "image": "orange.png"
             },
             {

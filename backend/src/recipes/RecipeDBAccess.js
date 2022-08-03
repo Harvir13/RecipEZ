@@ -37,17 +37,22 @@ function getFromCache(recipeID) {
 }
 
 function addToCache(recipeID, recipeData, hasRecipe) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
         if (hasRecipe) {
-            const recipe = await client.db("RecipeDB").collection("Cache").findOne({ recipeid: parseInt(recipeID, 10) })
-            const newRefcount = recipe.refcount + 1
+            var newRefcount
+            client.db("RecipeDB").collection("Cache").findOne({ recipeid: parseInt(recipeID, 10) }).then((recipe) => {
+                newRefcount = recipe.refcount + 1
+            })
             client.db("RecipeDB").collection("Cache").updateOne({ recipeid: parseInt(recipeID, 10) }, {
                 $set: { refcount: newRefcount }
             }).then(() => {
                 return resolve({"status": 200, "result": "new ref count: " + newRefcount});
             })
         } else {
-            const numEntries = await client.db("RecipeDB").collection("Cache").countDocuments({})
+            var numEntries
+            client.db("RecipeDB").collection("Cache").countDocuments({}).then((dbEntries) => {
+                numEntries = dbEntries
+            })
             if (numEntries >= MAX_CACHE_ENTRIES) {
                 client.db("RecipeDB").collection("Cache").find().sort({refcount: 1}).limit(1).toArray(async (err, res) => {
                     if (err) return
