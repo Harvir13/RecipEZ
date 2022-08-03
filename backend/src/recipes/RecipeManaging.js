@@ -304,7 +304,7 @@ const getRecipeDetails = async (req, res) => {
             axios.get("https://api.spoonacular.com/recipes/" + req.query["recipeid"] + "/ingredientWidget.json?apiKey=" + API_KEY).then(response =>
                 response.data
             ).then(data => {
-                if (!data.hasOwnProperty('ingredients')) {
+                if (!Object.prototype.hasOwnProperty.call(data, "ingredients")) {
                     return res.status(455).send({"result": "Recipe does not exist"})
                 }
                 var returnObj = {}
@@ -398,7 +398,7 @@ const getAllPaths = async (req, res) => {
             var idPathJSON = {}
             var retArr = []
             for (let i = 0; i < result.length; i++) {
-                if (idPathJSON.hasOwnProperty(result[i]["userID"])) {
+                if (Object.prototype.hasOwnProperty.call(idPathJSON, result[i]["userID"])) {
                     idPathJSON[result[i]["userID"]].push(result[i]["path"])
                 }
                 else {
@@ -406,7 +406,7 @@ const getAllPaths = async (req, res) => {
                 }
             }
             for (let userID in idPathJSON) {
-                retArr.push({"userID": userID, "paths": idPathJSON[userID]})
+                retArr.push({userID, "paths": idPathJSON[userID]})
             }
             var status = response.status
             return res.status(status).send(retArr)

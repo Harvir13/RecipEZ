@@ -4,7 +4,7 @@ const supertest = require('supertest');
 
 const {app} = require('../src/router.js');
 
-const server = app.listen(8089);
+app.listen(8089);
 const request = supertest(app);
 
 const uri = "mongodb://localhost:27017";
@@ -27,7 +27,7 @@ test("requestIngredients: user with no ingredients", async () => {
 test("requestIngredients: user with ingredients", async () => {
     return request.get("/requestIngredients?userid=22222").then((response) => {
         expect(response.body).toEqual([
-            { name: "orange", expiry: 123456789, image: "orange.png" },
+            { name: "orange", expiry: parseInt("123456789", 10), image: "orange.png" },
             { name: "chicken", expiry: 259200, image: "whole-chicken.jpg" },
             { name: "apple", expiry: 259201, image: "apple.jpg" }
         ]);
@@ -124,7 +124,7 @@ test("getIngredientSuggestions: has results", async () => {
     expect(response.body).toEqual([
         {"id":9003,"name":"apple","image":"apple.jpg"},
         {"id":1009016,"name":"apple cider","image":"apple-cider.jpg"},
-        {"id":10019297,"name":"apple jelly","image":"apple-jelly.jpg"},
+        {"id":parseInt("10019297", 10),"name":"apple jelly","image":"apple-jelly.jpg"},
         {"id":19312,"name":"apple pie filling","image":"apple-pie-slice.jpg"},
         {"id":19294,"name":"apple butter spread","image":"apple-jelly.jpg"},
         {"id":2048,"name":"apple cider distilled vinegar","image":"apple-cider-vinegar.jpg"},
@@ -203,11 +203,11 @@ test("addIngredient: ingredient already present", async () => {
 });
 
 beforeAll(async () => {
-    const res1 = await client.db("IngredientDB").collection("Users").insertOne({
+    await client.db("IngredientDB").collection("Users").insertOne({
         "userid": 11111,
         "ingredients": []
     });
-    const res2 = await client.db("IngredientDB").collection("Users").insertOne({
+    await client.db("IngredientDB").collection("Users").insertOne({
         "userid": 22222,
         "ingredients": [
             {

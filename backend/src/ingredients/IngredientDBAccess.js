@@ -22,9 +22,9 @@ function storeIngredient(userid, inputIngredient) {
         if (inputIngredient.expiry < 0) return reject({"status": 405, "result": "Error: invalid expiry value"});
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
             let alreadyHaveIng = false;
-            result.ingredients.forEach((ingredient => {
+            result.ingredients.forEach((ingredient) => {
                 if (ingredient.name == inputIngredient.name) alreadyHaveIng = true;
-            }));
+            });
             if (!alreadyHaveIng) result.ingredients.push(inputIngredient);
             let newIngredients = {$set: { ingredients: result.ingredients }};
             client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(userid, 10) }, newIngredients).then(result => {

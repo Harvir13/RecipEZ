@@ -1,4 +1,3 @@
-var axios = require("axios")
 const UserManaging = require('../src/user/UserManaging.js')
 const IngredientManaging = require('../src/ingredients/IngredientManaging.js')
 const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
@@ -510,23 +509,17 @@ test("Success", async () => {
 })
 
 test("Unregistered user", async () => {
-
-    try {
-        const response = await(RecipeDBAccess.addToBookmarkedList(-1, 632660, "dessert", "Apricot Glazed Apple Tart", "https://spoonacular.com/recipeImages/632660-312x231.jpg"))
-    } catch (e) {
-        expect(e.status).toEqual(404)
-    }  
-
+    RecipeDBAccess.addToBookmarkedList(-1, 632660, "dessert", "Apricot Glazed Apple Tart", "https://spoonacular.com/recipeImages/632660-312x231.jpg").catch((err) => {
+        expect(err.status).toEqual(404)
+    })
 })
 
 // removeFromBookmarkedList tests
 test("Missing Recipe in Bookmarked List", async () => {
-    try {
-        await (RecipeDBAccess.removeFromBookmarkedList(22222, 632660))
-    } catch(e) {
-        expect(e.status).toEqual(453)
-        expect(e.result).toEqual("Missing recipe from bookmarked list")
-    }
+    RecipeDBAccess.removeFromBookmarkedList(22222, 632660).catch((err) => {
+        expect(err.status).toEqual(453)
+        expect(err.result).toEqual("Missing recipe from bookmarked list")
+    })
 })
 
 test("Success", async () => {
@@ -537,13 +530,9 @@ test("Success", async () => {
 })
 
 test("Unregistered user", async () => {
-
-    try {
-        const response = await(RecipeDBAccess.removeFromBookmarkedList(-1, 632660))
-    } catch(e) {
+    RecipeDBAccess.removeFromBookmarkedList(-1, 632660).catch((e) => {
         expect(e.status).toEqual(404)
-    }
-
+    })
 })
 
 // getBookmarkedRecipes tests
@@ -560,12 +549,9 @@ test("Success", async () => {
 })
 
 test("Unregistered user", async () => {
-
-    try {
-        const response = await RecipeDBAccess.getBookmarkedRecipes(-1)
-    } catch (e) {
+    RecipeDBAccess.getBookmarkedRecipes(-1).catch((e) => {
         expect(e.status).toEqual(404)
-    }
+    })
 })
 
 // addToPathList tests
@@ -576,32 +562,25 @@ test("Success", async () => {
 })
 
 test("Path already exists", async () => {
-    try {
-        await RecipeDBAccess.addToPathList(11111, "pasta")
-    } catch(e) {
+    RecipeDBAccess.addToPathList(11111, "pasta").catch((e) => {
         expect(e.status).toEqual(456)
         expect(e.result).toEqual("Path already exists")
-    }
+    })
 })
 
 
 test("Unregistered user", async () => {
-
-    try {
-        const response = await RecipeDBAccess.addToPathList(-1, "pasta")
-    } catch(e) {
+    RecipeDBAccess.addToPathList(-1, "pasta").catch((e) => {
         expect(e.status).toEqual(404)
-    }
+    })
 })
 
 // removeFromPathList tests
 test("Path does not exist", async () => {
-    try {
-        await RecipeDBAccess.removeFromPathList(22222, "breakfast")
-    } catch (e) {
+    RecipeDBAccess.removeFromPathList(22222, "breakfast").catch((e) => {
         expect(e.status).toEqual(457)
         expect(e.result).toEqual("Path does not exist")
-    }
+    })
 })
 
 test("Success", async () => {
@@ -612,12 +591,9 @@ test("Success", async () => {
 
 
 test("Unregistered user", async () => {
-
-    try {
-        const response = await RecipeDBAccess.removeFromPathList(-1, "breakfast")
-    } catch (e) {
+    RecipeDBAccess.removeFromPathList(-1, "breakfast").catch((e) => {
         expect(e.status).toEqual(404)
-    }
+    })
 })
 
 // getPaths tests
@@ -637,12 +613,8 @@ test("Success", async () => {
 
 
 test("Unregistered user", async () => {
-
-    try {
-        const response = await RecipeDBAccess.getPaths(-1)
-    } catch (e ){
+    RecipeDBAccess.getPaths(-1).catch((e) => {
         expect(e.status).toEqual(404)
-    }
-    
+    })
 })
 

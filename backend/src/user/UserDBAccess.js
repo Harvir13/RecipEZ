@@ -5,9 +5,9 @@ const client = new MongoClient(uri)
 
 function scanDB(email) {
     return new Promise((resolve, reject) => {
-        client.db("UserDB").collection("Users").countDocuments({"email": email}).then(result => {
+        client.db("UserDB").collection("Users").countDocuments({email}).then(result => {
             if (result > 0) {
-                client.db("UserDB").collection("Users").findOne({"email": email}).then(result =>{
+                client.db("UserDB").collection("Users").findOne({email}).then(result =>{
                     return resolve({"status": 200, "userID": result["userID"]})
                 })
             }
@@ -21,20 +21,15 @@ function scanDB(email) {
 }
 
 async function generateUserID () {
-    try {
-        const result = await client.db("UserDB").collection("Users").countDocuments()
-        const newID = result + 1
-        return newID
-    }
-    catch (err) {
-        throw err
-    }
+    const result = await client.db("UserDB").collection("Users").countDocuments()
+    const newID = result + 1
+    return newID
 }
 
 function storeUserInfo(email) {
     return new Promise((resolve, reject) => {
         generateUserID().then(id => {
-            var newUser = {"email": email}
+            var newUser = {email}
         newUser["userID"] = id;
         newUser["dietaryRestrictions"] = [];
         client.db("UserDB").collection("Users").insertOne(newUser).then(result => {
@@ -51,13 +46,13 @@ function storeToken(userID, token) {
     return new Promise((resolve, reject) => {
         client.db("UserDB").collection("Tokens").findOne({"userID": parseInt(userID, 10)}).then(result => {
             if (result === null) {
-                var newToken = {"userID": parseInt(userID, 10), "token": token}
+                var newToken = {"userID": parseInt(userID, 10), token}
                 client.db("UserDB").collection("Tokens").insertOne(newToken).then(result => {
                     return resolve({"status": 200, "result": "New user's token has been added to DB"})
                 })
             }
             else {
-                client.db("UserDB").collection("Tokens").updateOne({"userID": parseInt(userID, 10)}, {$set: {"token": token}}).then(result => {
+                client.db("UserDB").collection("Tokens").updateOne({"userID": parseInt(userID, 10)}, {$set: {token}}).then(result => {
                     return resolve({"status": 200, "result": "Updated token"})
                 })  
             }
@@ -110,8 +105,8 @@ function deleteDietaryRestrictions(userID, restriction) {
 function getDietaryRestrictions(userid) {
     return new Promise((resolve, reject) => {
         var userID = parseInt(userid, 10)
-        client.db("UserDB").collection("Users").findOne({"userID": userID}).then(result => {
-            return resolve({"status": 200, "result": result})
+        client.db("UserDB").collection("Users").findOne({userID}).then(result => {
+            return resolve({"status": 200, result})
         }).catch(err => {
             return reject({"status": 400, "result": err})
         }) 

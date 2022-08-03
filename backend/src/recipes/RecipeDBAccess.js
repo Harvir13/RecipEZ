@@ -4,14 +4,6 @@ const uri = "mongodb://localhost:27017"
 const client = new MongoClient(uri)
 var MAX_CACHE_ENTRIES = 20
 
-//TODO: Add this
-/*
-check db for recipe; if there and db not full, add and set refcount to one
-if full use refcount replacement policy
-if recipe already bookmarked, do nothing, if not remove refcount by 1
-if refcount reaches 0 delete
-*/
-
 //for testing purposes only
 function changeCacheSize(size) {
     MAX_CACHE_ENTRIES = size
@@ -31,35 +23,39 @@ function getFromCache(recipeID) {
         client.db("RecipeDB").collection("Cache").findOne({ recipeid: parseInt(recipeID, 10) }).then((result) => {
             if (result == null) return reject({"status": 400, "result": "No recipe in cache"})
             delete result._id
-            return resolve({"status": 200, "result": result})
+            return resolve({"status": 200, result})
         })
     })
 }
 
 function addToCache(recipeID, recipeData, hasRecipe) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
         if (hasRecipe) {
-            const recipe = await client.db("RecipeDB").collection("Cache").findOne({ recipeid: parseInt(recipeID, 10) })
-            const newRefcount = recipe.refcount + 1
-            client.db("RecipeDB").collection("Cache").updateOne({ recipeid: parseInt(recipeID, 10) }, {
-                $set: { refcount: newRefcount }
-            }).then(() => {
-                return resolve({"status": 200, "result": "new ref count: " + newRefcount});
+            client.db("RecipeDB").collection("Cache").findOne({ recipeid: parseInt(recipeID, 10) }).then((recipe) => {
+                const newRefcount = recipe.refcount + 1
+                client.db("RecipeDB").collection("Cache").updateOne({ recipeid: parseInt(recipeID, 10) }, {
+                    $set: { refcount: newRefcount }
+                }).then(() => {
+                    return resolve({"status": 200, "result": "new ref count: " + newRefcount});
+                })
             })
         } else {
-            const numEntries = await client.db("RecipeDB").collection("Cache").countDocuments({})
-            if (numEntries >= MAX_CACHE_ENTRIES) {
-                client.db("RecipeDB").collection("Cache").find().sort({refcount: 1}).limit(1).toArray(async (err, res) => {
-                    await client.db("RecipeDB").collection("Cache").deleteOne({ recipeid: res[0].recipeid })
+            client.db("RecipeDB").collection("Cache").countDocuments({}).then((dbEntries) => {
+                const numEntries = dbEntries
+                if (numEntries >= MAX_CACHE_ENTRIES) {
+                    client.db("RecipeDB").collection("Cache").find().sort({refcount: 1}).limit(1).toArray(async (err, res) => {
+                        if (err) return
+                        await client.db("RecipeDB").collection("Cache").deleteOne({ recipeid: res[0].recipeid })
+                    })
+                }
+                const recipeInfo = {
+                    recipeid: parseInt(recipeID, 10),
+                    refcount: 1,
+                    recipedata: recipeData
+                }
+                client.db("RecipeDB").collection("Cache").insertOne(recipeInfo).then(() => {
+                    return resolve({"status": 200, "result": "added " + recipeID})
                 })
-            }
-            const recipeInfo = {
-                recipeid: parseInt(recipeID, 10),
-                refcount: 1,
-                recipedata: recipeData
-            }
-            client.db("RecipeDB").collection("Cache").insertOne(recipeInfo).then(() => {
-                return resolve({"status": 200, "result": "added " + recipeID})
             })
         }
     })
