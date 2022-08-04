@@ -30,6 +30,8 @@ android {
 dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.android.volley:volley:1.2.1'
+    implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.0-alpha07'
     def fragment_version = "1.4.1"
     implementation "androidx.fragment:fragment:$fragment_version"
