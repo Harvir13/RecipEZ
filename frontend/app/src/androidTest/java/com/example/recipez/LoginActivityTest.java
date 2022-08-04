@@ -74,6 +74,13 @@ public class LoginActivityTest {
             passwordNextButton.clickAndWaitForNewWindow();
         }
 
+        try {
+            UiObject turnOnBackupButton = mDevice.findObject(new UiSelector().className("android.widget.Button").packageName("com.google.android.gms").text("TURN ON BACKUP"));
+            turnOnBackupButton.clickAndWaitForNewWindow();
+        } catch (UiObjectNotFoundException e) {
+            e.printStackTrace();
+        }
+
         UiObject TOSAgreeButton = mDevice.findObject(new UiSelector().className("android.widget.Button").packageName("com.google.android.gms").text("I agree"));
         TOSAgreeButton.clickAndWaitForNewWindow();
 
