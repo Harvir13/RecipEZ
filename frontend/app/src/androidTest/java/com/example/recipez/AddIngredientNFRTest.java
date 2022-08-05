@@ -34,6 +34,8 @@ import org.junit.Assert;
 
 @RunWith(AndroidJUnit4.class)
 public class AddIngredientNFRTest {
+    int clickCount = 0;
+
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule =
             new ActivityScenarioRule<>(MainActivity.class);
@@ -47,8 +49,6 @@ public class AddIngredientNFRTest {
     public void unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResourceUtil.getIdlingResource());
     }
-
-    int clickCount = 0;
 
     @Test
     public void addIngredientClickCount() {
