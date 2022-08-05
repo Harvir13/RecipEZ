@@ -181,7 +181,7 @@ public class RecipesFragment extends Fragment {
 
     private void requestIngredients(int userID, Dialog dialog) {
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8082/requestIngredients?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+        String url = "http://20.70.170.6:8082/requestIngredients?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
@@ -237,7 +237,7 @@ public class RecipesFragment extends Fragment {
 
     private void searchRecipe(String recipeName) {// Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8082/searchRecipe?recipename=" + recipeName + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+        String url = "http://20.70.170.6:8082/searchRecipe?recipename=" + recipeName + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         EspressoIdlingResourceUtil.increment();
 
@@ -286,7 +286,7 @@ public class RecipesFragment extends Fragment {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
 
-        String url = "http://20.53.224.7:8082/generateSuggestedRecipesList?userid=" + userId + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+        String url = "http://20.70.170.6:8082/generateSuggestedRecipesList?userid=" + userId + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         // Request a string response from the provided URL.
         JsonArrayRequest jsonRequest = new JsonArrayRequest
@@ -347,7 +347,7 @@ public class RecipesFragment extends Fragment {
         Log.d(TAG, "ingredientsList " + ingredientsList);
         Log.d(TAG, "filtersList " + filtersList);
 
-        String url = "http://20.53.224.7:8082/requestFilteredRecipes?ingredients=" + ingredientsList + "&filters=" + filtersList + "&userid=" + userid + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+        String url = "http://20.70.170.6:8082/requestFilteredRecipes?ingredients=" + ingredientsList + "&filters=" + filtersList + "&userid=" + userid + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         EspressoIdlingResourceUtil.increment();
 
