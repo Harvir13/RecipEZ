@@ -154,7 +154,7 @@ public class RecipeDetailFragment extends Fragment {
     private void getFullRecipeDetails(int recipeID) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8082/getRecipeDetails?recipeid=" + recipeID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+        String url = "http://20.70.170.6:8082/getRecipeDetails?recipeid=" + recipeID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -212,7 +212,7 @@ public class RecipeDetailFragment extends Fragment {
     private void addRecipeToBookmarkList(int userID, int recipeID, String path, String title, String image) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8082/addRecipe";
+        String url = "http://20.70.170.6:8082/addRecipe";
         // 10.0.2.2 is a special alias to localhost for developers
 
         Map<String, String> jsonParams = new HashMap();
@@ -245,7 +245,7 @@ public class RecipeDetailFragment extends Fragment {
     private void removeRecipeFromBookmarkList(int userID, int recipeID, Dialog dialog) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8082/removeRecipe";
+        String url = "http://20.70.170.6:8082/removeRecipe";
         // 10.0.2.2 is a special alias to localhost for developers
 
         Map<String, String> jsonParams = new HashMap();
@@ -277,7 +277,7 @@ public class RecipeDetailFragment extends Fragment {
     private void getRecipesFromBookmarkList(int userID, Dialog dialog) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8082/getRecipes?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+        String url = "http://20.70.170.6:8082/getRecipes?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         EspressoIdlingResourceUtil.increment();
 

@@ -63,7 +63,7 @@ public class AllergiesListFragment extends Fragment {
 
         private void requestAllergiesList(String userID, View view) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/getRestrictions?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.70.170.6:8082/getRestrictions?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                 @Override
@@ -94,7 +94,7 @@ public class AllergiesListFragment extends Fragment {
 
         private void deleteAllergy(String userID, String ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/deleteRestrictions";
+            String url = "http://20.70.170.6:8082/deleteRestrictions";
 
             Map<String, String> jsonParams = new HashMap();
             jsonParams.put("userID", userID);
@@ -118,7 +118,7 @@ public class AllergiesListFragment extends Fragment {
 
         private void addAllergy(String userID, String ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/addRestrictions";
+            String url = "http://20.70.170.6:8082/addRestrictions";
 
             Map<String, String> jsonParams = new HashMap();
             try {
@@ -146,7 +146,7 @@ public class AllergiesListFragment extends Fragment {
 
         private void getIngredientSuggestions(String string) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/getIngredientSuggestions?string=" + string + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.70.170.6:8082/getIngredientSuggestions?string=" + string + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
             JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                         @Override

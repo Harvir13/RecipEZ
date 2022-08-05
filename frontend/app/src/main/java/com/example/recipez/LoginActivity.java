@@ -239,7 +239,7 @@ public class LoginActivity extends AppCompatActivity {
            if (userID != 0) {
                // Instantiate the RequestQueue.
                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-               String url = "http://20.53.224.7:8082/storeUserToken";
+               String url = "http://20.70.170.6:8082/storeUserToken";
                // 10.0.2.2 is a special alias to localhost for developers
 
                Map<String, String> jsonParams = new HashMap();
@@ -279,7 +279,7 @@ public class LoginActivity extends AppCompatActivity {
         public void signIn(String email) {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-            String url = "http://20.53.224.7:8082/checkUserExists?email=" + email + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.70.170.6:8082/checkUserExists?email=" + email + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             // Request a string response from the provided URL.
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -333,7 +333,7 @@ public class LoginActivity extends AppCompatActivity {
         private void sendRegistrationToServer(String token, int userID) {
             // Instantiate the RequestQueue.
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-            String url = "http://20.53.224.7:8082/storeUserToken";
+            String url = "http://20.70.170.6:8082/storeUserToken";
             // 10.0.2.2 is a special alias to localhost for developers
 
             Map<String, String> jsonParams = new HashMap();

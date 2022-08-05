@@ -71,7 +71,7 @@ public class FridgeFragment extends Fragment {
 
         private void requestIngredients(String userID) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/requestIngredients?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.70.170.6:8082/requestIngredients?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                 @Override
@@ -99,7 +99,7 @@ public class FridgeFragment extends Fragment {
 
         private void deleteIngredient(String userID, String ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/deleteIngredient";
+            String url = "http://20.70.170.6:8082/deleteIngredient";
 
             Map<String, String> jsonParams = new HashMap();
             jsonParams.put("userid", userID);
@@ -123,7 +123,7 @@ public class FridgeFragment extends Fragment {
 
         private void storeIngredient(String userID, JSONObject ingredient) { // or the actual ingredient, just need the name here
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/addIngredient";
+            String url = "http://20.70.170.6:8082/addIngredient";
 
             Map<String, String> jsonParams = new HashMap();
             try {
@@ -154,7 +154,7 @@ public class FridgeFragment extends Fragment {
 
         private void updateExpiryDate(String userID, JSONObject ingredient) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/updateExpiryDate";
+            String url = "http://20.70.170.6:8082/updateExpiryDate";
 
             Map<String, String> jsonParams = new HashMap();
             try {
@@ -186,7 +186,7 @@ public class FridgeFragment extends Fragment {
 
         private void getIngredientSuggestions(String string) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/getIngredientSuggestions?string=" + string + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.70.170.6:8082/getIngredientSuggestions?string=" + string + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
             JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                         @Override
@@ -222,7 +222,7 @@ public class FridgeFragment extends Fragment {
 
         private void checkIngredient(String name) {
             RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-            String url = "http://20.53.224.7:8082/requestExpiryDate?ingredient=" + name + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+            String url = "http://20.70.170.6:8082/requestExpiryDate?ingredient=" + name + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
             StringRequest stringRequest = new StringRequest
                     (Request.Method.GET, url, new Response.Listener<String>() {

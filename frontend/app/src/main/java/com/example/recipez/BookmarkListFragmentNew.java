@@ -155,7 +155,7 @@ public class BookmarkListFragmentNew extends Fragment {
     private void getRecipesFromBookmarkList(int userID) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8082/getRecipes?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+        String url = "http://20.70.170.6:8082/getRecipes?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 
         EspressoIdlingResourceUtil.increment();
 
@@ -220,7 +220,7 @@ public class BookmarkListFragmentNew extends Fragment {
     private void addPathToPathsList(int userID, String path) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "http://20.53.224.7:8082/addNewPath";
+        String url = "http://20.70.170.6:8082/addNewPath";
 
         Map<String, String> jsonParams = new HashMap();
         jsonParams.put("userID", String.valueOf(userID));
@@ -249,7 +249,7 @@ public class BookmarkListFragmentNew extends Fragment {
 //    private void getPathsList(int userID) {
 //        // Instantiate the RequestQueue.
 //        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-//        String url = "http://20.53.224.7:8082/getAllPaths?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
+//        String url = "http://20.70.170.6:8082/getAllPaths?userid=" + userID + "&googlesignintoken=" + sharedpreferences.getString("googleSignInToken", "");
 //
 //        // Request a string response from the provided URL.
 //        JsonArrayRequest jsonRequest = new JsonArrayRequest

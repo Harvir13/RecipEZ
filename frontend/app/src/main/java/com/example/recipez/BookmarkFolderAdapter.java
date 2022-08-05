@@ -138,7 +138,7 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
     private void removeRecipeFromBookmarkList(int userID, int recipeID, Context context) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(context);
-        String url = "http://20.53.224.7:8082/removeRecipe";
+        String url = "http://20.70.170.6:8082/removeRecipe";
         // 10.0.2.2 is a special alias to localhost for developers
 
         Map<String, String> jsonParams = new HashMap();
@@ -168,7 +168,7 @@ public class BookmarkFolderAdapter extends RecyclerView.Adapter<BookmarkFolderAd
     private void removePathFromPathsList(int userID, String path, Context context) {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(context);
-        String url = "http://20.53.224.7:8082/removeExistingPath";
+        String url = "http://20.70.170.6:8082/removeExistingPath";
         // 10.0.2.2 is a special alias to localhost for developers
 
         Map<String, String> jsonParams = new HashMap();
