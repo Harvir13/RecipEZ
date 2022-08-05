@@ -208,6 +208,7 @@ const generateSuggestedRecipesList = async (req, res) => {
         IngredientManaging.requestIngredients(req.query["userid"], req.query["googlesignintoken"]).then(response => {
             return response.data
         }).then(ingredientResponse => {
+            console.log(ingredientResponse)
             if (ingredientResponse.length === 0) {
                 return res.send(ingredientResponse)
             }
@@ -234,6 +235,7 @@ const generateSuggestedRecipesList = async (req, res) => {
                 axios.get("https://api.spoonacular.com/recipes/findByIngredients?ignorePantry=true&missedIngredientCount=" + missingIngredientThreshold + "&ingredients=" + ingredients + "&apiKey=" + API_KEY).then(response =>
                     response.data
                 ).then (data => {
+                    console.log(data)
                     var recipesWithTitles = checkForTitles(data)
                     var retList = []
                     var passesDietaryRestrictionsCheck
@@ -257,6 +259,7 @@ const generateSuggestedRecipesList = async (req, res) => {
                             retList.push(currItem)
                         }
                     }
+                    console.log(retList)
                     res.send(retList)
                 })
             })
