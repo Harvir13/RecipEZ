@@ -265,6 +265,7 @@ test("Success", async () => {
     expect(response.body.length).toEqual(0)
 })
 
+
 test("Unregistered user", async () => {
 
     UserManaging.getRestrictions = jest.fn().mockImplementation((userid, googlesignintoken) => {
