@@ -62,7 +62,7 @@ test("Success", async () => {
 // getRecipeDetails
 
 test("Invalid recipe ID", async () => {
-    const response = await request.get("/getRecipeDetails?recipeid=0")
+    const response = await request.get("/getRecipeDetails?recipeid=-1")
     expect(response.status).toEqual(455)
 })
 

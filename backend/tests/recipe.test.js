@@ -30,6 +30,8 @@ const request = supertest(app)
 
 jest.mock('../src/verify.js')
 
+jest.setTimeout(15000)
+
 // cache tests
 describe('Cache tests', () => {
     beforeEach(async () => {
