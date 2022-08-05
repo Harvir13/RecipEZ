@@ -47,8 +47,14 @@ test("Not enough ingredients to make a recipe", async () => {
     expect(response.status).toEqual(200)
 })
 
-test("Success", async () => {
+test("Filtered out at least one recipe", async () => {
     const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=vegetarian")
+        expect(response.status).toEqual(200)
+        expect(response.body.length).toEqual(0)
+})
+
+test("Success", async () => {
+    const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=dairyFree")
         expect(response.status).toEqual(200)
         expect(response.body.length).toBeGreaterThan(0)
 })
