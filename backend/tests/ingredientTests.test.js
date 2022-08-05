@@ -12,6 +12,7 @@ const uri = "mongodb://localhost:27017";
 const client = new MongoClient(uri);
 
 jest.mock('../src/verify.js');
+jest.mock('../src/user/UserManaging.js')
 
 //tests for getIngredients
 test("getIngredients: user with unregistered userID", async () => {
@@ -55,6 +56,16 @@ test("storeIngredient: negative expiry value", async () => {
     }).catch((err) => {
         expect(err.status).toBe(405);
     });
+});
+
+test("storeIngredient: ingredient already present", async () => {
+    return IngredientDBAccess.storeIngredient(22222, {
+        name: "apple",
+        expiry: 259201,
+        inage: "apple.jpg"
+    }).then((response) => {
+        expect(response.status).toBe(200);
+    })
 });
 
 test("storeIngredient: correct input", async () => {
@@ -365,6 +376,15 @@ test("addIngredient: ingredient doesn't exist in Spoonaular API", () => {
     }).then((response) => {
         expect(response.status).toBe(410);
     });
+});
+
+test("addIngredient: ingredient already present", async () => {
+    const response = await request.post("/addIngredient").send({
+        userid: 22222,
+        ingredient: "apple",
+        expiry: 259201
+    });
+    expect(response.body).toEqual({ name: "apple", expiry: 259201, image: "apple.jpg" });
 });
 
 test("addIngredient: correct inputs", async () => {
