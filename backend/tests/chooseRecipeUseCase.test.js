@@ -55,12 +55,7 @@ test("Success", async () => {
 
     const response = await request.get("/generateSuggestedRecipesList?userid=11111")
     expect(response.status).toEqual(200)
-    expect(response.body).toEqual(expect.arrayContaining([{
-        title: 'Roja Sangria',
-        image: 'https://spoonacular.com/recipeImages/658737-312x231.jpg',
-        id: 658737,
-        ingredientsIAlreadyHave: '2 / 7'
-      }]))
+    expect(response.body).toEqual(expect.arrayContaining([{"id": 637223, "image": "https://spoonacular.com/recipeImages/637223-312x231.jpg", "ingredientsIAlreadyHave": "2 / 8", "title": "Carrot Raisin Pineapple Salad"}]))
 })
 
 
