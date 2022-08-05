@@ -121,7 +121,7 @@ public class FilterRecipeUseCaseTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             onView(withId(R.id.fridgeRecyclerView))
                     .perform(
                             RecyclerViewActions.actionOnItemAtPosition(
