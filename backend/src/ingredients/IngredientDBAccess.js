@@ -9,7 +9,10 @@ function getIngredients(userid) {
             return reject({"status": 404, "result": "User not found"})
         }
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
-                return resolve({"status": 200, "result": result.ingredients});
+            if (result === null) {
+                return resolve({"status": 200, "result": []});
+            }
+            return resolve({"status": 200, "result": result.ingredients});
         });
     });
 }
@@ -22,14 +25,19 @@ function storeIngredient(userid, inputIngredient) {
         if (inputIngredient.expiry < 0) return reject({"status": 405, "result": "Error: invalid expiry value"});
         client.db("IngredientDB").collection("Users").findOne({ userid: parseInt(userid, 10) }).then((result) => {
             let alreadyHaveIng = false;
-            result.ingredients.forEach((ingredient) => {
-                if (ingredient.name == inputIngredient.name) alreadyHaveIng = true;
-            });
-            if (!alreadyHaveIng) result.ingredients.push(inputIngredient);
+            if (result !== null) {
+                result.ingredients.forEach((ingredient) => {
+                    if (ingredient.name == inputIngredient.name) alreadyHaveIng = true;
+                });
+                if (!alreadyHaveIng) result.ingredients.push(inputIngredient);
             let newIngredients = {$set: { ingredients: result.ingredients }};
             client.db("IngredientDB").collection("Users").updateOne({ userid: parseInt(userid, 10) }, newIngredients).then(result => {
                 return resolve({"status": 200, "result": inputIngredient});
             });
+            } else {
+                client.db("IngredientDB").collection("Users").insertOne({ userid: parseInt(userid, 10), ingredients: [inputIngredient] });
+                return resolve({"status": 200, "result": inputIngredient});
+            }
         });
     })
 }
