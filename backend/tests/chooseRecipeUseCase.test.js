@@ -13,7 +13,7 @@ jest.mock('../src/verify.js');
 
 
 beforeAll(async () => {
-    await client.db("UserDB").collection("Users").insertOne({"userID": 11111, "dietaryRestrictions": ["bread"]})
+    await client.db("UserDB").collection("Users").insertOne({"userID": 11111, "dietaryRestrictions": ["raspberries"]})
     await client.db("UserDB").collection("Users").insertOne({"userID": 22222, "dietaryRestrictions": ["Apple"]})
     await client.db("UserDB").collection("Users").insertOne({"userID": 33333, "dietaryRestrictions": []})
     await client.db("IngredientDB").collection("Users").insertOne({"userid": 11111, "ingredients": [{"name": "Apple"}, {"name":"Blue berries"}, {"name": "Orange"}]})
@@ -22,7 +22,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-    await client.db("UserDB").collection("Users").deleteOne({"userID": 11111, "dietaryRestrictions": ["bread"]})
+    await client.db("UserDB").collection("Users").deleteOne({"userID": 11111, "dietaryRestrictions": ["raspberries"]})
     await client.db("UserDB").collection("Users").deleteOne({"userID": 22222, "dietaryRestrictions": ["Apple"]})
     await client.db("UserDB").collection("Users").deleteOne({"userID": 33333, "dietaryRestrictions": []})
     await client.db("IngredientDB").collection("Users").deleteOne({"userid": 11111, "ingredients": [{"name": "Apple"}, {"name":"Blue berries"}, {"name": "Orange"}]})

@@ -13,11 +13,11 @@ const request = supertest(app)
 jest.mock('../src/verify.js')
 
 beforeAll(async () => {
-    await client.db("UserDB").collection("Users").insertOne({"userID": 11111, "dietaryRestrictions": ["bread"]})
+    await client.db("UserDB").collection("Users").insertOne({"userID": 11111, "dietaryRestrictions": ["lemon"]})
 })
 
 afterAll(async () => {
-    await client.db("UserDB").collection("Users").deleteOne({"userID": 11111, "dietaryRestrictions": ["bread"]})
+    await client.db("UserDB").collection("Users").deleteOne({"userID": 11111, "dietaryRestrictions": ["lemon"]})
     await client.close()
     server.close()
 })
@@ -30,6 +30,21 @@ test("No user", async () => {
 test("Invalid list of ingredients", async () => {
     const response = await request.get("/requestFilteredRecipes?userid=11111&filters=vegetarian")
     expect(response.status).toEqual(400)
+})
+
+test("Invalid list of filters", async () => {
+    const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,breadbread&filters=indian")
+    expect(response.status).toEqual(454)
+})
+
+test("Filter argumet missing", async () => {
+    const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread")
+    expect(response.status).toEqual(200)
+})
+
+test("Not enough ingredients to make a recipe", async () => {
+    const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=Breadfruit&filters=dairyFree")
+    expect(response.status).toEqual(200)
 })
 
 test("Success", async () => {
