@@ -12,6 +12,10 @@ const request = supertest(app)
 
 jest.mock('../src/verify.js')
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
 beforeAll(async () => {
     await client.db("UserDB").collection("Users").insertOne({"userID": 11111, "dietaryRestrictions": ["lemon"]})
 })
@@ -52,6 +56,8 @@ test("Filtered out at least one recipe", async () => {
         expect(response.status).toEqual(200)
         expect(response.body.length).toEqual(0)
 })
+
+await sleep(2000);
 
 test("Success", async () => {
     const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=dairyFree")
