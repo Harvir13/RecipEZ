@@ -5,6 +5,7 @@ const {MongoClient} = require('mongodb')
 
 const uri = "mongodb://localhost:27017"
 const client = new MongoClient(uri)
+const RecipeDBAccess = require('../src/recipes/RecipeDBAccess.js')
 
 const server = app.listen(8086);
 const request = supertest(app);
@@ -28,6 +29,8 @@ afterAll(async () => {
     await client.db("IngredientDB").collection("Users").deleteOne({"userid": 11111, "ingredients": [{"name": "Apple"}, {"name":"Blue berries"}, {"name": "Orange"}]})
     await client.db("IngredientDB").collection("Users").deleteOne({"userid": 22222, "ingredients": [{"name": "Breadfruit"}]})
     await client.db("IngredientDB").collection("Users").deleteOne({"userid": 33333, "ingredients": []})
+    await client.db("RecipeDB").collection("Cache").deleteOne({"recipeid": 632660})
+    await client.db("RecipeDB").collection("Cache").deleteOne({"recipeid": 632660})
     await client.close()
     server.close()
 })
@@ -68,11 +71,21 @@ test("Invalid recipe ID", async () => {
     expect(response.status).toEqual(455)
 })
 
-test("Success", async () => {
+test("Success, no recipe in cache", async () => {
     const response = await request.get("/getRecipeDetails?recipeid=632660")
     expect(response.status).toEqual(200)
     expect(response.body.instructions).toBeDefined()
     expect(response.body.nutritionDetails).toBeDefined()
+})
+
+test("Success, recipe already in cache", async () => {
+    const response = await request.get("/getRecipeDetails?recipeid=632660")
+    expect(response.status).toEqual(200)
+    expect(response.body.instructions).toBeDefined()
+    expect(response.body.nutritionDetails).toBeDefined()
+    const cache = await RecipeDBAccess.getFromCache(632660)
+    expect(cache.result.refcount).toBe(2)
+    expect(cache.result.recipeid).toBe(632660)
 })
 
 // searchRecipe
