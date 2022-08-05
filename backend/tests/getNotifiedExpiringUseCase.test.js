@@ -6,6 +6,24 @@ jest.mock('axios');
 const uri = "mongodb://localhost:27017";
 const client = new MongoClient(uri);
 
+test("scanExpiryDates: negative expiry value", async () => {
+    return IngredientManagingAccess.scanExpiryDates(-1).catch((err) => {
+        expect(err.status).toBe(405);
+    });
+});
+
+test("scanExpiryDates: correct input w/ an expiring user", async () => {
+    return IngredientManagingAccess.scanExpiryDates(86400).then((response) => {
+        expect(response).toEqual([22222]);
+    });
+});
+
+test("scanExpiryDates: correct input w/o an expiring user", async () => {
+    return IngredientManagingAccess.scanExpiryDates(0).then((response) => {
+        expect(response).toEqual([]);
+    })
+});
+
 test("no expiring items", async () => {
     const response = await IngredientManagingAccess.sendExpiryNotification(0);
     expect(response).toEqual([]);
