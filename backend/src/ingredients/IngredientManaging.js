@@ -116,7 +116,6 @@ const requestExpiryDate = async (req, res) => {
 
 // expects {userid: xxx, ingredient: xxx, expiry: xxx}
 const addIngredient = async (req, res) => {
-	console.log(req.body);
 	verify(req.body.googleSignInToken).then(() => {
 		searchForIngredient(req.body.ingredient).then((spoonacularIng) => {
 			if (spoonacularIng.length === 0) {
