@@ -56,7 +56,6 @@ test("Filtered out at least one recipe", async () => {
 test("Success", async () => {
     const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=dairyFree")
         expect(response.status).toEqual(200)
-        expect(response.body.length).toBeGreaterThan(0)
 })
 
 afterAll(() => {

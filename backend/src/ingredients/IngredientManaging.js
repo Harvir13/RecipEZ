@@ -6,7 +6,7 @@ const {verify} = require('../verify.js');
  
 // const API_KEY = process.env.API_KEY;
 const API_KEY = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
-const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9oNYTw1T3MRgbaZ-pzeDgRkNKJomwiC9LMrvqYKVnkzOZPz5HJDk4Mm96l2E3epm4_ZFVCXBjQMVk4sXV78-H6qVT9voEKfrM";
+const SERVER_KEY = "key=AAAAJOkJ-ZY:APA91bFsKSgiNaNnUnQlj6BCwLWi5KnQEWZd5L9FXa7FlxNz5dyEUXaC7S5VP6j3A80YSyHD8OKHy-kpFUHaOwAhPcEn9nDK4oZIbNo5DblwMTmAVHLPK0BltQdnv0xkwMRDEDJiPzm8";
 
 var app = express();
 app.use(express.json());
