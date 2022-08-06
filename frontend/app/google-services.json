@@ -1,33 +1,41 @@
 {
   "project_info": {
-    "project_number": "208965623846",
-    "project_id": "recipez-92366",
-    "storage_bucket": "recipez-92366.appspot.com"
+    "project_number": "158528567702",
+    "project_id": "recipez-1656275159675",
+    "storage_bucket": "recipez-1656275159675.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:208965623846:android:cc358e5761da0f80b446e7",
+        "mobilesdk_app_id": "1:158528567702:android:bdbbca5bcfd1ba826985b7",
         "android_client_info": {
           "package_name": "com.example.recipez"
         }
       },
       "oauth_client": [
         {
-          "client_id": "208965623846-dv99la8h6b3d9e7gvqqe4u79m5fnb31u.apps.googleusercontent.com",
+          "client_id": "158528567702-1f7d5qh3duau9u6645fganlhb28qejkp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.recipez",
+            "certificate_hash": "e92794044052621722005fca49087b132a44d9b5"
+          }
+        },
+        {
+          "client_id": "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBDAnUdgx8o8sTcT6s7r9RjqcgfOTPVrxY"
+          "current_key": "AIzaSyDqEiER35-o0xmlh890HJNQuaUcmRMW8u4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "208965623846-dv99la8h6b3d9e7gvqqe4u79m5fnb31u.apps.googleusercontent.com",
+              "client_id": "158528567702-cla9vjg1b8mj567gnp1arb90870b001h.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
