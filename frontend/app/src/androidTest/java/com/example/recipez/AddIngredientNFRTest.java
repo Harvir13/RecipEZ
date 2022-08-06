@@ -30,9 +30,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.Assert;
 
 @RunWith(AndroidJUnit4.class)
-public class AddIngredientNonFunctionalReq {
+public class AddIngredientNFRTest {
+    int clickCount = 0;
+
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule =
             new ActivityScenarioRule<>(MainActivity.class);
@@ -52,20 +55,25 @@ public class AddIngredientNonFunctionalReq {
         // Adds "apple" to the user's fridge
 
         // click #1: open fridge page
-        onView(allOf(withId(R.id.fridgeFab), childAtPosition(childAtPosition(withId(android.R.id.content), 0), 2), isDisplayed())).perform(click());
+        clickWithCounterOnView(allOf(withId(R.id.fridgeFab), childAtPosition(childAtPosition(withId(android.R.id.content), 0), 2), isDisplayed()));
+
         // click #2: add ingredient button
-        onView(allOf(withId(R.id.addIngredientButton), childAtPosition(childAtPosition(withClassName(is("android.widget.LinearLayout")), 0), 1), isDisplayed())).perform(click());
+        clickWithCounterOnView(allOf(withId(R.id.addIngredientButton), childAtPosition(childAtPosition(withClassName(is("android.widget.LinearLayout")), 0), 1), isDisplayed()));
+
         // click #3: highlight search text input
+        clickWithCounterOnView(allOf(withId(R.id.editIngredientName), childAtPosition(childAtPosition(withId(android.R.id.content), 0), 1), isDisplayed()));
         onView(allOf(withId(R.id.editIngredientName), childAtPosition(childAtPosition(withId(android.R.id.content), 0), 1), isDisplayed())).perform(replaceText("apple"), closeSoftKeyboard());
+
         // click #4: search button
-        onView(allOf(withId(R.id.addIngredientConfirm), withText("Search"), childAtPosition(childAtPosition(withId(android.R.id.content), 0), 2), isDisplayed())).perform(click());
+        clickWithCounterOnView(allOf(withId(R.id.addIngredientConfirm), withText("Search"), childAtPosition(childAtPosition(withId(android.R.id.content), 0), 2), isDisplayed()));
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         // click #5: select "Apple" from search suggestions
-        onData(anything()).inAdapterView(allOf(withId(R.id.selectIngredientList), childAtPosition(withClassName(is("android.widget.RelativeLayout")), 1))).atPosition(0).perform(click());
+        clickWithCounterOnData(anything());
         try {
             Thread.sleep(4000);
         } catch (InterruptedException e) {
@@ -74,6 +82,18 @@ public class AddIngredientNonFunctionalReq {
 
         // Check that "apple" is added
         onView(allOf(withId(R.id.fridgeRecyclerView), hasChildCount(1)));
+
+        Assert.assertEquals(5, clickCount);
+    }
+
+    private void clickWithCounterOnView(Matcher<View> view) {
+        onView(view).perform(click());
+        clickCount++;
+    }
+
+    private void clickWithCounterOnData(Matcher<Object> object) {
+        onData(object).inAdapterView(allOf(withId(R.id.selectIngredientList), childAtPosition(withClassName(is("android.widget.RelativeLayout")), 1))).atPosition(0).perform(click());
+        clickCount++;
     }
 
     private static Matcher<View> childAtPosition(final Matcher<View> parentMatcher, final int position) {
