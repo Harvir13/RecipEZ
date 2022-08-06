@@ -171,20 +171,24 @@ public class RecipeDetailFragment extends Fragment {
                             recipeIngredients.setText(ingredientParser.toString());
 
                             JSONArray instructionArray = response.getJSONArray("instructions");
-                            StringBuilder instructionParser = new StringBuilder();
-                            for (int i = 0; i < instructionArray.length(); i++) {
-                                String subName = instructionArray.getJSONObject(i).getString("name");
-                                if (!subName.equals("")) {
-                                    instructionParser.append(subName);
+                            if (instructionArray.length() == 0) {
+                                recipeInstructions.setText("No instructions found\n\n");
+                            } else {
+                                StringBuilder instructionParser = new StringBuilder();
+                                for (int i = 0; i < instructionArray.length(); i++) {
+                                    String subName = instructionArray.getJSONObject(i).getString("name");
+                                    if (!subName.equals("")) {
+                                        instructionParser.append(subName);
+                                    }
+                                    JSONArray instructionSubArray = instructionArray.getJSONObject(i).getJSONArray("steps");
+                                    for (int j = 0; j < instructionSubArray.length(); j++) {
+                                        instructionParser.append(j + 1).append(". ");
+                                        instructionParser.append(instructionSubArray.getString(j));
+                                        instructionParser.append("\n\n");
+                                    }
                                 }
-                                JSONArray instructionSubArray = instructionArray.getJSONObject(i).getJSONArray("steps");
-                                for (int j = 0; j < instructionSubArray.length(); j++) {
-                                    instructionParser.append(j + 1).append(". ");
-                                    instructionParser.append(instructionSubArray.getString(j));
-                                    instructionParser.append("\n\n");
-                                }
+                                recipeInstructions.setText(instructionParser.toString());
                             }
-                            recipeInstructions.setText(instructionParser.toString());
 
                             JSONObject nutritionObject = response.getJSONObject("nutritionDetails");
                             StringBuilder nutritionParser = new StringBuilder();

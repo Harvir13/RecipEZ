@@ -25,6 +25,9 @@ import android.view.WindowManager;
 
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.Root;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -108,6 +111,46 @@ public class FilterRecipeUseCaseTest {
 
         // Check that three ingredients have been added
         onView(allOf(withId(R.id.fridgeRecyclerView), hasChildCount(3)));
+    }
+
+    @After
+    public void removeTestIngredients() {
+        onView(allOf(withId(R.id.fridgeFab), childAtPosition(childAtPosition(withId(android.R.id.content), 0), 2), isDisplayed())).perform(click());
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < 3; i++) {
+            onView(withId(R.id.fridgeRecyclerView))
+                    .perform(
+                            RecyclerViewActions.actionOnItemAtPosition(
+                                    0,
+                                    new ViewAction() {
+                                        @Override
+                                        public Matcher<View> getConstraints() {
+                                            return null;
+                                        }
+
+                                        @Override
+                                        public String getDescription() {
+                                            return "Click on specific button";
+                                        }
+
+                                        @Override
+                                        public void perform(UiController uiController, View view) {
+                                            View button = view.findViewById(R.id.ingredientDelete);
+                                            button.performClick();
+                                        }
+                                    })
+                    );
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Test

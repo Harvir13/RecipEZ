@@ -2,7 +2,6 @@ package com.example.recipez;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,26 +33,17 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view;
-        if (this.getItemCount() == 0) {
-            // todo: come back to this later... maybe
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.placeholder_no_recipe, parent, false);
-        } else {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_card_cell, parent, false);
-        }
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_card_cell, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        if (this.getItemCount() == 0) {
-            Log.d(TAG, "item count " + this.getItemCount());
-        } else {
-            Log.d(TAG, "item count " + this.getItemCount());
-            try {
-                Picasso.get().load(recipeArrayList.get(position).getString("image")).fit().centerCrop().into(holder.recipeImage);
-                holder.recipeTitle.setText(recipeArrayList.get(position).getString("title"));
-//                holder.missingIngredientCount.setText(recipeArrayList.get(position).getString("ingredientsAlreadyHave"));
+        try {
+            if (recipeArrayList.get(position).getString("title").equals("Try adding ingredients to your pantry to get suggested recipes!")) {
+                holder.recipeCard.setClickable(false);
+             } else {
+                holder.recipeCard.setClickable(true);
                 holder.recipeCard.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -64,7 +54,6 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
                             bundle.putInt("RECIPE_ID", recipeArrayList.get(position).getInt("id"));
                             bundle.putString("RECIPE_TITLE", recipeArrayList.get(position).getString("title"));
                             bundle.putString("RECIPE_IMAGE", recipeArrayList.get(position).getString("image"));
-//                            bundle.putString("MISSING_INGREDIENTS", recipeArrayList.get(position).getString("ingredientsAlreadyHave"));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -72,11 +61,19 @@ public class RecipeCardListRecycleAdapter extends RecyclerView.Adapter<RecipeCar
                         activity.getSupportFragmentManager().beginTransaction().replace(R.id.frame, fragment).addToBackStack(null).commit();
                     }
                 });
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-        }
 
+            Picasso.get().load(recipeArrayList.get(position).getString("image")).fit().centerCrop().into(holder.recipeImage);
+            holder.recipeTitle.setText(recipeArrayList.get(position).getString("title"));
+            try {
+                holder.missingIngredientCount.setText(recipeArrayList.get(position).getString("ingredientsIAlreadyHave"));
+            } catch (JSONException e) {
+                holder.missingIngredientCount.setText("N/A");
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

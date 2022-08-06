@@ -293,37 +293,36 @@ public class RecipesFragment extends Fragment {
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-//                        if (response.length() == 0 ) {
-//                            if (getActivity() != null) {
-//                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//                                builder.setTitle("Your fridge is empty").setMessage("Try adding ingredients in your fridge to see suggested recipes just for you! :)");
-//                                builder.setPositiveButton("Open fridge", new DialogInterface.OnClickListener() {
-//                                    public void onClick(DialogInterface dialog, int id) {
-//                                        Fragment fragment = new FridgeFragment();
-//                                        getParentFragmentManager().beginTransaction().replace(R.id.frame, fragment).commit();
-//                                    }
-//                                });
-//                                AlertDialog dialog = builder.create();
-//                                dialog.show();
-//                            }
-//                        }
-                        try {
-                            JSONArray recipesArray = response;
-                            recipes = new ArrayList<>();
-                            for (int i = 0; i < recipesArray.length(); i++) {
-                                JSONObject recipeObject = recipesArray.getJSONObject(i);
-                                recipes.add(recipeObject);
+                        int spanCount = 2;
+                        recipes = new ArrayList<>();
+
+                        if (response.length() == 0) {
+                            JSONObject placeholder = new JSONObject();
+                            try {
+                                placeholder.put("image", "https://i.imgur.com/4mHTulR.png");
+                                placeholder.put("title", "Try adding ingredients to your pantry to get suggested recipes!");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+                            recipes.add(placeholder);
+                            spanCount = 1;
+                        } else {
+                            try {
+                                JSONArray recipesArray = response;
+                                for (int i = 0; i < recipesArray.length(); i++) {
+                                    JSONObject recipeObject = recipesArray.getJSONObject(i);
+                                    recipes.add(recipeObject);
+                                }
 
-                            recycleAdapter = new RecipeCardListRecycleAdapter(recipes);
-                            RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
-                            recipeListRecyclerView.setLayoutManager(layoutManager);
-                            recipeListRecyclerView.setAdapter(recycleAdapter);
-
-                        } catch (JSONException e) {
-                            Log.d(TAG, e.toString());
-                            e.printStackTrace();
+                            } catch (JSONException e) {
+                                Log.d(TAG, e.toString());
+                                e.printStackTrace();
+                            }
                         }
+                        recycleAdapter = new RecipeCardListRecycleAdapter(recipes);
+                        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
+                        recipeListRecyclerView.setLayoutManager(layoutManager);
+                        recipeListRecyclerView.setAdapter(recycleAdapter);
                         Log.d(TAG, "suggested recipes " + response.toString());
                     }
                 }, new Response.ErrorListener() {
