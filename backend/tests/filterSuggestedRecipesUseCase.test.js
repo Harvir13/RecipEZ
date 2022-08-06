@@ -37,6 +37,12 @@ test("Invalid list of filters", async () => {
     expect(response.status).toEqual(454)
 })
 
+test("Filtered out at least one recipe", async () => {
+    const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=vegetarian")
+        expect(response.status).toEqual(200)
+        expect(response.body.length).toEqual(0)
+})
+
 test("Filter argumet missing", async () => {
     const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread")
     expect(response.status).toEqual(400)
@@ -45,12 +51,6 @@ test("Filter argumet missing", async () => {
 test("Not enough ingredients to make a recipe", async () => {
     const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=Breadfruit&filters=dairyFree")
     expect(response.status).toEqual(200)
-})
-
-test("Filtered out at least one recipe", async () => {
-    const response = await request.get("/requestFilteredRecipes?userid=11111&ingredients=lettuce,tomatoes,apple,banana,rice,bread&filters=vegetarian")
-        expect(response.status).toEqual(200)
-        expect(response.body.length).toEqual(0)
 })
 
 test("Success", async () => {
