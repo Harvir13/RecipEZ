@@ -232,7 +232,6 @@ async function sendNotificationFirebase(json) {
 			Authorization: SERVER_KEY
 		}
 	});
-	console.log(res.data);
 	return res;
 }
 
