@@ -35,13 +35,12 @@ jobs:
           cd backend
           npm ci
           npm run build --if-present
-          # npx jest bookmarkRecipeUseCase.test.js
-          # npx jest chooseRecipeUseCase.test.js
-          # npx jest filterSuggestedRecipesUseCase.test.js
-          # npx jest getNotifiedExpiringUseCase.test.js
-          # npx jest manageIngredientUseCase.test.js
-          # npx jest signInUseCase.test.js
-          # npx jest ingredientTests.test.js
-          # npx jest recipe.test.js
-          npx jest
+          npx jest bookmarkRecipeUseCase.test.js
+          npx jest chooseRecipeUseCase.test.js
+          npx jest filterSuggestedRecipesUseCase.test.js
+          npx jest getNotifiedExpiringUseCase.test.js
+          npx jest manageIngredientUseCase.test.js
+          npx jest signInUseCase.test.js
+          npx jest ingredientTests.test.js
+          npx jest recipe.test.js
           
