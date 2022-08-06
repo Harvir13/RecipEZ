@@ -2,7 +2,6 @@ const {getDietaryRestrictions, deleteDietaryRestrictions, addToDietaryRestrictio
 const {verify} = require('../verify.js')
 
 const checkUserExists = async (req, res) => {
-    console.log(req.query);
         verify(req.query["googlesignintoken"]).then(() => {
         var email = req.query["email"]
         scanDB(email).then(data => {
