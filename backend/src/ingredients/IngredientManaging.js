@@ -232,7 +232,6 @@ async function sendNotificationFirebase(json) {
 			Authorization: SERVER_KEY
 		}
 	});
-	console.log(res.data);
 	return res;
 }
 
@@ -260,3 +259,5 @@ async function shelfLifeGuide(id) {
 
 module.exports = {requestIngredientsAPI, searchForIngredient, scanExpiryDates, sendExpiryNotification, expiringIngredients,
 	deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient, sendNotificationFirebase, requestIngredients};
+
+	

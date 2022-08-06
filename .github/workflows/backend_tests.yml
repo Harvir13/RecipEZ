@@ -43,3 +43,4 @@ jobs:
           npx jest signInUseCase.test.js
           npx jest ingredientTests.test.js
           npx jest recipe.test.js
+          
