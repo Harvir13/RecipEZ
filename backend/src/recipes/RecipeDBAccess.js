@@ -4,6 +4,10 @@ const uri = "mongodb://localhost:27017"
 const client = new MongoClient(uri)
 var MAX_CACHE_ENTRIES = 20
 
+setInterval(function() { // should move this to router.js
+	flushCache();
+}, 300000)
+
 //for testing purposes only
 function changeCacheSize(size) {
     MAX_CACHE_ENTRIES = size

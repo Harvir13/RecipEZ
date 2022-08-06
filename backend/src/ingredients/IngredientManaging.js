@@ -6,7 +6,7 @@ const {verify} = require('../verify.js');
  
 // const API_KEY = process.env.API_KEY;
 const API_KEY = "d1e4859a4c854f3a9f5f8cdbbf2bf18f"
-const SERVER_KEY = "key=AAAAJOkJ-ZY:APA91bFsKSgiNaNnUnQlj6BCwLWi5KnQEWZd5L9FXa7FlxNz5dyEUXaC7S5VP6j3A80YSyHD8OKHy-kpFUHaOwAhPcEn9nDK4oZIbNo5DblwMTmAVHLPK0BltQdnv0xkwMRDEDJiPzm8";
+const SERVER_KEY = "key=AAAAPdt3dzY:APA91bFC9GpDCB1ZNHT4f9M7vWtZu39390qdypz6gQMhe0gwXQj47TSS9V-HHB5hjIB6EO0WHWw8CYt5vSvgzgl6E4HKbUxRV0T9QnQWCEyqz4aTZL4mfjgdILHl-VPyQLJ_eBD_ntyz";
 
 var app = express();
 app.use(express.json());
@@ -232,7 +232,7 @@ async function sendNotificationFirebase(json) {
 			Authorization: SERVER_KEY
 		}
 	});
-	console.log(res.data.results);
+	console.log(res.data);
 	return res;
 }
 
