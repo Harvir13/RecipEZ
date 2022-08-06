@@ -11,9 +11,9 @@ const SERVER_KEY = "key=AAAAMKdSYCY:APA91bFkZgU98nuuyEQod_nkkfKP4U6r3uA-avUnsJu9
 var app = express();
 app.use(express.json());
 
-// setInterval(function() { // should move this to router.js
-// 	sendExpiryNotification(Math.round(Date.now() / 1000).toString());
-// }, 10000)
+setInterval(function() { // should move this to router.js
+	sendExpiryNotification(Math.round(Date.now() / 1000).toString());
+}, 10000)
 
 //expects {userid: xxx}
 const requestIngredientsAPI = async (req, res) => {
@@ -232,6 +232,7 @@ async function sendNotificationFirebase(json) {
 			Authorization: SERVER_KEY
 		}
 	});
+	console.log(res.data.results);
 	return res;
 }
 
