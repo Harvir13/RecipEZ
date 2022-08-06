@@ -259,3 +259,5 @@ async function shelfLifeGuide(id) {
 
 module.exports = {requestIngredientsAPI, searchForIngredient, scanExpiryDates, sendExpiryNotification, expiringIngredients,
 	deleteIngredient, updateExpiryDate, getIngredientSuggestions, requestExpiryDate, addIngredient, sendNotificationFirebase, requestIngredients};
+
+	
