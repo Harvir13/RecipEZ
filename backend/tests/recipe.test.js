@@ -406,29 +406,6 @@ test("Success", async () => {
     expect(response.body.length).toBeGreaterThan(0)
 })
 
-// getRecipeDetails tests
-test("Invalid recipe ID", async () => {
-    const response = await request.get("/getRecipeDetails?recipeid=0")
-    expect(response.status).toEqual(455)
-})
-
-test("Success, no recipe in cache", async () => {
-    const response = await request.get("/getRecipeDetails?recipeid=632660")
-    expect(response.status).toEqual(200)
-    expect(response.body.instructions).toBeDefined()
-    expect(response.body.nutritionDetails).toBeDefined()
-})
-
-test("Success, recipe already in cache", async () => {
-    const response = await request.get("/getRecipeDetails?recipeid=632660")
-    expect(response.status).toEqual(200)
-    expect(response.body.instructions).toBeDefined()
-    expect(response.body.nutritionDetails).toBeDefined()
-    const cache = await RecipeDBAccess.getFromCache(632660)
-    expect(cache.result.refcount).toBe(2)
-    expect(cache.result.recipeid).toBe(632660)
-})
-
 // addNewPath tests
 test("Success", async () => {
     const response = await request.post("/addNewPath").send({
@@ -456,6 +433,28 @@ test("Unregistered user", async () => {
         expect(response.status).toEqual(404)
 })
 
+// getRecipeDetails tests
+test("Invalid recipe ID", async () => {
+    const response = await request.get("/getRecipeDetails?recipeid=0")
+    expect(response.status).toEqual(455)
+})
+
+test("Success, no recipe in cache", async () => {
+    const response = await request.get("/getRecipeDetails?recipeid=632660")
+    expect(response.status).toEqual(200)
+    expect(response.body.instructions).toBeDefined()
+    expect(response.body.nutritionDetails).toBeDefined()
+})
+
+test("Success, recipe already in cache", async () => {
+    const response = await request.get("/getRecipeDetails?recipeid=632660")
+    expect(response.status).toEqual(200)
+    expect(response.body.instructions).toBeDefined()
+    expect(response.body.nutritionDetails).toBeDefined()
+    const cache = await RecipeDBAccess.getFromCache(632660)
+    expect(cache.result.refcount).toBe(2)
+    expect(cache.result.recipeid).toBe(632660)
+})
 
 // removeExistingPath tests
 test("Path does not exist", async () => {
